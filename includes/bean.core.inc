@@ -26,6 +26,18 @@ class Bean extends Entity {
 
     // load the plugin info
     $this->plugin = bean_load_plugin_class($this->type);
+    $this->setFields();
+  }
+
+  /**
+   * Set the fields from the defaults and plugin
+   */
+  protected function setFields() {
+    $values = unserialize($this->data);
+    foreach ($this->plugin->values() as $field => $default) {
+      $this->$field = empty($values[$field]) ? $default : $values[$field];
+      dsm($this->$field);
+    }
   }
 
   /**
@@ -46,7 +58,7 @@ class Bean extends Entity {
   /**
    * Validate the plugin form
    */
-  public function validatePlugin($values) {
+  public function validate($values) {
     $this->plugin->validate($values);
   }
 
@@ -61,9 +73,8 @@ class Bean extends Entity {
    * Set the values from a plugin
    */
   public function setValues($values) {
-    $plugin = bean_load_plugin_class($this->type);
-
-    foreach ($plugin->values() as $field => $value) {
+    $this->data = array();
+    foreach ($this->plugin->values() as $field => $value) {
       $this->data[$field] = $values[$field];
     }
   }

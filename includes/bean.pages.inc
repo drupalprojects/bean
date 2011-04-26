@@ -53,7 +53,7 @@ function theme_bean_add_list($variables) {
   if ($content) {
     $output = '<dl class="bean-type-list">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l('Add ' . $item['label'], 'block/add/' . $item['name']) . '</dt>';
+      $output .= '<dt>' . l('Add ' . $item['label'], 'block/add/' . str_replace('_', '-', $item['name'])) . '</dt>';
     }
     $output .= '</dl>';
   }
