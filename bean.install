@@ -13,6 +13,13 @@ function bean_schema() {
         'description' => 'Primary Key: Unique bean item ID.',
       ),
       'label' => array(
+        'description' => 'The Displays in the Admin page.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'title' => array(
         'description' => 'The human-readable name of this bean.',
         'type' => 'varchar',
         'length' => 255,

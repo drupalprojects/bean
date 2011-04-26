@@ -5,8 +5,17 @@
  */
 class Bean extends Entity {
   public $label;
+  public $title;
   public $type;
   public $data;
+  protected $plugin;
+
+  /**
+   * Get Plugin info
+   */
+  public function getInfo($key = NULL) {
+    return $this->plugin->getInfo($key);
+  }
 
   public function defaultLabel() {
     return $this->label;
@@ -14,6 +23,9 @@ class Bean extends Entity {
 
   public function __construct($values = array()) {
     parent::__construct($values, 'bean');
+
+    // load the plugin info
+    $this->plugin = bean_load_plugin_class($this->type);
   }
 
   /**
@@ -22,6 +34,20 @@ class Bean extends Entity {
    */
   protected function defaultUri() {
     return array('path' => 'block/' . $this->identifier());
+  }
+
+  /**
+   * Get the plugin form
+   */
+  public function getForm() {
+    return $this->plugin->form($this);
+  }
+
+  /**
+   * Validate the plugin form
+   */
+  public function validatePlugin($values) {
+    $this->plugin->validate($values);
   }
 
   /**
@@ -38,7 +64,7 @@ class Bean extends Entity {
     $plugin = bean_load_plugin_class($this->type);
 
     foreach ($plugin->values() as $field => $value) {
-      $this->data[$field] = $value;
+      $this->data[$field] = $values[$field];
     }
   }
 }

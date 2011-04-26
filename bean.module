@@ -28,10 +28,10 @@ function bean_entity_info() {
       'uri callback' => 'entity_class_uri',
       'access callback' => 'bean_access',
       'module' => 'bean',
-      'metadata controller class' => 'BeanMetadataController'
+      //'metadata controller class' => 'BeanMetadataController'
     ),
   );
-
+/*
   $return['bean_type'] = array(
     'label' => t('Block Type'),
     'entity class' => 'BeanType',
@@ -52,7 +52,7 @@ function bean_entity_info() {
       'file' => 'includes/bean.admin.inc',
       'controller class' => 'BeanTypeUIController',
     ),
-  );
+  );*/
 
   return $return;
 }
@@ -61,12 +61,12 @@ function bean_entity_info() {
  * Implements of hook_entity_info_alter()
  */
 function bean_entity_info_alter(&$entity_info) {
-  foreach (bean_get_types() as $type => $info) {
-    $entity_info['bean']['bundles'][$type] = array(
-      'label' => $info->label,
+  foreach (bean_get_types() as $info) {
+    $entity_info['bean']['bundles'][$info['name']] = array(
+      'label' => $info['label'],
       'admin' => array(
         'path' => 'admin/structure/beans/manage/%bean_type',
-        'real path' => 'admin/structure/beans/manage/' . $type,
+        'real path' => 'admin/structure/beans/manage/' . $info['name'],
         'bundle argument' => 4,
         'access arguments' => array('administer beans'),
       )
@@ -159,7 +159,10 @@ function bean_get_types($type_name = NULL) {
   // @TODO Add the table fetching
   //$types = entity_load('bean_type', isset($type_name) ? array($type_name) : FALSE);
   //return isset($type_name) ? reset($types) : $types;
-  return bean_fetch_plugin_info();
+  $plugins = bean_fetch_plugin_info();
+  unset($plugins['bean']);
+
+  return $plugins;
 
 
 }
@@ -171,10 +174,10 @@ function bean_fetch_plugin_info($plugin = NULL) {
   ctools_include('plugins');
 
   if (empty($plugin)) {
-    return ctools_get_plugins('energy_hero', 'plugin');
+    return ctools_get_plugins('bean', 'plugins');
   }
   else {
-    return ctools_get_plugins('energy_hero', 'plugin', $plugin);
+    return ctools_get_plugins('bean', 'plugins', $plugin);
   }
 }
 
@@ -184,21 +187,25 @@ function bean_fetch_plugin_info($plugin = NULL) {
  * @param $plugin key - the key fo the plugin
  * @return an object from the plugin
  */
-function bean_load_plugin_class($plugin) {
+function bean_load_plugin_class($plugin_key) {
   $cache = &drupal_static(__FUNCTION__);
+  error_log($plugin_key);
 
-  if (!isset($cache[$plugin])) {
+  if (!isset($cache[$plugin_key])) {
     ctools_include('plugins');
-    $plugin = bean_fetch_plugin_info($plugin);
+    $plugin = bean_fetch_plugin_info($plugin_key);
+    error_log(print_r($plugin, TRUE));
 
-    if ($class = bean_fetch_plugin_info($plugin, 'handler')) {
+    if ($class = ctools_plugin_get_class($plugin, 'handler')) {
       if (class_exists($class)) {
-        $cache[$plugin] = new $class($plugin);
+        $cache[$plugin_key] = new $class($plugin);
       }
     }
   }
 
-  return isset($cache[$plugin]) ? $cache[$plugin] : FALSE;
+  error_log(print_r($cache, TRUE));
+
+  return isset($cache[$plugin_key]) ? $cache[$plugin_key] : FALSE;
 }
 
 /**
@@ -261,19 +268,19 @@ function bean_permissions() {
 
   // Add a Permission for each entity type
   foreach (bean_get_types() as $bean_type) {
-    $bean_type_name = check_plain($bean_type->type);
+    $bean_type_name = check_plain($bean_type['name']);
     $perms += array(
       "create any $bean_type_name bean" => array(
-        'title' => t('%type_name: add Bean', array('%type_name' => $bean_type->label)),
+        'title' => t('%type_name: add Bean', array('%type_name' => $bean_type['label'])),
       ),
       "edit any $bean_type_name bean" => array(
-        'title' => t('%type_name: Edit Bean', array('%type_name' => $bean_type->label)),
+        'title' => t('%type_name: Edit Bean', array('%type_name' => $bean_type['label'])),
       ),
       "view any $bean_type_name bean" => array(
-        'title' => t('%type_name: View Bean', array('%type_name' => $bean_type->label)),
+        'title' => t('%type_name: View Bean', array('%type_name' => $bean_type['label'])),
       ),
       "delete any $bean_type_name bean" => array(
-        'title' => t('%type_name: delete Bean', array('%type_name' => $bean_type->label)),
+        'title' => t('%type_name: delete Bean', array('%type_name' => $bean_type['label'])),
       ),
     );
   }
@@ -319,7 +326,7 @@ function bean_access($op, $bean = NULL, $account = NULL) {
       $op = 'edit';
   }
 
-  if (isset($bean) && $type_name = $bean->type) {
+  if (isset($bean) && $type_name = $bean['type']) {
     if (user_access("$op any $type_name bean", $account)) {
       return TRUE;
     }
@@ -328,7 +335,7 @@ function bean_access($op, $bean = NULL, $account = NULL) {
   else {
     // Here we are looking for access to any of the types
     foreach (bean_get_types() as $bean_type) {
-      $perm = $op . ' any ' . $bean_type->type . ' bean';
+      $perm = $op . ' any ' . $bean_type['type'] . ' bean';
       if (user_access($perm)) {
         return TRUE;
       }
@@ -383,6 +390,7 @@ function bean_block_info() {
   foreach ($beans as $bean) {
     $blocks[$bean->bid] = array(
       'info' => $bean->label,
+      'cache' => $bean->getInfo('cache_level'),
     );
   }
 
@@ -398,7 +406,7 @@ function bean_block_view($delta = '') {
   if (bean_access('view', $bean)) {
     return array(
       'content' => $bean->view(),
-      'subject' => $bean->label,
+      'subject' => $bean->title,
     );
   }
 }
@@ -406,7 +414,7 @@ function bean_block_view($delta = '') {
 /**
  * Implements hook_ctools_plugin_type()
  */
-function bean_ctools_plugins_type() {
+function bean_ctools_plugin_type() {
   return array(
     'plugins' => array(
       'cache' => TRUE,
@@ -414,6 +422,7 @@ function bean_ctools_plugins_type() {
       'classes' => array('handler'),
       'defaults' => array(
         'label' => t('Bean'),
+        'cache_level' => DRUPAL_CACHE_PER_ROLE,
       ),
     ),
   );
@@ -424,16 +433,27 @@ function bean_ctools_plugins_type() {
  */
 function bean_bean_plugins() {
   $plugins = array();
-  $pluin_path = drupal_get_path('module', 'bean') . '/plugins';
+  $plugin_path = drupal_get_path('module', 'bean') . '/plugins';
 
   $plugins['bean'] = array(
-    'label' => t('Bean'),
     'handler' => array(
-      'path' => $pluin_path,
+      'path' => $plugin_path,
       'file' => 'base.inc',
       'class' => 'base_plugin',
-    )
+    ),
   );
+
+  $plugins['bean_default'] = array(
+    'label' => t('Bean'),
+    'handler' => array(
+      'path' => $plugin_path,
+      'file' => 'base.inc',
+      'class' => 'bean_default',
+      'parent' => 'bean',
+    ),
+  );
+
+  return $plugins;
 }
 
 /**

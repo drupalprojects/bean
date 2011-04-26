@@ -38,11 +38,21 @@ abstract class bean_plugin {
   /**
    * The Plugin Form
    */
-  abstract protected function form($bean);
+  abstract public function form($bean);
 
   /**
    * THe plugin submit function
    */
-  abstract protected function validate($values);
+  public function validate($values) {}
 
+}
+
+class bean_default extends bean_plugin {
+  public function values() {
+    return array();
+  }
+
+  public function form($bean) {
+    return array();
+  }
 }
