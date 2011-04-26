@@ -1,0 +1,393 @@
+<?php
+
+/**
+ * @file
+ * Block Entity
+ */
+
+/**
+ * Implements hook_entity_info()
+ */
+function bean_entity_info() {
+  $return = array(
+    'bean' => array(
+      'label' => t('Block'),
+      'entity class' => 'Bean',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'bean',
+      'fieldable' => TRUE,
+      'entity keys' => array(
+        'id' => 'bid',
+        'bundle' => 'type',
+      ),
+      'bundles' => array(),
+      'bundle keys' => array(
+        'bundle' => 'type',
+      ),
+      'label callback' => 'entity_class_label',
+      'uri callback' => 'entity_class_uri',
+      'access callback' => 'bean_access',
+      'module' => 'bean',
+      'metadata controller class' => 'BeanMetadataController'
+    ),
+  );
+
+  $return['bean_type'] = array(
+    'label' => t('Block Type'),
+    'entity class' => 'BeanType',
+    'controller class' => 'EntityAPIController',
+    'base table' => 'bean_type',
+    'fieldable' => FALSE,
+    'bundle of' => 'bean',
+    'exportable' => TRUE,
+    'entity keys' => array(
+      'id' => 'id',
+      'name' => 'type',
+      'label' => 'label',
+    ),
+    'access callback' => 'bean_type_access',
+    'module' => 'bean',
+    'admin ui' => array(
+      'path' => 'admin/structure/beans',
+      'file' => 'includes/bean.admin.inc',
+      'controller class' => 'BeanTypeUIController',
+    ),
+  );
+
+  return $return;
+}
+
+/**
+ * Implements of hook_entity_info_alter()
+ */
+function bean_entity_info_alter(&$entity_info) {
+  foreach (bean_get_types() as $type => $info) {
+    $entity_info['bean']['bundles'][$type] = array(
+      'label' => $info->label,
+      'admin' => array(
+        'path' => 'admin/structure/beans/manage/%bean_type',
+        'real path' => 'admin/structure/beans/manage/' . $type,
+        'bundle argument' => 4,
+        'access arguments' => array('administer beans'),
+      )
+    );
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function bean_menu() {
+  $items = array();
+  $items['block/add'] = array(
+    'title' => 'Add Block',
+    'page callback' => 'bean_add_page',
+    'access arguments' => array('add'),
+    'access callback' => 'bean_access',
+    'file' => 'includes/bean.pages.inc',
+  );
+
+  foreach (bean_get_types() as $type) {
+    $items['block/add/' . $type->urlKey()] = array(
+      'title' => $type->label,
+      'title callback' => 'check_plain',
+      'page callback' => 'bean_add',
+      'page arguments' => array($type->type),
+      'access arguments' => array('create any ' . $type->type . ' bean'),
+      //'description' => $type->description,
+      'file' => 'includes/bean.pages.inc',
+    );
+  }
+
+  $items['block/%bean'] = array(
+    'title' => 'Block',
+    'page callback' => 'bean_edit',
+    'page arguments' => array(1),
+    'access arguments' => array('edit', 1),
+    'access callback' => 'bean_access',
+    'file' => 'includes/bean.pages.inc',
+  );
+
+  $items['block/%bean/edit'] = array(
+    'title' => 'Edit',
+    'title callback' => 'bean_page_title',
+    'title arguments' => array(1),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -18
+  );
+
+  $items['block/%bean/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bean_delete_confirm', 1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('delete', 1),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'file' => 'includes/bean.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Title of the bean
+ */
+function bean_page_title($bean) {
+  return $bean->label;
+}
+
+/**
+ * Menu Argument Loader
+ */
+function bean_type_load($type) {
+  return bean_get_types($type);
+}
+
+/**
+ * Gets an array of all bean types, keyed by the type name.
+ *
+ * @param $type_name
+ *   If set, the type with the given name is returned.
+ * @return BeanType[]
+ *   Depending whether $type isset, an array of bean types or a single one.
+ */
+function bean_get_types($type_name = NULL) {
+  $types = entity_load('bean_type', isset($type_name) ? array($type_name) : FALSE);
+  return isset($type_name) ? reset($types) : $types;
+}
+
+/**
+ * Load all beans
+ */
+function bean_get_all_beans() {
+  return bean_load_multiple(FALSE);
+}
+
+/**
+ * Fetch a bean object.
+ *
+ * @param $bid
+ *   Integer specifying the bean id.
+ * @param $reset
+ *   A boolean indicating that the internal cache should be reset.
+ * @return
+ *   A fully-loaded $bean object or FALSE if it cannot be loaded.
+ *
+ * @see bean_load_multiple()
+ */
+function bean_load($bid, $reset = FALSE) {
+  $beans = bean_load_multiple(array($bid), array(), $reset);
+  return reset($beans);
+}
+
+/**
+ * Load multiple beans based on certain conditions.
+ *
+ * @param $bids
+ *   An array of bean IDs.
+ * @param $conditions
+ *   An array of conditions to match against the {bean} table.
+ * @param $reset
+ *   A boolean indicating that the internal cache should be reset.
+ * @return
+ *   An array of bean objects, indexed by pid.
+ *
+ * @see entity_load()
+ * @see bean_load()
+ */
+function bean_load_multiple($bids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('bean', $bids, $conditions, $reset);
+}
+
+/**
+ * Implements hook_permissions()
+ */
+function bean_permissions() {
+  $perms = array(
+    'administer bean types' =>  array(
+      'title' => t('Administer bean types'),
+      'description' => t('Create and delete fields on beans, and set their permissions.'),
+    ),
+    'administer beans' =>  array(
+      'title' => t('Administer beans'),
+      'description' => t('Edit and view all beans.'),
+    ),
+  );
+
+  // Add a Permission for each entity type
+  foreach (bean_get_types() as $bean_type) {
+    $bean_type_name = check_plain($bean_type->type);
+    $perms += array(
+      "create any $bean_type_name bean" => array(
+        'title' => t('%type_name: add Bean', array('%type_name' => $bean_type->label)),
+      ),
+      "edit any $bean_type_name bean" => array(
+        'title' => t('%type_name: Edit Bean', array('%type_name' => $bean_type->label)),
+      ),
+      "view any $bean_type_name bean" => array(
+        'title' => t('%type_name: View Bean', array('%type_name' => $bean_type->label)),
+      ),
+      "delete any $bean_type_name bean" => array(
+        'title' => t('%type_name: delete Bean', array('%type_name' => $bean_type->label)),
+      ),
+    );
+  }
+
+  return $perms;
+}
+
+/**
+ * Access callback for the entity API.
+ */
+function bean_type_access($op, $type = NULL, $account = NULL) {
+  return user_access('administer bean types', $account);
+}
+
+/**
+ * Determines whether the given user has access to a bean.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create', 'delete'
+ *   or just 'edit' (being the same as 'create' or 'update').
+ * @param $bean
+ *   Optionally a bean or a bean type o check access for. If nothing is
+ *   given, access for all beans is determined.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the global user.
+ * @return boolean
+ *   Whether access is allowed or not.
+ */
+function bean_access($op, $bean = NULL, $account = NULL) {
+  if (user_access('administer beans', $account)) {
+    return TRUE;
+  }
+
+  switch ($op) {
+    case 'view':
+    case 'delete':
+    case 'create':
+      $op = $op;
+      break;
+    case 'add':
+      $op = 'create';
+    default:
+      $op = 'edit';
+  }
+
+  if (isset($bean) && $type_name = $bean->type) {
+    if (user_access("$op any $type_name bean", $account)) {
+      return TRUE;
+    }
+
+  }
+  else {
+    // Here we are looking for access to any of the types
+    foreach (bean_get_types() as $bean_type) {
+      $perm = $op . ' any ' . $bean_type->type . ' bean';
+      if (user_access($perm)) {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Inserts or updates a bean object into the database.
+ *
+ * @param $bean
+ *   The bean object to be inserted.
+ *
+ * @return
+ *   Failure to write a record will return FALSE. Otherwise SAVED_NEW or
+ *   SAVED_UPDATED is returned depending on the operation performed.
+ */
+function bean_save($bean) {
+  return entity_save('bean', $bean);
+}
+
+/**
+ * Deletes an existing bean.
+ *
+ * @param $bean
+ *   The message object to be bean.
+ */
+function bean_delete($bean) {
+  return entity_delete('bean', $bean);
+}
+
+/**
+ * Helper to easily create a bean.
+ *
+ * @param $values
+ *   Array with the following keys:
+ *   - "arguments" - Array with arguments that should be replaced on run time in
+ *     the message type.
+ */
+function bean_create($values) {
+  return entity_create('bean', $values);
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function bean_block_info() {
+  $blocks = array();
+  $beans = bean_get_all_beans();
+  foreach ($beans as $bean) {
+    $blocks[$bean->bid] = array(
+      'info' => $bean->label,
+    );
+  }
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view
+ */
+function bean_block_view($delta = '') {
+  $bean = bean_load($delta);
+  return array(
+    'content' => $bean->view(),
+    'subject' => $bean->label,
+  );
+}
+
+/**
+ * Implements hook_ctools_plugin_type()
+ */
+function bean_ctools_plugins_type() {
+  return array(
+    'plugins' => array(
+      'cache' => TRUE,
+      'use hooks' => TRUE,
+      'classes' => array('handler'),
+      'defaults' => array(
+        'label' => t('Bean'),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_bean_plugins()
+ *
+function bean_bean_plugins() {
+
+}*/
+
+/**
+ * Implements hook_theme().
+ */
+function bean_theme() {
+  return array(
+    'bean_add_list' => array(
+      'variables' => array('content' => NULL),
+    ),
+  );
+}

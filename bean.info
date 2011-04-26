@@ -1,0 +1,12 @@
+; $Id:$
+name = Beans
+description = Create Bean (Block Entities)
+core = 7.x
+files[] = bean.module
+files[] = bean.test
+files[] = includes/bean.core.inc
+files[] = includes/bean.admin.inc
+files[] = includes/bean.info.inc
+files[] = includes/bean.pages.inc
+dependencies[] = entity
+configure = admin/structure/beans
