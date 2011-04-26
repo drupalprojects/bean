@@ -88,12 +88,13 @@ function bean_menu() {
   );
 
   foreach (bean_get_types() as $type) {
-    $items['block/add/' . $type->urlKey()] = array(
-      'title' => $type->label,
+    $type_url_str = str_replace('_', '-', $type['name']);
+    $items['block/add/' . $type_url_str] = array(
+      'title' => $type['label'],
       'title callback' => 'check_plain',
       'page callback' => 'bean_add',
-      'page arguments' => array($type->type),
-      'access arguments' => array('create any ' . $type->type . ' bean'),
+      'page arguments' => array($type['name']),
+      'access arguments' => array('create any ' . $type['name'] . ' bean'),
       //'description' => $type->description,
       'file' => 'includes/bean.pages.inc',
     );
@@ -143,7 +144,7 @@ function bean_page_title($bean) {
  * Menu Argument Loader
  */
 function bean_type_load($type) {
-  return bean_get_types($type);
+  return bean_load_plugin_class($type);
 }
 
 /**
@@ -155,8 +156,49 @@ function bean_type_load($type) {
  *   Depending whether $type isset, an array of bean types or a single one.
  */
 function bean_get_types($type_name = NULL) {
-  $types = entity_load('bean_type', isset($type_name) ? array($type_name) : FALSE);
-  return isset($type_name) ? reset($types) : $types;
+  // @TODO Add the table fetching
+  //$types = entity_load('bean_type', isset($type_name) ? array($type_name) : FALSE);
+  //return isset($type_name) ? reset($types) : $types;
+  return bean_fetch_plugin_info();
+
+
+}
+
+/**
+ * Fetch the widget plugin info
+ */
+function bean_fetch_plugin_info($plugin = NULL) {
+  ctools_include('plugins');
+
+  if (empty($plugin)) {
+    return ctools_get_plugins('energy_hero', 'plugin');
+  }
+  else {
+    return ctools_get_plugins('energy_hero', 'plugin', $plugin);
+  }
+}
+
+/**
+ * Load a widget class
+ *
+ * @param $plugin key - the key fo the plugin
+ * @return an object from the plugin
+ */
+function bean_load_plugin_class($plugin) {
+  $cache = &drupal_static(__FUNCTION__);
+
+  if (!isset($cache[$plugin])) {
+    ctools_include('plugins');
+    $plugin = bean_fetch_plugin_info($plugin);
+
+    if ($class = bean_fetch_plugin_info($plugin, 'handler')) {
+      if (class_exists($class)) {
+        $cache[$plugin] = new $class($plugin);
+      }
+    }
+  }
+
+  return isset($cache[$plugin]) ? $cache[$plugin] : FALSE;
 }
 
 /**
@@ -352,10 +394,13 @@ function bean_block_info() {
  */
 function bean_block_view($delta = '') {
   $bean = bean_load($delta);
-  return array(
-    'content' => $bean->view(),
-    'subject' => $bean->label,
-  );
+
+  if (bean_access('view', $bean)) {
+    return array(
+      'content' => $bean->view(),
+      'subject' => $bean->label,
+    );
+  }
 }
 
 /**
@@ -376,10 +421,20 @@ function bean_ctools_plugins_type() {
 
 /**
  * Implements hook_bean_plugins()
- *
+ */
 function bean_bean_plugins() {
+  $plugins = array();
+  $pluin_path = drupal_get_path('module', 'bean') . '/plugins';
 
-}*/
+  $plugins['bean'] = array(
+    'label' => t('Bean'),
+    'handler' => array(
+      'path' => $pluin_path,
+      'file' => 'base.inc',
+      'class' => 'base_plugin',
+    )
+  );
+}
 
 /**
  * Implements hook_theme().

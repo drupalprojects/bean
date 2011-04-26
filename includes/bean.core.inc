@@ -6,6 +6,7 @@
 class Bean extends Entity {
   public $label;
   public $type;
+  public $data;
 
   public function defaultLabel() {
     return $this->label;
@@ -28,6 +29,17 @@ class Bean extends Entity {
    */
   public function editURL() {
     return 'block/' . $this->identifier() . '/edit';
+  }
+
+  /**
+   * Set the values from a plugin
+   */
+  public function setValues($values) {
+    $plugin = bean_load_plugin_class($this->type);
+
+    foreach ($plugin->values() as $field => $value) {
+      $this->data[$field] = $value;
+    }
   }
 }
 

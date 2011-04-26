@@ -28,8 +28,8 @@ function bean_add_page() {
   $bean_types = bean_get_types();
   // Bypass the block/add listing if only one block type is available.
   if (count($bean_types) == 1) {
-    $bean = array_shift($bean_types);
-    drupal_goto($bean->addURL());
+    $bean_type = array_shift($bean_types);
+    drupal_goto('block/add/' . $bean_type['name']);
   }
 
   return theme('bean_add_list', array('content' => $bean_types));
@@ -51,7 +51,7 @@ function theme_bean_add_list($variables) {
   if ($content) {
     $output = '<dl class="bean-type-list">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l('Add ' . $item->label, $item->addURL()) . '</dt>';
+      $output .= '<dt>' . l('Add ' . $item['label'], 'block/add/' . $item['name']) . '</dt>';
     }
     $output .= '</dl>';
   }
@@ -79,6 +79,9 @@ function bean_form($form, &$form_state, $bean) {
 
   field_attach_form('bean', $bean, $form, $form_state);
 
+  // Get the Bean type form
+  $form += bean_get_plugin_form($bean);
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#weight' => 200,
@@ -86,6 +89,16 @@ function bean_form($form, &$form_state, $bean) {
   );
 
   return $form;
+}
+
+/**
+ * Get the plugin form
+ */
+function bean_get_plugin_form(Bean $bean) {
+  $plugin = bean_load_plugin_class($bean->type);
+
+
+  return $plugin->form($bean);
 }
 
 /**
@@ -97,6 +110,9 @@ function bean_form_validate($form, &$form_state) {
 
   field_attach_form_validate('bean', $bean, $form, $form_state);
   $form_state['values']['bean'] = $bean;
+
+  $plugin = bean_load_plugin_class($bean->type);
+  $plugin->validate($form_state['values']);
 }
 
 /**
@@ -104,7 +120,38 @@ function bean_form_validate($form, &$form_state) {
  */
 function bean_form_submit($form, &$form_state) {
   $bean = $form_state['values']['bean'];
+  $bean->setValues($form_state['values']);
+
   field_attach_submit('bean', $bean, $form, $form_state);
   $bean->save();
   $form_state['redirect'] = $bean->editURL();
+}
+
+/**
+ * Menu callback -- ask for confirmation of bean deletion
+ */
+function bean_delete_confirm($form, &$form_state, $bean) {
+  $form['#bean'] = $bean;
+
+  return confirm_form($form,
+    t('Are you sure you want to delete %title?', array('%title' => $bean->label)),
+    'block/' . $bean->bid,
+    t('This action cannot be undone.'),
+    t('Delete'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Execute node deletion
+ */
+function node_delete_confirm_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    $bean = $form_state['values']['bean'];
+    $bean->delete();
+    watchdog('block', '@type: deleted %title.', array('@type' => $bean->type, '%title' => $bean->label));
+    drupal_set_message(t('@type %title has been deleted.', array('@type' => $bean->type, '%title' => $bean->label)));
+  }
+
+  $form_state['redirect'] = '<front>';
 }
