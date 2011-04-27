@@ -17,7 +17,6 @@ function bean_edit($bean) {
  */
 function bean_add($type) {
   $bean = bean_create(array('type' => $type));
-  error_log(print_r($bean, TRUE));
 
   return drupal_get_form('bean_form', $bean);
 }

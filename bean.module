@@ -189,12 +189,10 @@ function bean_fetch_plugin_info($plugin = NULL) {
  */
 function bean_load_plugin_class($plugin_key) {
   $cache = &drupal_static(__FUNCTION__);
-  error_log($plugin_key);
 
   if (!isset($cache[$plugin_key])) {
     ctools_include('plugins');
     $plugin = bean_fetch_plugin_info($plugin_key);
-    error_log(print_r($plugin, TRUE));
 
     if ($class = ctools_plugin_get_class($plugin, 'handler')) {
       if (class_exists($class)) {
@@ -202,8 +200,6 @@ function bean_load_plugin_class($plugin_key) {
       }
     }
   }
-
-  error_log(print_r($cache, TRUE));
 
   return isset($cache[$plugin_key]) ? $cache[$plugin_key] : FALSE;
 }
