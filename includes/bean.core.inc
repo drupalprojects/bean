@@ -78,6 +78,18 @@ class Bean extends Entity {
       $this->data[$field] = $values[$field];
     }
   }
+
+  /**
+   * Generate an array for rendering the entity.
+   *
+   * @see entity_view()
+   */
+  public function view($view_mode = 'full', $langcode = NULL) {
+    $content = parent::view();
+
+    return $this->plugin->view($this, $content, $view_mode, $langcode);
+  }
+
 }
 
 /**

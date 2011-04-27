@@ -45,6 +45,20 @@ abstract class bean_plugin {
    */
   public function validate($values) {}
 
+  /**
+   * Return the block content.
+   *
+   * @param $bean
+   *   The bean object being viewed.
+   * @param $content
+   *   The default content array created by Entity API.  This will include any
+   *   fields attached to the entity.
+   * @param $view_mode
+   *   The view mode passed into $entity->view().
+   * @return
+   *   Return a renderable content array.
+   */
+  public function view($bean, $content, $view_mode = 'full', $langcode = NULL) {}
 }
 
 class bean_default extends bean_plugin {
@@ -54,5 +68,9 @@ class bean_default extends bean_plugin {
 
   public function form($bean) {
     return array();
+  }
+
+  public function view($bean, $content, $view_mode = 'full', $langcode = NULL) {
+    return $content;
   }
 }
