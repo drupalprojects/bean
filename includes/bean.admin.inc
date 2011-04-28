@@ -21,10 +21,10 @@ function bean_type_admin_page() {
 
     if ($field_ui) {
       // Manage fields.
-      $row[] = array('data' => l(t('manage fields'), 'admin/structure/beans/manage/' . $bean_type->buildURL() . '/fields'));
+      $row[] = array('data' => l(t('manage fields'), 'admin/structure/bean/manage/' . $bean_type->buildURL() . '/fields'));
 
       // Display fields.
-      $row[] = array('data' => l(t('manage display'), 'admin/structure/beans/manage/' . $bean_type->buildURL() . '/display'));
+      $row[] = array('data' => l(t('manage display'), 'admin/structure/bean/manage/' . $bean_type->buildURL() . '/display'));
     }
     $rows[] = $row;
   }
@@ -95,12 +95,12 @@ function bean_type_form_submit(&$form, &$form_state) {
   $bean_type = entity_ui_form_submit_build_entity($form, $form_state);
   // Save and go back.
   $bean_type->save();
-  $form_state['redirect'] = 'admin/structure/beans';
+  $form_state['redirect'] = 'admin/structure/bean';
 }
 
 /**
  * Form API submit callback for the delete button.
  */
 function bean_type_form_submit_delete(&$form, &$form_state) {
-  $form_state['redirect'] = 'admin/structure/beans/manage/' . $form_state['bean_type']->type . '/delete';
+  $form_state['redirect'] = 'admin/structure/bean/manage/' . $form_state['bean_type']->type . '/delete';
 }

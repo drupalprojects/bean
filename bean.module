@@ -36,8 +36,8 @@ function bean_entity_info() {
     $return['bean']['bundles'][$type->type] = array(
       'label' => $type->getLabel(),
       'admin' => array(
-        'path' => 'admin/structure/beans/manage/%bean_type',
-        'real path' => 'admin/structure/beans/manage/' . $type->buildURL(),
+        'path' => 'admin/structure/bean/manage/%bean_type',
+        'real path' => 'admin/structure/bean/manage/' . $type->buildURL(),
         'bundle argument' => 4,
         'access arguments' => array('administer bean types'),
       )
@@ -102,7 +102,7 @@ function bean_menu() {
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['admin/structure/beans'] = array(
+  $items['admin/structure/bean'] = array(
     'title' => 'Block Type Admin',
     'description' => 'Manage Block Type Fields',
     'page callback' => 'bean_type_admin_page',
