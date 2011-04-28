@@ -7,6 +7,7 @@
 
 abstract class bean_plugin {
   protected $plugin_info;
+  public $type;
 
   /**
    * Get Plugin info
@@ -19,8 +20,23 @@ abstract class bean_plugin {
     return $this->plugin_info;
   }
 
+  /**
+   * Build the URL string
+   */
+  public function buildURL() {
+    return str_replace('_', '-', $this->type);
+  }
+
+  /**
+   * Get the label
+   */
+  public function getLabel() {
+    return $this->getInfo('label');
+  }
+
   public function __construct($plugin_info) {
     $this->plugin_info = $plugin_info;
+    $this->type = $plugin_info['name'];
   }
 
   /**
