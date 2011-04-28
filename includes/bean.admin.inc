@@ -8,18 +8,10 @@
  */
 
 /**
- * UI controller.
+ * Main page callback on the bean type
  */
-class BeanTypeUIController extends EntityDefaultUIController {
+function bean_type_admin_page($form) {
 
-  /**
-   * Overrides hook_menu() defaults.
-   */
-  public function hook_menu() {
-    $items = parent::hook_menu();
-    $items[$this->path]['description'] = 'Manage beans, including fields.';
-    return $items;
-  }
 }
 
 /**

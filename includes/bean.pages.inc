@@ -30,7 +30,7 @@ function bean_add_page() {
   // Bypass the block/add listing if only one block type is available.
   if (count($bean_types) == 1) {
     $bean_type = array_shift($bean_types);
-    drupal_goto('block/add/' . str_replace('_', '-', $bean_type['name']));
+    drupal_goto('block/add/' . $bean_type->buildURL());
   }
 
   return theme('bean_add_list', array('content' => $bean_types));
@@ -52,7 +52,7 @@ function theme_bean_add_list($variables) {
   if ($content) {
     $output = '<dl class="bean-type-list">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l('Add ' . $item['label'], 'block/add/' . str_replace('_', '-', $item['name'])) . '</dt>';
+      $output .= '<dt>' . l('Add ' . $item->getLabel(), 'block/add/' . str_replace('_', '-', $item->type)) . '</dt>';
     }
     $output .= '</dl>';
   }
