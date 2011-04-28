@@ -10,8 +10,32 @@
 /**
  * Main page callback on the bean type
  */
-function bean_type_admin_page($form) {
+function bean_type_admin_page() {
+  $field_ui = module_exists('field_ui');
+  $header = array(t('Name'), array('data' => t('Operations'), 'colspan' => $field_ui ? '4' : '2'));
+  $rows = array();
 
+  foreach (bean_get_types() as $type => $bean_type) {
+    $row = array();
+    $row[] = array('data' => $bean_type->getLabel());
+
+    if ($field_ui) {
+      // Manage fields.
+      $row[] = array('data' => l(t('manage fields'), 'admin/structure/beans/manage/' . $bean_type->buildURL() . '/fields'));
+
+      // Display fields.
+      $row[] = array('data' => l(t('manage display'), 'admin/structure/beans/manage/' . $bean_type->buildURL() . '/display'));
+    }
+    $rows[] = $row;
+  }
+
+  $build['bean_table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => t('There are no Bean Types Available'),
+  );
+  return $build;
 }
 
 /**
