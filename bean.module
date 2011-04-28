@@ -28,6 +28,7 @@ function bean_entity_info() {
       'uri callback' => 'entity_class_uri',
       'access callback' => 'bean_access',
       'module' => 'bean',
+      'metadata controller class' => 'BeanMetadataController'
     ),
   );
 
@@ -429,7 +430,7 @@ function bean_bean_plugins() {
     'handler' => array(
       'path' => $plugin_path,
       'file' => 'base.inc',
-      'class' => 'base_plugin',
+      'class' => 'bean_plugin',
     ),
   );
 
