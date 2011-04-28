@@ -109,13 +109,23 @@ function bean_menu() {
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['block/%bean/edit'] = array(
-    'title' => 'Edit',
-    'title callback' => 'bean_page_title',
-    'title arguments' => array(1),
+  $items['block/%bean/view'] = array(
+    'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'weight' => -18
+    'context' => MENU_CONTEXT_NONE,
+    'weight' => -20,
+  );
+
+
+  $items['block/%bean/edit'] = array(
+    'title' => 'Edit block',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'page callback' => 'bean_edit',
+    'page arguments' => array(1),
+    'access arguments' => array('edit', 1),
+    'access callback' => 'bean_access',
+    'file' => 'includes/bean.pages.inc',
   );
 
   $items['block/%bean/delete'] = array(
@@ -126,7 +136,7 @@ function bean_menu() {
     'access arguments' => array('delete', 1),
     'weight' => 1,
     'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_INLINE,
+    'context' => MENU_CONTEXT_NONE,
     'file' => 'includes/bean.pages.inc',
   );
 
@@ -461,4 +471,13 @@ function bean_theme() {
       'variables' => array('content' => NULL),
     ),
   );
+}
+
+/**
+ * Implements hook_block_view_alter().
+ */
+function bean_block_view_alter(&$data, $block) {
+  if ($block->module == 'bean') {
+    $data['content']['#contextual_links']['bean'] = array('block', array($block->delta));
+  }
 }
