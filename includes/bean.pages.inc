@@ -57,7 +57,7 @@ function theme_bean_add_list($variables) {
     $output .= '</dl>';
   }
   else {
-    //$output = '<p>' . t('You have not created any block types yet. Go to the <a href="@create-content">block type creation page</a> to add a new bean type.', array('@create-content' => url('admin/structure/beans/add'))) . '</p>';
+    //$output = '<p>' . t('You have not created any block types yet. Go to the <a href="@create-content">block type creation page</a> to add a new bean type.', array('@create-content' => url('admin/structure/bean/add'))) . '</p>';
     $output = '<p>' . t('You have not created any block types yet.') . '</p>';
   }
   return $output;

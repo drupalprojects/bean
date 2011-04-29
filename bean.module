@@ -28,6 +28,7 @@ function bean_entity_info() {
       'uri callback' => 'entity_class_uri',
       'access callback' => 'bean_access',
       'module' => 'bean',
+      'metadata controller class' => 'BeanMetadataController'
     ),
   );
 
@@ -35,8 +36,8 @@ function bean_entity_info() {
     $return['bean']['bundles'][$type->type] = array(
       'label' => $type->getLabel(),
       'admin' => array(
-        'path' => 'admin/structure/beans/manage/%bean_type',
-        'real path' => 'admin/structure/beans/manage/' . $type->buildURL(),
+        'path' => 'admin/structure/bean/manage/%bean_type',
+        'real path' => 'admin/structure/bean/manage/' . $type->buildURL(),
         'bundle argument' => 4,
         'access arguments' => array('administer bean types'),
       )
@@ -80,13 +81,23 @@ function bean_menu() {
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['block/%bean/edit'] = array(
-    'title' => 'Edit',
-    'title callback' => 'bean_page_title',
-    'title arguments' => array(1),
+  $items['block/%bean/view'] = array(
+    'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'weight' => -18
+    'context' => MENU_CONTEXT_NONE,
+    'weight' => -20,
+  );
+
+
+  $items['block/%bean/edit'] = array(
+    'title' => 'Edit block',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'page callback' => 'bean_edit',
+    'page arguments' => array(1),
+    'access arguments' => array('edit', 1),
+    'access callback' => 'bean_access',
+    'file' => 'includes/bean.pages.inc',
   );
 
   $items['block/%bean/delete'] = array(
@@ -97,11 +108,11 @@ function bean_menu() {
     'access arguments' => array('delete', 1),
     'weight' => 1,
     'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_INLINE,
+    'context' => MENU_CONTEXT_NONE,
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['admin/structure/beans'] = array(
+  $items['admin/structure/bean'] = array(
     'title' => 'Block Type Admin',
     'description' => 'Manage Block Type Fields',
     'page callback' => 'bean_type_admin_page',
@@ -429,7 +440,7 @@ function bean_bean_plugins() {
     'handler' => array(
       'path' => $plugin_path,
       'file' => 'base.inc',
-      'class' => 'base_plugin',
+      'class' => 'bean_plugin',
     ),
   );
 
@@ -455,4 +466,13 @@ function bean_theme() {
       'variables' => array('content' => NULL),
     ),
   );
+}
+
+/**
+ * Implements hook_block_view_alter().
+ */
+function bean_block_view_alter(&$data, $block) {
+  if ($block->module == 'bean') {
+    $data['content']['#contextual_links']['bean'] = array('block', array($block->delta));
+  }
 }

@@ -1,5 +1,5 @@
 ; $Id:$
-name = Beans
+name = Bean
 description = Create Bean (Block Entities)
 core = 7.x
 files[] = bean.module
@@ -11,4 +11,4 @@ files[] = includes/bean.pages.inc
 files[] = plugins/base.inc
 dependencies[] = entity
 dependencies[] = ctools
-configure = admin/structure/beans
+configure = admin/structure/bean

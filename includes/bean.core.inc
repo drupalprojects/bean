@@ -35,8 +35,7 @@ class Bean extends Entity {
   protected function setFields() {
     $values = unserialize($this->data);
     foreach ($this->plugin->values() as $field => $default) {
-      $this->$field = empty($values[$field]) ? $default : $values[$field];
-      dsm($this->$field);
+      $this->$field = isset($values[$field]) ? $values[$field] : $default;
     }
   }
 
