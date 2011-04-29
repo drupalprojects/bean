@@ -8,6 +8,7 @@ files[] = includes/bean.core.inc
 files[] = includes/bean.admin.inc
 files[] = includes/bean.info.inc
 files[] = includes/bean.pages.inc
+files[] = plugins/base.inc
 dependencies[] = entity
 dependencies[] = ctools
 configure = admin/structure/beans
