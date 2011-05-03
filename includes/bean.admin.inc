@@ -34,6 +34,7 @@ function bean_type_admin_page() {
     '#header' => $header,
     '#rows' => $rows,
     '#empty' => t('There are no Bean Types Available'),
+    '#prefix' => '<p>' . l('+ Add a Bean', 'admin/structure/bean/block/add') . '</p>',
   );
   return $build;
 }
