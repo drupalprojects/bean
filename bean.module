@@ -462,6 +462,9 @@ function bean_bean_plugins() {
  */
 function bean_theme() {
   return array(
+    'bean' => array(
+      'render element' => 'entity',
+    ),
     'bean_add_list' => array(
       'variables' => array('content' => NULL),
     ),
