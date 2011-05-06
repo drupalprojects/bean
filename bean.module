@@ -52,6 +52,50 @@ function bean_entity_info() {
  */
 function bean_menu() {
   $items = array();
+
+  $items['admin/structure/block_types'] = array(
+    'title' => 'Block Type Admin',
+    'description' => 'Manage Block Type Fields',
+    'page callback' => 'bean_type_admin_page',
+    'access arguments' => array('administer bean types'),
+    'file' => 'includes/bean.admin.inc',
+  );
+
+  $items['admin/structure/block_types/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/structure/block_types/add'] = array(
+    'title' => 'Add content type',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bean_type_form'),
+    'access arguments' => array('administer block types'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/bean.admin.inc',
+  );
+
+  $items['admin/structure/block_types/manage/%bean_type'] = array(
+    'title' => 'Edit content type',
+    'title callback' => 'node_type_page_title',
+    'title arguments' => array(4),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bean_type_form', 4),
+    'access arguments' => array('administer block types'),
+    'file' => 'includes/bean.admin.inc',
+  );
+  $items['admin/structure/block_types/manage/%bean_type/edit'] = array(
+    'title' => 'Edit',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/structure/block_types/manage/%bean_type/delete'] = array(
+    'title' => 'Delete',
+    'page arguments' => array('bean_type_delete_confirm', 4),
+    'access arguments' => array('administer block types'),
+    'file' => 'includes/bean.admin.inc',
+  );
+
   $items['block/add'] = array(
     'title' => 'Add Block',
     'page callback' => 'bean_add_page',
@@ -112,14 +156,6 @@ function bean_menu() {
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['admin/structure/bean'] = array(
-    'title' => 'Block Type Admin',
-    'description' => 'Manage Block Type Fields',
-    'page callback' => 'bean_type_admin_page',
-    'access arguments' => array('administer bean types'),
-    'file' => 'includes/bean.admin.inc',
-  );
-
   return $items;
 }
 
@@ -146,14 +182,7 @@ function bean_type_load($type) {
  *   Depending whether $type isset, an array of bean types or a single one.
  */
 function bean_get_types() {
-  //$types = array();
-  // @TODO Add the table fetching
-  //$types = entity_load('bean_type', isset($type_name) ? array($type_name) : FALSE);
-  //return isset($type_name) ? reset($types) : $types;
-
   return bean_load_plugin_class_all();
-
-
 }
 
 /**
@@ -424,6 +453,9 @@ function bean_ctools_plugin_type() {
       'defaults' => array(
         'label' => t('Bean'),
         'cache_level' => DRUPAL_CACHE_PER_ROLE,
+        // Editable in the block type UI
+        // THESE should have 'bean_ui' as the class
+        'editable' => FALSE,
       ),
     ),
   );
@@ -453,6 +485,20 @@ function bean_bean_plugins() {
       'parent' => 'bean',
     ),
   );
+
+  // Add in the types defined in the UI
+  foreach (BeanType::loadAll() as $bean_type) {
+    $plugins[$bean_type->type] = array(
+      'label' => $bean_type->label,
+      'editable' => TRUE,
+      'handler' => array(
+        'path' => $plugin_path,
+        'file' => 'base.inc',
+        'class' => 'bean_ui',
+        'parent' => 'bean',
+      ),
+    );
+  }
 
   return $plugins;
 }

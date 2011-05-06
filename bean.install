@@ -53,11 +53,6 @@ function bean_schema() {
   $schema['bean_type'] = array(
     'description' => 'Stores information about all defined bean types.',
     'fields' => array(
-      'id' => array(
-        'type' => 'serial',
-        'not null' => TRUE,
-        'description' => 'Primary Key: Unique bean type ID.',
-      ),
       'type' => array(
         'description' => 'The machine-readable name of this bean type.',
         'type' => 'varchar',
@@ -71,25 +66,8 @@ function bean_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'weight' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'tiny',
-        'description' => 'The weight of this bean type in relation to others.',
-      ),
-      'data' => array(
-        'type' => 'text',
-        'not null' => FALSE,
-        'size' => 'big',
-        'serialize' => TRUE,
-        'description' => 'A serialized array of additional data related to this bean type.',
-      ),
-    ) + entity_exportable_schema_fields(),
-    'primary key' => array('id'),
-    'unique keys' => array(
-      'type' => array('type'),
     ),
+    'primary key' => array('type'),
   );
   return $schema;
 }
