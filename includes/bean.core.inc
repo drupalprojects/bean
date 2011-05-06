@@ -44,7 +44,7 @@ class Bean extends Entity {
    * 'entity_class_uri' as 'uri callback' hook_entity_info().
    */
   protected function defaultUri() {
-    return array('path' => 'block/' . $this->identifier());
+    return array('path' => 'admin/structure/bean/block/' . $this->identifier());
   }
 
   /**
@@ -65,7 +65,7 @@ class Bean extends Entity {
    * Edit URL
    */
   public function editURL() {
-    return 'block/' . $this->identifier() . '/edit';
+    return 'admin/structure/bean/block/' . $this->identifier() . '/edit';
   }
 
   /**

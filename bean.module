@@ -82,8 +82,8 @@ function bean_menu() {
   $items['admin/structure/bean/block/%bean'] = array(
     'title' => 'Block',
     'page callback' => 'bean_edit',
-    'page arguments' => array(1),
-    'access arguments' => array('edit', 1),
+    'page arguments' => array(4),
+    'access arguments' => array('edit', 4),
     'access callback' => 'bean_access',
     'file' => 'includes/bean.pages.inc',
   );
@@ -101,8 +101,8 @@ function bean_menu() {
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'page callback' => 'bean_edit',
-    'page arguments' => array(1),
-    'access arguments' => array('edit', 1),
+    'page arguments' => array(4),
+    'access arguments' => array('edit', 4),
     'access callback' => 'bean_access',
     'file' => 'includes/bean.pages.inc',
   );
@@ -110,9 +110,9 @@ function bean_menu() {
   $items['admin/structure/bean/block/%bean/delete'] = array(
     'title' => 'Delete bean',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_delete_confirm', 1),
+    'page arguments' => array('bean_delete_confirm', 4),
     'access callback' => 'bean_access',
-    'access arguments' => array('delete', 1),
+    'access arguments' => array('delete', 4),
     'weight' => 1,
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_NONE,
