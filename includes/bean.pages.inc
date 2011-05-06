@@ -168,7 +168,7 @@ function bean_delete_confirm($form, &$form_state, $bean) {
  */
 function bean_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
-    $bean = $form_state['values']['bean'];
+    $bean = $form['#bean'];
     $bean->delete();
     watchdog('block', '@type: deleted %title.', array('@type' => $bean->type, '%title' => $bean->label));
     drupal_set_message(t('@type %title has been deleted.', array('@type' => $bean->type, '%title' => $bean->label)));
