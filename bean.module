@@ -411,7 +411,7 @@ function bean_block_info() {
 function bean_block_view($delta = '') {
   $bean = bean_load($delta);
 
-  if (bean_access('view', $bean)) {
+  if (bean_access('view', $bean) && $bean) {
     return array(
       'content' => $bean->view(),
       'subject' => $bean->title,
