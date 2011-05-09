@@ -130,7 +130,7 @@ function bean_menu() {
   return $items;
 }*/
   $items['admin/structure/block/types'] = array(
-    'title' => 'Block Type Admin',
+    'title' => 'Block Types',
     'description' => 'Manage Block Type Fields',
     'page callback' => 'bean_type_admin_page',
     'access arguments' => array('administer bean types'),
@@ -232,6 +232,13 @@ function bean_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function bean_menu_alter(&$items) {
+
 }
 
 /**
@@ -529,35 +536,6 @@ function bean_block_view($delta = '') {
       'content' => $bean->view(),
       'subject' => $bean->title,
     );
-  }
-}
-
-/**
- * Implements hook_block_configure().
- */
-function bean_block_configure($delta = '') {
-  if (!empty($delta)) {
-    $bean = bean_load($delta);
-
-    if ($bean instanceof Bean) {
-      return $bean->getForm();
-    }
-  }
-}
-
-/**
- * Implements hook_block_save().
- */
-function bean_block_save($delta = '', $edit = array() {
-  if (!empty($delta)) {
-    $bean = bean_load($delta);
-
-    if ($bean instanceof Bean) {
-      $bean->setValues($edit);
-
-      field_attach_submit('bean', $bean, $form, $form_state);
-      $bean->save();
-    }
   }
 }
 
