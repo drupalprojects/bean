@@ -88,4 +88,13 @@ class Bean extends Entity {
 
     return $this->plugin->view($this, $content, $view_mode, $langcode);
   }
+
+  /**
+   * Override the save to add clearing of caches
+   */
+  public function save() {
+    $return = parent::save();
+    cache_clear_all();
+    return $return;
+  }
 }
