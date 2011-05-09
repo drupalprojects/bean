@@ -11,7 +11,8 @@ A Bean Type (or Block Type) is a bundle of beans (blocks).  Each Bean type is de
 ### Defining a Bean Type
 
 Place this in your mymodule.module file.
-<
+
+```php
 /**
  * Implements hook_bean_plugins().
  */
@@ -31,11 +32,11 @@ function mymodule_bean_plugins() {
 
   return $plugins;
 }
->
+```
 
 Place this in the plugins/plugin.inc file.
 
-<
+```php
 /**
  * Define the plugin class
  */
@@ -99,4 +100,4 @@ mymodule_plugin extends bean_plugin {
     return $content;
   }
 }
->
+```
