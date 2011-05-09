@@ -533,6 +533,35 @@ function bean_block_view($delta = '') {
 }
 
 /**
+ * Implements hook_block_configure().
+ */
+function bean_block_configure($delta = '') {
+  if (!empty($delta)) {
+    $bean = bean_load($delta);
+
+    if ($bean instanceof Bean) {
+      return $bean->getForm();
+    }
+  }
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function bean_block_save($delta = '', $edit = array() {
+  if (!empty($delta)) {
+    $bean = bean_load($delta);
+
+    if ($bean instanceof Bean) {
+      $bean->setValues($edit);
+
+      field_attach_submit('bean', $bean, $form, $form_state);
+      $bean->save();
+    }
+  }
+}
+
+/**
  * Implements hook_ctools_plugin_type()
  */
 function bean_ctools_plugin_type() {
