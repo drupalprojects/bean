@@ -47,6 +47,13 @@ abstract class bean_plugin {
   }
 
   /**
+   * Is the bean type editable
+   */
+  public function isEditable() {
+    return $this->getInfo('editable');
+  }
+
+  /**
    * Define the form values
    */
   abstract public function values();
@@ -86,16 +93,18 @@ class bean_ui extends bean_plugin {
    * Delete the record from the database.
    */
   public function delete() {
-    if (!empty($this->type)) {
-      // Delete all fo the beans
-      db_delete('bean_type')
-        ->condition('type', $this->type)
-        ->execute();
+    db_delete('bean')
+      ->condition('type', $this->type)
+      ->execute();
 
-      field_attach_delete_bundle('bean', $this->type);
+    // Delete all fo the beans
+    db_delete('bean_type')
+      ->condition('type', $this->type)
+      ->execute();
 
-      drupal_flush_all_caches();
-    }
+    field_attach_delete_bundle('bean', $this->type);
+
+    drupal_flush_all_caches();
   }
 
   /**
@@ -107,7 +116,7 @@ class bean_ui extends bean_plugin {
       'label' => $this->getLabel(),
     );
 
-    $primary_key = $new == FALSE ? 'type' : NULL;
+    $primary_key = $new == FALSE ? 'type' : array();
     drupal_write_record('bean_type', $bean_type, $primary_key);
     drupal_flush_all_caches();
   }
@@ -119,13 +128,6 @@ class bean_ui extends bean_plugin {
    */
   public function setLabel($label) {
     $this->plugin_info['label'] = $label;
-  }
-
-  /**
-   * Is the bean type editable
-   */
-  public function isEditable() {
-    return $this->getInfo('editable');
   }
 
   public function values() {

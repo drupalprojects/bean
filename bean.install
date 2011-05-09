@@ -69,5 +69,6 @@ function bean_schema() {
     ),
     'primary key' => array('type'),
   );
+
   return $schema;
 }
