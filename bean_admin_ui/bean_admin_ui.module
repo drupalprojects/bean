@@ -66,7 +66,16 @@ function bean_admin_ui_ctools_plugin_directory($module, $type) {
 }
 
 /**
- * Implements hook_bean_plugins()
+ * Implements hook_bean_types_api_info().
+ */
+function bean_admin_ui_bean_types_api_info() {
+  return array(
+    'api' => bean_current_version(),
+  );
+}
+
+/**
+ * Implements hook_bean_types()
  */
 function bean_admin_ui_bean_types() {
   $plugins = array();

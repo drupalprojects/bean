@@ -84,6 +84,9 @@ abstract class bean_plugin {
   public function view($bean, $content, $view_mode = 'full', $langcode = NULL) {}
 }
 
+/**
+ * Example Implementation
+ */
 class bean_default extends bean_plugin {
   public function values() {
     return array();

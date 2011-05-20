@@ -126,14 +126,6 @@ function bean_menu() {
 }
 
 /**
- * Implements hook_menu_alter().
- */
-function bean_menu_alter(&$items) {
-  // Alter the default block/add and replace with bean add form
-
-}
-
-/**
  * Implements hook_admin_paths().
  */
 function bean_admin_paths() {
@@ -179,14 +171,33 @@ function bean_get_types() {
  * Fetch the widget plugin info
  */
 function bean_fetch_plugin_info($plugin = NULL) {
+  $plugins = &drupal_static(__FUNCTION__);
   ctools_include('plugins');
 
+  if (empty($plugins)) {
+    // Check the cache
+    $cache = cache_get('BEAN_PLUGINS');
+    if (empty($cache->data)) {
+      $plugins = ctools_get_plugins('bean', 'types');
+
+      // Only use modules with the same version
+      $allowed_modules = array_keys(ctools_plugin_api_info('bean', 'types', bean_current_version(), bean_min_version()));
+      foreach ($plugins as $key => $plugin_value) {
+        if (!in_array($plugin_value['module'], $allowed_modules)) {
+          unset($plugins[$key]);
+        }
+      }
+    }
+    cache_set('BEAN_PLUGINS', $plugins);
+  }
+
   if (empty($plugin)) {
-    return ctools_get_plugins('bean', 'plugins');
+    return $plugins;
   }
   else {
-    return ctools_get_plugins('bean', 'plugins', $plugin);
+    return $plugins[$plugin];
   }
+
 }
 
 /**
@@ -223,7 +234,6 @@ function bean_load_plugin_class_all() {
       $return[$plugin['name']] = bean_load_plugin_class($plugin['name']);
     }
   }
-
 
   return $return;
 }
@@ -433,6 +443,36 @@ function bean_block_view($delta = '') {
 }
 
 /**
+ * Define the name of the api hook
+ */
+function bean_types_hook_name() {
+  return 'bean_types_api_info';
+}
+
+/**
+ * The current version of the API
+ */
+function bean_current_version() {
+  return 1;
+}
+
+/**
+ * The minimal version
+ */
+function bean_min_version() {
+  return 1;
+}
+
+/**
+ * Implements hook_bean_types_api_info().
+ */
+function bean_bean_types_api_info() {
+  return array(
+    'api' => bean_current_version(),
+  );
+}
+
+/**
  * Implements hook_ctools_plugin_type()
  */
 function bean_ctools_plugin_type() {
@@ -442,10 +482,10 @@ function bean_ctools_plugin_type() {
       'use hooks' => TRUE,
       'classes' => array('handler'),
       'defaults' => array(
-        'label' => t('Bean'),
+        'label' => t('Block'),
         'cache_level' => DRUPAL_CACHE_PER_ROLE,
         // Editable in the block type UI
-        // THESE should have 'bean_ui' as the class
+        // THESE should have 'bean_custom' as the class
         'editable' => FALSE,
       ),
     ),
@@ -473,16 +513,6 @@ function bean_bean_types() {
       'path' => $plugin_path,
       'file' => 'base.inc',
       'class' => 'bean_plugin',
-    ),
-  );
-
-  $plugins['bean_default'] = array(
-    'label' => t('Block'),
-    'handler' => array(
-      'path' => $plugin_path,
-      'file' => 'base.inc',
-      'class' => 'bean_default',
-      'parent' => 'bean',
     ),
   );
 
