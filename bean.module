@@ -437,7 +437,7 @@ function bean_block_view($delta = '') {
  */
 function bean_ctools_plugin_type() {
   return array(
-    'plugins' => array(
+    'types' => array(
       'cache' => TRUE,
       'use hooks' => TRUE,
       'classes' => array('handler'),
@@ -462,9 +462,9 @@ function bean_ctools_plugin_directory($module, $type) {
 }
 
 /**
- * Implements hook_bean_plugins()
+ * Implements hook_bean_types()
  */
-function bean_bean_plugins() {
+function bean_bean_types() {
   $plugins = array();
   $plugin_path = drupal_get_path('module', 'bean') . '/plugins';
 

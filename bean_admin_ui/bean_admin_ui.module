@@ -68,7 +68,7 @@ function bean_admin_ui_ctools_plugin_directory($module, $type) {
 /**
  * Implements hook_bean_plugins()
  */
-function bean_admin_ui_bean_plugins() {
+function bean_admin_ui_bean_types() {
   $plugins = array();
 
 
