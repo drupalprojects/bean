@@ -8,7 +8,7 @@
 /**
  * Implementation of hook_schema
  */
-function bean_schema() {
+function bean_admin_ui_schema() {
   $schema['bean_type'] = array(
     'description' => 'Stores information about all defined bean types.',
     'fields' => array(

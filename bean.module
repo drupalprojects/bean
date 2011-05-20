@@ -486,22 +486,6 @@ function bean_bean_plugins() {
     ),
   );
 
-  // Add in the types defined in the UI
-  $result = db_query('SELECT * FROM {bean_type}');
-
-  foreach ($result as $bean_type) {
-    $plugins[$bean_type->type] = array(
-      'label' => $bean_type->label,
-      'editable' => TRUE,
-      'handler' => array(
-        'path' => $plugin_path,
-        'file' => 'base.inc',
-        'class' => 'bean_ui',
-        'parent' => 'bean',
-      ),
-    );
-  }
-
   return $plugins;
 }
 

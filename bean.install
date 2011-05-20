@@ -50,25 +50,5 @@ function bean_schema() {
     'primary key' => array('bid'),
   );
 
-  $schema['bean_type'] = array(
-    'description' => 'Stores information about all defined bean types.',
-    'fields' => array(
-      'type' => array(
-        'description' => 'The machine-readable name of this bean type.',
-        'type' => 'varchar',
-        'length' => 32,
-        'not null' => TRUE,
-      ),
-      'label' => array(
-        'description' => 'The human-readable name of this bean type.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-    ),
-    'primary key' => array('type'),
-  );
-
   return $schema;
 }
