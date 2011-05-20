@@ -425,6 +425,7 @@ function bean_block_view($delta = '') {
 function bean_ctools_plugin_type() {
   return array(
     'plugins' => array(
+      'cache' => TRUE,
       'use hooks' => TRUE,
       'classes' => array('handler'),
       'defaults' => array(
