@@ -38,7 +38,7 @@ function bean_add_page() {
   // Bypass the block/add listing if only one block type is available.
   if (count($bean_types) == 1) {
     $bean_type = array_shift($bean_types);
-    drupal_goto('admin/structure/bean/block/add/' . $bean_type->buildURL());
+    drupal_goto('block/add/' . $bean_type->buildURL());
   }
 
   return theme('bean_add_list', array('content' => $bean_types));
@@ -49,10 +49,10 @@ function bean_list() {
   $beans = db_query('SELECT bid, label, type FROM {bean} ORDER BY bid');
   foreach($beans as $bean) {
     $rows[] = array (
-      l($bean->label, 'admin/structure/bean/block/' . $bean->bid . '/view'),
+      l($bean->label, 'block/' . $bean->bid . '/view'),
       $bean->type,
-      l('edit', 'admin/structure/bean/block/' . $bean->bid . '/edit'),
-      l('delete', 'admin/structure/bean/block/' . $bean->bid . '/delete'),
+      l('edit', 'block/' . $bean->bid . '/edit'),
+      l('delete', 'block/' . $bean->bid . '/delete'),
     );
   }
   $header = array(
@@ -81,13 +81,13 @@ function theme_bean_add_list($variables) {
   if ($content) {
     $output = '<dl class="bean-type-list">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l('Add ' . $item->getLabel(), 'admin/structure/bean/block/add/' . str_replace('_', '-', $item->type)) . '</dt>';
+      $output .= '<dt>' . l('Add ' . $item->getLabel(), 'block/add/' . str_replace('_', '-', $item->type)) . '</dt>';
     }
     $output .= '</dl>';
   }
   else {
-    //$output = '<p>' . t('You have not created any block types yet. Go to the <a href="@create-content">block type creation page</a> to add a new bean type.', array('@create-content' => url('admin/structure/bean/add'))) . '</p>';
-    $output = '<p>' . t('You have not created any bean types yet.') . '</p>';
+    //$output = '<p>' . t('You have not created any block types yet. Go to the <a href="@create-content">block type creation page</a> to add a new bean type.', array('@create-content' => url('admin/structure/block/types/add'))) . '</p>';
+    $output = '<p>' . t('You have not created any block types yet.') . '</p>';
   }
   return $output;
 }
@@ -153,7 +153,7 @@ function bean_form_submit($form, &$form_state) {
 
   field_attach_submit('bean', $bean, $form, $form_state);
   $bean->save();
-  $form_state['redirect'] = $bean->editURL();
+  $form_state['redirect'] = $bean->viewURL();;
 }
 
 /**

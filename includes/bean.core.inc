@@ -65,7 +65,14 @@ class Bean extends Entity {
    * Edit URL
    */
   public function editURL() {
-    return 'admin/structure/bean/block/' . $this->identifier() . '/edit';
+    return 'block/' . $this->identifier() . '/edit';
+  }
+
+  /**
+   * View URL
+   */
+  public function viewURL() {
+    return 'block/' . $this->identifier();
   }
 
   /**

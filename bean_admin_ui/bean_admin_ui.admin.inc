@@ -40,8 +40,7 @@ function bean_admin_ui_admin_page() {
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
-    '#empty' => t('There are no Bean Types Available'),
-    '#prefix' => '<p>' . l('+ Add a Bean', 'admin/structure/bean/block/add') . '</p>',
+    '#empty' => t('There are no Block Types Available'),
   );
   return $build;
 }
@@ -53,6 +52,7 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
   // If bean_type is null then load an empty one
   if (is_null($bean_type)) {
     $plugin_info = _bean_admin_default_plugin();
+    $plugin_info['name'] = '';
 
     $bean_type = new bean_custom($plugin_info);
 
