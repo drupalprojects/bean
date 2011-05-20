@@ -44,7 +44,7 @@ class Bean extends Entity {
    * 'entity_class_uri' as 'uri callback' hook_entity_info().
    */
   protected function defaultUri() {
-    return array('path' => 'block/' . $this->identifier());
+    return array('path' => 'admin/structure/bean/block/' . $this->identifier());
   }
 
   /**
@@ -65,7 +65,7 @@ class Bean extends Entity {
    * Edit URL
    */
   public function editURL() {
-    return 'block/' . $this->identifier() . '/edit';
+    return 'admin/structure/bean/block/' . $this->identifier() . '/edit';
   }
 
   /**
@@ -87,5 +87,14 @@ class Bean extends Entity {
     $content = parent::view();
 
     return $this->plugin->view($this, $content, $view_mode, $langcode);
+  }
+
+  /**
+   * Override the save to add clearing of caches
+   */
+  public function save() {
+    $return = parent::save();
+    cache_clear_all();
+    return $return;
   }
 }

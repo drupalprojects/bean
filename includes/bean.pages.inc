@@ -30,10 +30,31 @@ function bean_add_page() {
   // Bypass the block/add listing if only one block type is available.
   if (count($bean_types) == 1) {
     $bean_type = array_shift($bean_types);
-    drupal_goto('block/add/' . $bean_type->buildURL());
+    drupal_goto('admin/structure/bean/block/add/' . $bean_type->buildURL());
   }
 
   return theme('bean_add_list', array('content' => $bean_types));
+}
+
+function bean_list() {
+  $rows = array();
+  $beans = db_query('SELECT bid, label, type FROM {bean} ORDER BY bid');
+  foreach($beans as $bean) {
+    $rows[] = array (
+      l($bean->label, 'admin/structure/bean/block/' . $bean->bid . '/view'),
+      $bean->type,
+      l('edit', 'admin/structure/bean/block/' . $bean->bid . '/edit'),
+      l('delete', 'admin/structure/bean/block/' . $bean->bid . '/delete'),
+    );
+  }
+  $header = array(
+    t('Title'),
+    t('Type'),
+    t('Edit'),
+    t('Delete'),
+  );
+
+  return theme('table', array('header' => $header, 'rows' => $rows));
 }
 
 /**
@@ -52,13 +73,13 @@ function theme_bean_add_list($variables) {
   if ($content) {
     $output = '<dl class="bean-type-list">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l('Add ' . $item->getLabel(), 'block/add/' . str_replace('_', '-', $item->type)) . '</dt>';
+      $output .= '<dt>' . l('Add ' . $item->getLabel(), 'admin/structure/bean/block/add/' . str_replace('_', '-', $item->type)) . '</dt>';
     }
     $output .= '</dl>';
   }
   else {
     //$output = '<p>' . t('You have not created any block types yet. Go to the <a href="@create-content">block type creation page</a> to add a new bean type.', array('@create-content' => url('admin/structure/bean/add'))) . '</p>';
-    $output = '<p>' . t('You have not created any block types yet.') . '</p>';
+    $output = '<p>' . t('You have not created any bean types yet.') . '</p>';
   }
   return $output;
 }
@@ -147,7 +168,7 @@ function bean_delete_confirm($form, &$form_state, $bean) {
  */
 function bean_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
-    $bean = $form_state['values']['bean'];
+    $bean = $form['#bean'];
     $bean->delete();
     watchdog('block', '@type: deleted %title.', array('@type' => $bean->type, '%title' => $bean->label));
     drupal_set_message(t('@type %title has been deleted.', array('@type' => $bean->type, '%title' => $bean->label)));
