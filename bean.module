@@ -53,124 +53,7 @@ function bean_entity_info() {
 function bean_menu() {
   $items = array();
 
-  /*$items['admin/structure/bean/block/add'] = array(
-    'title' => 'Add a Bean',
-    'page callback' => 'bean_add_page',
-    'access arguments' => array('add'),
-    'access callback' => 'bean_access',
-    'file' => 'includes/bean.pages.inc',
-  );
 
-  $items['admin/structure/bean/block/list'] = array(
-    'title' => 'List All Beans',
-    'page callback' => 'bean_list',
-    'access arguments' => array('list'),
-    'access callback' => 'bean_access',
-    'file' => 'includes/bean.pages.inc',
-  );
-
-  foreach (bean_get_types() as $type) {
-    $items['admin/structure/bean/block/add/' . $type->buildURL()] = array(
-      'title' => $type->getLabel(),
-      'title callback' => 'check_plain',
-      'page callback' => 'bean_add',
-      'page arguments' => array($type->type),
-      'access arguments' => array('create any ' . $type->type . ' bean'),
-      'file' => 'includes/bean.pages.inc',
-    );
-  }
-
-  $items['admin/structure/bean/block/%bean'] = array(
-    'title' => 'Block',
-    'page callback' => 'bean_edit',
-    'page arguments' => array(4),
-    'access arguments' => array('edit', 4),
-    'access callback' => 'bean_access',
-    'file' => 'includes/bean.pages.inc',
-  );
-
-  $items['admin/structure/bean/block/%bean/view'] = array(
-    'title' => 'View bean',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'context' => MENU_CONTEXT_NONE,
-    'weight' => -20,
-  );
-
-
-  $items['admin/structure/bean/block/%bean/edit'] = array(
-    'title' => 'Edit bean',
-    'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_INLINE,
-    'page callback' => 'bean_edit',
-    'page arguments' => array(4),
-    'access arguments' => array('edit', 4),
-    'access callback' => 'bean_access',
-    'file' => 'includes/bean.pages.inc',
-  );
-
-  $items['admin/structure/bean/block/%bean/delete'] = array(
-    'title' => 'Delete bean',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_delete_confirm', 4),
-    'access callback' => 'bean_access',
-    'access arguments' => array('delete', 4),
-    'weight' => 1,
-    'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_NONE,
-    'file' => 'includes/bean.pages.inc',
-  );
-
-  $items['admin/structure/bean'] = array(
-    'title' => 'Bean',
-    'description' => 'Manage Bean Fields',
-    'page callback' => 'bean_type_admin_page',
-    'access arguments' => array('administer bean types'),
-    'file' => 'includes/bean.admin.inc',
-  );
-
-  return $items;
-}*/
-  $items['admin/structure/block/types'] = array(
-    'title' => 'Block Types',
-    'description' => 'Manage Block Type Fields',
-    'page callback' => 'bean_type_admin_page',
-    'access arguments' => array('administer bean types'),
-    'file' => 'includes/bean.admin.inc',
-  );
-
-  $items['admin/structure/block/types/list'] = array(
-    'title' => 'List',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-
-  $items['admin/structure/block/types/add'] = array(
-    'title' => 'Add block type',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_type_form'),
-    'access arguments' => array('administer block types'),
-    'type' => MENU_LOCAL_ACTION,
-    'file' => 'includes/bean.admin.inc',
-  );
-
-  $items['admin/structure/block/types/manage/%bean_type'] = array(
-    'title' => 'Edit block type',
-    'title arguments' => array(4),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_type_form', 5),
-    'access arguments' => array('administer block types'),
-    'file' => 'includes/bean.admin.inc',
-  );
-  $items['admin/structure/block/types/manage/%bean_type/edit'] = array(
-    'title' => 'Edit',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-  $items['admin/structure/block/types/manage/%bean_type/delete'] = array(
-    'title' => 'Delete',
-    'page arguments' => array('bean_type_delete_confirm', 5),
-    'access arguments' => array('administer block types'),
-    'file' => 'includes/bean.admin.inc',
-  );
 
   $items['block/add'] = array(
     'title' => 'Add Block',
@@ -180,16 +63,8 @@ function bean_menu() {
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['admin/structure/bean/block/list'] = array(
-    'title' => 'List All Beans',
-    'page callback' => 'bean_list',
-    'access arguments' => array('list'),
-    'access callback' => 'bean_access',
-    'file' => 'includes/bean.pages.inc',
-  );
-
   foreach (bean_get_types() as $type) {
-    $items['admin/structure/bean/block/add/' . $type->buildURL()] = array(
+    $items['block/add/' . $type->buildURL()] = array(
       'title' => $type->getLabel(),
       'title callback' => 'check_plain',
       'page callback' => 'bean_add',
@@ -199,43 +74,51 @@ function bean_menu() {
     );
   }
 
-  $items['admin/structure/bean/block/%bean'] = array(
+  $items['block/%bean'] = array(
     'title' => 'Block',
-    'page callback' => 'bean_edit',
-    'page arguments' => array(4),
-    'access arguments' => array('edit', 4),
+    'page callback' => 'bean_view',
+    'page arguments' => array(1),
+    'access arguments' => array('edit', 1),
     'access callback' => 'bean_access',
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['admin/structure/bean/block/%bean/view'] = array(
-    'title' => 'View bean',
+  $items['block/%bean/view'] = array(
+    'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_NONE,
     'weight' => -20,
   );
 
 
-  $items['admin/structure/bean/block/%bean/edit'] = array(
-    'title' => 'Edit bean',
+  $items['block/%bean/edit'] = array(
+    'title' => 'Edit',
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'page callback' => 'bean_edit',
-    'page arguments' => array(4),
-    'access arguments' => array('edit', 4),
+    'page arguments' => array(1),
+    'access arguments' => array('edit', 1),
     'access callback' => 'bean_access',
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['admin/structure/bean/block/%bean/delete'] = array(
-    'title' => 'Delete bean',
+  $items['block/%bean/delete'] = array(
+    'title' => 'Delete',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_delete_confirm', 4),
+    'page arguments' => array('bean_delete_confirm', 1),
     'access callback' => 'bean_access',
-    'access arguments' => array('delete', 4),
+    'access arguments' => array('delete', 1),
     'weight' => 1,
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_NONE,
+    'file' => 'includes/bean.pages.inc',
+  );
+
+
+  $items['admin/content/blocks'] = array(
+    'title' => 'Blocks',
+    'page callback' => 'bean_list',
+    'access arguments' => array('administer beans'),
     'file' => 'includes/bean.pages.inc',
   );
 
@@ -246,6 +129,7 @@ function bean_menu() {
  * Implements hook_menu_alter().
  */
 function bean_menu_alter(&$items) {
+  // Alter the default block/add and replace with bean add form
 
 }
 
@@ -393,7 +277,7 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
 function bean_permissions() {
   $perms = array(
     'administer bean types' =>  array(
-      'title' => t('Administer bean types'),
+      'title' => t('Administer block types'),
       'description' => t('Create and delete fields on beans, and set their permissions.'),
     ),
     'administer beans' =>  array(
@@ -458,6 +342,7 @@ function bean_access($op, $bean = NULL, $account = NULL) {
       break;
     case 'add':
       $op = 'create';
+      break;
     default:
       $op = 'edit';
   }
@@ -472,7 +357,7 @@ function bean_access($op, $bean = NULL, $account = NULL) {
     // Here we are looking for access to any of the types
     foreach (bean_get_types() as $bean_type) {
       $perm = $op . ' any ' . $bean_type->type . ' bean';
-      if (user_access($perm)) {
+      if (user_access($perm, $account)) {
         return TRUE;
       }
     }

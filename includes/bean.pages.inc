@@ -6,6 +6,14 @@
  */
 
 /**
+ * View the Bean
+ */
+function bean_view($bean) {
+  drupal_set_title($bean->title);
+  return $bean->view();
+}
+
+/**
  * Edit bean page callback
  */
 function bean_edit($bean) {

@@ -10,7 +10,7 @@
 /**
  * Main page callback on the bean type
  */
-function bean_type_admin_page() {
+function bean_admin_ui_admin_page() {
   $field_ui = module_exists('field_ui');
   $rows = array();
 
@@ -49,22 +49,12 @@ function bean_type_admin_page() {
 /**
  * Generates the bean type editing form.
  */
-function bean_type_form($form, &$form_state, $bean_type = NULL) {
+function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
   // If bean_type is null then load an empty one
   if (is_null($bean_type)) {
-    $plugin_info = array(
-      'label' => '',
-      'type' => '',
-      'name' => '',
-      'handler' => array(
-        'path' => drupal_get_path('module', 'bean') . '/plugins',
-        'file' => 'base.inc',
-        'class' => 'bean_ui',
-        'parent' => 'bean',
-      ),
-    );
+    $plugin_info = _bean_admin_default_plugin();
 
-    $bean_type = new bean_ui($plugin_info);
+    $bean_type = new bean_custom($plugin_info);
 
     $form['new'] = array(
       '#type' => 'value',
@@ -139,7 +129,7 @@ function bean_type_form($form, &$form_state, $bean_type = NULL) {
 /**
  * Form API submit callback for the type form.
  */
-function bean_type_form_submit(&$form, &$form_state) {
+function bean_admin_ui_type_form_submit(&$form, &$form_state) {
   $bean_type = $form_state['values']['bean_type'];
   $bean_type->type = $form_state['values']['type'];
   $bean_type->setLabel($form_state['values']['label']);
@@ -150,14 +140,14 @@ function bean_type_form_submit(&$form, &$form_state) {
 /**
  * Form API submit callback for the delete button.
  */
-function bean_type_form_submit_delete(&$form, &$form_state) {
+function bean_admin_ui_type_form_submit_delete(&$form, &$form_state) {
   $form_state['redirect'] = 'admin/structure/block/types/manage/' . $form_state['bean_type']->type . '/delete';
 }
 
 /**
  * Menu callback; delete a single content type.
  */
-function bean_type_delete_confirm($form, &$form_state, $type) {
+function bean_admin_ui_type_delete_confirm($form, &$form_state, $type) {
   $form['type'] = array('#type' => 'value', '#value' => $type);
   $form['name'] = array('#type' => 'value', '#value' => $type->getLabel());
 
@@ -174,7 +164,7 @@ function bean_type_delete_confirm($form, &$form_state, $type) {
   return confirm_form($form, $message, 'admin/structure/block/types', $caption, t('Delete'));
 }
 
-function bean_type_delete_confirm_submit($form, &$form_state) {
+function bean_admin_ui_type_delete_confirm_submit($form, &$form_state) {
   $form_state['values']['type']->delete();
   $form_state['redirect'] = 'admin/structure/block/types';
 }
