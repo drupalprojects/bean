@@ -425,7 +425,6 @@ function bean_block_view($delta = '') {
 function bean_ctools_plugin_type() {
   return array(
     'plugins' => array(
-      'cache' => TRUE,
       'use hooks' => TRUE,
       'classes' => array('handler'),
       'defaults' => array(
@@ -434,6 +433,15 @@ function bean_ctools_plugin_type() {
       ),
     ),
   );
+}
+
+/**
+ * Implements hook_ctools_plugin_directory()
+ */
+function bean_ctools_plugin_directory($module, $type) {
+  if ($module == 'bean') {
+    return 'plugins';
+  }
 }
 
 /**
