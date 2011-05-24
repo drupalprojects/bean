@@ -176,8 +176,10 @@ function bean_fetch_plugin_info($plugin = NULL) {
 
   if (empty($plugins)) {
     // Check the cache
-    $cache = cache_get('BEAN_PLUGINS');
-    if (empty($cache->data)) {
+    if (($cache = cache_get('BEAN_PLUGINS')) && !empty($cache->data)) {
+      $plugins = $cache->data;
+    }
+    else {
       $plugins = ctools_get_plugins('bean', 'types');
 
       // Only use modules with the same version
@@ -187,8 +189,8 @@ function bean_fetch_plugin_info($plugin = NULL) {
           unset($plugins[$key]);
         }
       }
+      cache_set('BEAN_PLUGINS', $plugins);
     }
-    cache_set('BEAN_PLUGINS', $plugins);
   }
 
   if (empty($plugin)) {
