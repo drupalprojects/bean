@@ -39,7 +39,9 @@ class bean_custom extends bean_plugin {
 
     $primary_key = $new == FALSE ? 'type' : array();
     drupal_write_record('bean_type', $bean_type, $primary_key);
-    drupal_flush_all_caches();
+    drupal_static_reset('bean_admin_ui_get_types');
+
+    bean_reset();
   }
 
   /**
