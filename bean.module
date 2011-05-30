@@ -282,9 +282,9 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
 }
 
 /**
- * Implements hook_permissions()
+ * Implements hook_permission()
  */
-function bean_permissions() {
+function bean_permission() {
   $perms = array(
     'administer bean types' =>  array(
       'title' => t('Administer block types'),
