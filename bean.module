@@ -94,7 +94,7 @@ function bean_menu() {
   $items['block/%bean/edit'] = array(
     'title' => 'Edit',
     'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_NONE,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'page callback' => 'bean_edit',
     'page arguments' => array(1),
     'access arguments' => array('edit', 1),
@@ -442,8 +442,8 @@ function bean_access($op, $bean = NULL, $account = NULL) {
  *   Failure to write a record will return FALSE. Otherwise SAVED_NEW or
  *   SAVED_UPDATED is returned depending on the operation performed.
  */
-function bean_save($bean) {
-  return entity_save('bean', $bean);
+function bean_save(Bean $bean) {
+  return $bean->save();
 }
 
 /**
@@ -452,8 +452,8 @@ function bean_save($bean) {
  * @param $bean
  *   The message object to be bean.
  */
-function bean_delete($bean) {
-  return entity_delete('bean', $bean);
+function bean_delete(Bean $bean) {
+  return $bean->delete();
 }
 
 /**

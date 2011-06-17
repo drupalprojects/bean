@@ -104,4 +104,31 @@ class Bean extends Entity {
     cache_clear_all();
     return $return;
   }
+
+  /**
+   * Override the delete to remove the fields and blocks
+   */
+  public function delete() {
+    // Delete the field values
+    field_attach_delete('bean', $this);
+
+    // Delete any blocks
+    // @see block_custom_block_delete_submit()
+    db_delete('block')
+      ->condition('module', 'bean')
+      ->condition('delta', $this->bid)
+      ->execute();
+    db_delete('block_role')
+      ->condition('module', 'bean')
+      ->condition('delta', $this->bid)
+      ->execute();
+
+    // @see node_form_block_custom_block_delete_submit()
+    db_delete('block_node_type')
+      ->condition('module', 'bean')
+      ->condition('delta', $this->bid)
+      ->execute();
+
+    parent::delete();
+  }
 }
