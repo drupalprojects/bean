@@ -603,3 +603,19 @@ function bean_block_view_alter(&$data, $block) {
     $data['content']['#contextual_links']['bean'] = array('block', array($block->delta));
   }
 }
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function bean_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to 'block/add' on 'admin/content/blocks' page.
+  if ($root_path == 'admin/content/blocks') {
+    $item = menu_get_item('block/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+}

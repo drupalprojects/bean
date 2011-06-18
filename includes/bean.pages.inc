@@ -46,23 +46,60 @@ function bean_add_page() {
 
 function bean_list() {
   $rows = array();
-  $beans = db_query('SELECT bid, label, type FROM {bean} ORDER BY bid');
+  
+  // Build the sortable table header.
+  $header = array(
+    'title' => array('data' => t('Title'), 'field' => 'b.label', 'sort'=>'asc'),
+    'type' => array('data' => t('Type'), 'field' => 'b.type'),
+    'operations' => array('data' => t('Operations')),
+  );
+  
+  $sql_query = db_select('bean', 'b');
+  
+  $sql_query->fields('b', array('bid', 'label', 'type'));
+  $sql_query = $sql_query->extend('TableSort')->extend('PagerDefault')->limit(50);
+  $beans = $sql_query->orderByHeader($header)->execute();
+  
+  $destination = drupal_get_destination();
+  
   foreach($beans as $bean) {
-    $rows[] = array (
-      l($bean->label, 'block/' . $bean->bid . '/view'),
-      $bean->type,
-      l('edit', 'block/' . $bean->bid . '/edit'),
-      l('delete', 'block/' . $bean->bid . '/delete'),
+    $rows[$bean->bid] = array (
+    'title' => array(
+      'data' => array(
+        '#type' => 'link',
+        '#title' => $bean->label,
+        '#href' => 'block/' . $bean->bid,
+      ),
+    ),
+    'type' => check_plain($bean->type),
+    );
+
+    // Build a list of all the accessible operations for the current bean.
+    $operations = array();
+    $operations['edit'] = array(
+      'title' => t('edit'),
+      'href' => 'block/' . $bean->bid . '/edit',
+      'query' => $destination,
+    );
+    $operations['delete'] = array(
+      'title' => t('delete'),
+      'href' => 'block/' . $bean->bid . '/delete',
+      'query' => $destination,
+    );
+    // Render an unordered list of operations links.
+    $rows[$bean->bid]['operations'] = array(
+      'data' => array(
+        '#theme' => 'links__node_operations',
+        '#links' => $operations,
+        '#attributes' => array('class' => array('links', 'inline')),
+      ),
     );
   }
-  $header = array(
-    t('Title'),
-    t('Type'),
-    t('Edit'),
-    t('Delete'),
-  );
 
-  return theme('table', array('header' => $header, 'rows' => $rows));
+  $output = theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= theme('pager');
+  
+  return $output;
 }
 
 /**
