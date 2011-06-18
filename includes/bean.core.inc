@@ -24,16 +24,34 @@ class Bean extends Entity {
   public function __construct($values = array()) {
     parent::__construct($values, 'bean');
 
-    // load the plugin info
-    $this->plugin = bean_load_plugin_class($this->type);
-    $this->setFields();
+    // Load the plugin info
+    // NOTE: When this is caalled as part of entity_load, $values seems to be
+    // empty, which makes it impossible to load the plugin and field data.
+    // in this case, we don't do this now and rely on the caller of entity_load to
+    // do it manually.
+    if (!empty($this->type)) {
+      $this->setPlugin();
+      $this->setFields();
+    }
   }
 
   /**
-   * Set the fields from the defaults and plugin
+   * Load and set the plugin info.
+   * FIXME: This should probably be be private, but we need to be able to call it
+   * externally for now (see note in __construct).
    */
-  protected function setFields() {
-    $values = unserialize($this->data);
+  public function setPlugin() {
+    $this->plugin = bean_load_plugin_class($this->type);
+  }
+  
+  /**
+   * Set the fields from the defaults and plugin
+   * FIXME: This should probably be be private, but we need to be able to call it
+   * externally for now (see note in __construct).
+   */
+  public function setFields() {
+    // NOTE: When setFields is caled externally $this->data is already unserializd.
+    $values = is_array($this->data)? $this->data : unserialize($this->data);
     foreach ($this->plugin->values() as $field => $default) {
       $this->$field = isset($values[$field]) ? $values[$field] : $default;
     }

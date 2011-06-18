@@ -334,7 +334,13 @@ function bean_load($bid, $reset = FALSE) {
  * @see bean_load()
  */
 function bean_load_multiple($bids = array(), $conditions = array(), $reset = FALSE) {
-  return entity_load('bean', $bids, $conditions, $reset);
+  $beans = entity_load('bean', $bids, $conditions, $reset);
+  foreach ($beans as $bid => $bean) {
+    $bean->setPlugin();
+    $bean->setFields();
+    $beans[$bid] = $bean;
+  }
+  return $beans;
 }
 
 /**
