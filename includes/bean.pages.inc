@@ -153,17 +153,33 @@ function bean_form($form, &$form_state, $bean) {
     '#value' => $bean,
   );
 
-  field_attach_form('bean', $bean, $form, $form_state);
-
   // Get the Bean type form
   $form += $bean->getForm();
 
-  $form['submit'] = array(
+  // Add the buttons.
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#weight' => 200,
     '#value' => t('Save'),
+    '#weight' => 200,
+    '#submit' => array('bean_form_submit'),
   );
+  if (!empty($bean->bid) && user_access('delete any ' . $bean->type . ' bean')) {
+    $form['actions']['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+      '#weight' => 201,
+      '#submit' => array('bean_form_delete_submit'),
+    );
+  }
 
+  $form['#validate'][] = 'bean_form_validate';
+  if (!isset($form['#submit']) && function_exists($bean->type . '_bean_form_submit')) {
+    $form['#submit'][] = $bean->type . '_bean_form_submit';
+  }
+  $form += array('#submit' => array());
+
+  field_attach_form('bean', $bean, $form, $form_state);
   return $form;
 }
 
@@ -191,6 +207,19 @@ function bean_form_submit($form, &$form_state) {
   field_attach_submit('bean', $bean, $form, $form_state);
   $bean->save();
   $form_state['redirect'] = $bean->viewURL();;
+}
+
+/**
+ * Button submit function: handle the 'Delete' button on the node form.
+ */
+function bean_form_delete_submit($form, &$form_state) {
+  $destination = array();
+  if (isset($_GET['destination'])) {
+    $destination = drupal_get_destination();
+    unset($_GET['destination']);
+  }
+  $bean = $form_state['values']['bean'];
+  $form_state['redirect'] = array('node/' . $bean->bid . '/delete', array('query' => $destination));
 }
 
 /**
