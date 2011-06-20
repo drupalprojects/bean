@@ -94,6 +94,13 @@ class Bean extends Entity {
   }
 
   /**
+   * Type name
+   */
+  public function typeName() {
+    return $this->getInfo('label');
+  }
+  
+  /**
    * Set the values from a plugin
    */
   public function setValues($values) {

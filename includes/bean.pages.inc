@@ -202,11 +202,31 @@ function bean_form_validate($form, &$form_state) {
  */
 function bean_form_submit($form, &$form_state) {
   $bean = $form_state['values']['bean'];
+  $insert = empty($bean->bid);
   $bean->setValues($form_state['values']);
-
   field_attach_submit('bean', $bean, $form, $form_state);
   $bean->save();
-  $form_state['redirect'] = $bean->viewURL();;
+
+  $watchdog_args = array('@type' => $bean->type, '%title' => $bean->label);
+  $t_args = array('@type' => $bean->typeName(), '%title' => $bean->label);
+
+  if ($insert) {
+    watchdog('bean', '@type: added %title.', $watchdog_args, WATCHDOG_NOTICE, $bean->viewURL());
+    drupal_set_message(t('@type %title has been created.', $t_args));
+  }
+  else {
+    watchdog('bean', '@type: updated %title.', $watchdog_args, WATCHDOG_NOTICE, $bean->viewURL());
+    drupal_set_message(t('@type %title has been updated.', $t_args));
+  }
+  if ($bean->bid) {
+    $form_state['redirect'] = $bean->viewURL();
+  }
+  else {
+    // In the unlikely case something went wrong on save, the bean will be
+    // rebuilt and bean form redisplayed the same way as in preview.
+    drupal_set_message(t('The block could not be saved.'), 'error');
+    $form_state['rebuild'] = TRUE;
+  }
 }
 
 /**
