@@ -14,7 +14,11 @@ class Bean extends Entity {
    * Get Plugin info
    */
   public function getInfo($key = NULL) {
-    return $this->plugin->getInfo($key);
+    if (!empty($this->plugin)) {
+      return $this->plugin->getInfo($key);
+    }
+
+    return array();
   }
 
   public function defaultLabel() {
