@@ -42,7 +42,7 @@ class Bean extends Entity {
   public function setPlugin() {
     $this->plugin = bean_load_plugin_class($this->type);
   }
-  
+
   /**
    * Set the fields from the defaults and plugin
    * FIXME: This should probably be be private, but we need to be able to call it
@@ -50,9 +50,11 @@ class Bean extends Entity {
    */
   public function setFields() {
     // NOTE: When setFields is caled externally $this->data is already unserializd.
-    $values = is_array($this->data)? $this->data : unserialize($this->data);
-    foreach ($this->plugin->values() as $field => $default) {
-      $this->$field = isset($values[$field]) ? $values[$field] : $default;
+    if (!empty($this->plugin)) {
+      $values = is_array($this->data)? $this->data : unserialize($this->data);
+      foreach ($this->plugin->values() as $field => $default) {
+        $this->$field = isset($values[$field]) ? $values[$field] : $default;
+      }
     }
   }
 
@@ -61,7 +63,7 @@ class Bean extends Entity {
    * 'entity_class_uri' as 'uri callback' hook_entity_info().
    */
   protected function defaultUri() {
-    return array('path' => 'admin/structure/bean/block/' . $this->identifier());
+    return array('path' => 'block/' . $this->identifier());
   }
 
   /**
@@ -98,7 +100,7 @@ class Bean extends Entity {
   public function typeName() {
     return $this->getInfo('label');
   }
-  
+
   /**
    * Set the values from a plugin
    */
