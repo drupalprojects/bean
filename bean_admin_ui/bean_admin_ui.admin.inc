@@ -27,7 +27,6 @@ function bean_admin_ui_admin_page() {
     // Edit and delete buttons
     if ($bean_type->isEditable()) {
       $row[] = array('data' => l(t('Edit'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/edit'));
-      dsm($export_status);
       switch ($export_status) {
         case 'Normal':
           $row[] = array('data' => l(t('Delete'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/delete'));
