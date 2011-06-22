@@ -340,10 +340,15 @@ function bean_load($bid, $reset = FALSE) {
 function bean_load_multiple($bids = array(), $conditions = array(), $reset = FALSE) {
   $beans = entity_load('bean', $bids, $conditions, $reset);
   foreach ($beans as $bid => $bean) {
-    $bean->setPlugin();
-    $bean->setFields();
+    try {
+      $bean->setPlugin();
+      $bean->setFields();
+    } catch (BeanException $e) {
+      watchdog(WATCHDOG_ERROR, t('Bid: @bid Bean not loaded correctly', array('@bid' => $bean->bid)));
+    }
     $beans[$bid] = $bean;
   }
+
   return $beans;
 }
 

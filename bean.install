@@ -52,3 +52,11 @@ function bean_schema() {
 
   return $schema;
 }
+
+/**
+ * Update Registry to implement new Code Interface
+ */
+function bean_update_7001() {
+  registry_rebuild();
+  return t('Registry has been rebuilt');
+}

@@ -5,7 +5,7 @@
  * Base Plugin Class
  */
 
-abstract class bean_plugin {
+abstract class bean_plugin implements bean_type_plugin_interface {
   protected $plugin_info;
   public $type;
 
@@ -42,7 +42,7 @@ abstract class bean_plugin {
   /**
    * Add a Bean to the plugin
    */
-  public function setBean(Bean $bean) {
+  public function setBean($bean) {
     $this->bean = $bean;
   }
 
@@ -52,16 +52,6 @@ abstract class bean_plugin {
   public function isEditable() {
     return $this->getInfo('editable');
   }
-
-  /**
-   * Define the form values
-   */
-  abstract public function values();
-
-  /**
-   * The Plugin Form
-   */
-  abstract public function form($bean);
 
   /**
    * THe plugin submit function
