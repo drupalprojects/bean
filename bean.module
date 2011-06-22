@@ -33,15 +33,17 @@ function bean_entity_info() {
   );
 
   foreach (bean_get_types() as $type) {
-    $return['bean']['bundles'][$type->type] = array(
-      'label' => $type->getLabel(),
-      'admin' => array(
-        'path' => 'admin/structure/block/types/manage/%bean_type',
-        'real path' => 'admin/structure/block/types/manage/' . $type->buildURL(),
-        'bundle argument' => 5,
-        'access arguments' => array('administer bean types'),
-      )
-    );
+    if (!empty($type)) {
+      $return['bean']['bundles'][$type->type] = array(
+        'label' => $type->getLabel(),
+        'admin' => array(
+          'path' => 'admin/structure/block/types/manage/%bean_type',
+          'real path' => 'admin/structure/block/types/manage/' . $type->buildURL(),
+          'bundle argument' => 5,
+          'access arguments' => array('administer bean types'),
+        )
+      );
+    }
   }
 
   return $return;
@@ -64,14 +66,16 @@ function bean_menu() {
   );
 
   foreach (bean_get_types() as $type) {
-    $items['block/add/' . $type->buildURL()] = array(
-      'title' => $type->getLabel(),
-      'title callback' => 'check_plain',
-      'page callback' => 'bean_add',
-      'page arguments' => array($type->type),
-      'access arguments' => array('create any ' . $type->type . ' bean'),
-      'file' => 'includes/bean.pages.inc',
-    );
+   if (!empty($type)) {
+      $items['block/add/' . $type->buildURL()] = array(
+        'title' => $type->getLabel(),
+        'title callback' => 'check_plain',
+        'page callback' => 'bean_add',
+        'page arguments' => array($type->type),
+        'access arguments' => array('create any ' . $type->type . ' bean'),
+        'file' => 'includes/bean.pages.inc',
+      );
+    }
   }
 
   $items['block/%bean'] = array(

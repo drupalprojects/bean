@@ -85,12 +85,13 @@ function bean_admin_ui_bean_types() {
   $bean_types = bean_admin_ui_get_types();
 
   foreach ($bean_types as $bean_type) {
-    $plugins[$bean_type->type] = array(
+    $plugins[$bean_type->name] = array(
       'label' => $bean_type->label,
-      'type' => $bean_type->type,
+      'type' => $bean_type->name,
+      'export_status' => $bean_type->type,
     );
 
-    $plugins[$bean_type->type] += _bean_admin_default_plugin();
+    $plugins[$bean_type->name] += _bean_admin_default_plugin();
   }
 
   return $plugins;
@@ -105,7 +106,8 @@ function bean_admin_ui_get_types() {
   if (empty($bean_types)) {
     $cache = cache_get('bean_types');
     if (empty($cache->data)) {
-      $bean_types = db_query('SELECT * FROM {bean_type}')->fetchAllAssoc('type');
+      ctools_include('export');
+      $bean_types = ctools_export_load_object('bean_type');
       cache_set('bean_types', $bean_types);
     }
     else {
@@ -131,4 +133,18 @@ function _bean_admin_default_plugin() {
       'parent' => 'bean',
     ),
   );
+}
+
+/**
+ * Implements hook_features_api().
+ */
+function bean_admin_ui_features_api() {
+  static $api = FALSE;
+  if (!$api) {
+    module_load_include('inc', 'features', 'includes/features.ctools');
+    $api = ctools_component_features_api('bean_admin_ui');
+    $api['bean_type']['name'] = 'Bean types';
+    $api['bean_type']['file'] = drupal_get_path('module', 'bean_admin_ui') .'/includes/features.inc';
+  }
+  return $api;
 }

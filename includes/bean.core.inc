@@ -23,7 +23,6 @@ class Bean extends Entity {
 
   public function __construct($values = array()) {
     parent::__construct($values, 'bean');
-
     // Load the plugin info
     // NOTE: When this is caalled as part of entity_load, $values seems to be
     // empty, which makes it impossible to load the plugin and field data.

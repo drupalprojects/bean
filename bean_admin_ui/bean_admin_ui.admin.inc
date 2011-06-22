@@ -17,11 +17,28 @@ function bean_admin_ui_admin_page() {
   foreach (bean_get_types() as $bean_type) {
     $row = array();
     $row[] = array('data' => $bean_type->getLabel());
-
+    if (method_exists($bean_type, 'getExportStatus')) {
+      $export_status = $bean_type->getExportStatus();
+    }
+    else {
+      $export_status = 'Normal';
+    }
+    $row[] = array('data' => $export_status);
     // Edit and delete buttons
     if ($bean_type->isEditable()) {
       $row[] = array('data' => l(t('Edit'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/edit'));
-      $row[] = array('data' => l(t('Delete'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/delete'));
+      dsm($export_status);
+      switch ($export_status) {
+        case 'Normal':
+          $row[] = array('data' => l(t('Delete'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/delete'));
+          break;
+        case 'Overridden':
+          $row[] = array('data' => l(t('Revert'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/delete'));
+          break;
+        case 'Default':
+          $row[] = array();
+          break;
+      }
     }
 
     if ($field_ui) {
@@ -34,7 +51,7 @@ function bean_admin_ui_admin_page() {
     $rows[] = $row;
   }
 
-  $header = array(t('Name'), array('data' => t('Operations'), 'colspan' => $field_ui ? '6' : '4'));
+  $header = array(t('Name'), t('Status'), array('data' => t('Operations'), 'colspan' => $field_ui ? '6' : '4'));
 
   $build['bean_table'] = array(
     '#theme' => 'table',
@@ -49,19 +66,18 @@ function bean_admin_ui_admin_page() {
  * Generates the bean type editing form.
  */
 function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
+  $form['new'] = array(
+    '#type' => 'value',
+    '#value' => TRUE,
+  );
   // If bean_type is null then load an empty one
   if (is_null($bean_type)) {
     $plugin_info = _bean_admin_default_plugin();
     $plugin_info['name'] = '';
 
     $bean_type = new bean_custom($plugin_info);
-
-    $form['new'] = array(
-      '#type' => 'value',
-      '#value' => TRUE,
-    );
   }
-  else {
+  elseif (!method_exists($bean_type, 'getExportStatus') || $bean_type->getExportStatus() == 'Normal') {
     $form['new'] = array(
       '#type' => 'value',
       '#value' => FALSE,
@@ -73,9 +89,6 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
   if ($disabled) {
     drupal_set_message(t('This Block Type can not be edited'));
   }
-
-
-
   $form['bean_type'] = array(
     '#type' => 'value',
     '#value' => $bean_type
@@ -92,7 +105,7 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
   );
 
   // Machine-readable type name.
-  $form['type'] = array(
+  $form['name'] = array(
     '#type' => 'machine_name',
     '#default_value' => isset($bean_type->type) ? $bean_type->type : '',
     '#maxlength' => 32,
@@ -131,10 +144,11 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
  */
 function bean_admin_ui_type_form_submit(&$form, &$form_state) {
   $bean_type = $form_state['values']['bean_type'];
-  $bean_type->type = $form_state['values']['type'];
+  $bean_type->type = $form_state['values']['name'];
   $bean_type->setLabel($form_state['values']['label']);
   $bean_type->save($form_state['values']['new']);
   $form_state['redirect'] = 'admin/structure/block/types';
+  ctools_include('export');
 }
 
 /**
@@ -150,18 +164,22 @@ function bean_admin_ui_type_form_submit_delete(&$form, &$form_state) {
 function bean_admin_ui_type_delete_confirm($form, &$form_state, $type) {
   $form['type'] = array('#type' => 'value', '#value' => $type);
   $form['name'] = array('#type' => 'value', '#value' => $type->getLabel());
-
-  $message = t('Are you sure you want to delete the block type %type?', array('%type' => $type->getLabel()));
   $caption = '';
-
-  $num_beans = db_query("SELECT COUNT(*) FROM {bean} WHERE type = :type", array(':type' => $type->type))->fetchField();
-  if ($num_beans) {
-    $caption .= '<p>' . format_plural($num_beans, '%type is used by 1 block on your site. If you remove this block type, you will not be able to edit the %type blocks and it may not display correctly.', '%type is used by @count pieces of content on your site. If you remove %type, you will not be able to edit the %type content and it may not display correctly.', array('%type' => $type->getLabel())) . '</p>';
+  if (!method_exists($type, 'getExportStatus') || $type->getExportStatus() == 'Normal') {
+    $message = t('Are you sure you want to delete the block type %type?', array('%type' => $type->getLabel()));
+    $num_beans = db_query("SELECT COUNT(*) FROM {bean} WHERE type = :type", array(':type' => $type->type))->fetchField();
+    if ($num_beans) {
+      $caption .= '<p>' . format_plural($num_beans, '%type is used by 1 block on your site. If you remove this block type, you will not be able to edit the %type blocks and it may not display correctly.', '%type is used by @count pieces of content on your site. If you remove %type, you will not be able to edit the %type content and it may not display correctly.', array('%type' => $type->getLabel())) . '</p>';
+    }
+    $action = t('Delete');
   }
-
+  else {
+    $message = t('Are you sure you want to revert the block type %type?', array('%type' => $type->getLabel()));
+    $action = t('Revert');
+  }
   $caption .= '<p>' . t('This action cannot be undone.') . '</p>';
 
-  return confirm_form($form, $message, 'admin/structure/block/types', $caption, t('Delete'));
+  return confirm_form($form, $message, 'admin/structure/block/types', $caption, $action);
 }
 
 function bean_admin_ui_type_delete_confirm_submit($form, &$form_state) {

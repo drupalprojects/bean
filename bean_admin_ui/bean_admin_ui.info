@@ -5,3 +5,4 @@ core = 7.x
 files[] = bean_admin_ui.module
 dependencies[] = bean
 files[] = plugins/custom.inc
+files[] = includes/features.inc
