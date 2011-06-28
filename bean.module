@@ -290,8 +290,8 @@ function bean_load_plugin_class_all() {
   $return = array();
 
   foreach (bean_fetch_plugin_info() as $plugin) {
-    if ($plugin['name'] !== 'bean') {
-      $return[$plugin['name']] = bean_load_plugin_class($plugin['name']);
+    if (!empty($plugin['name']) && $plugin['name'] !== 'bean' && $plugin_class = bean_load_plugin_class($plugin['name'])) {
+      $return[$plugin['name']] = $plugin_class;
     }
   }
 
