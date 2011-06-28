@@ -5,6 +5,10 @@
  * Base Plugin Class
  */
 
+if (!interface_exists('bean_type_plugin_interface')) {
+  require_once drupal_get_path('module', 'bean') . '/includes/bean.core.inc';
+}
+
 abstract class bean_plugin implements bean_type_plugin_interface {
   protected $plugin_info;
   public $type;
