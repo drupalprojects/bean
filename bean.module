@@ -121,9 +121,11 @@ function bean_menu() {
 
   $items['admin/content/blocks'] = array(
     'title' => 'Blocks',
+    'description' => 'Manage blocks used on your site.',
     'page callback' => 'bean_list',
     'access arguments' => array('administer beans'),
     'file' => 'includes/bean.pages.inc',
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;
