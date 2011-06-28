@@ -7,5 +7,6 @@ files[] = bean.test
 files[] = includes/bean.core.inc
 files[] = includes/bean.info.inc
 files[] = includes/bean.pages.inc
+dependencies[] = block
 dependencies[] = entity
 dependencies[] = ctools

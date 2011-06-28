@@ -234,7 +234,7 @@ class Bean extends Entity {
    */
   public function save() {
     $return = parent::save();
-    cache_clear_all();
+    block_flush_caches();
     return $return;
   }
 
