@@ -133,6 +133,21 @@ function theme_bean_add_list($variables) {
  * Bean form
  */
 function bean_form($form, &$form_state, $bean) {
+  
+  // During initial form build, add the node entity to the form state for use
+  // during form building and processing. During a rebuild, use what is in the
+  // form state.
+  if (!isset($form_state['bean'])) {
+    if (!isset($bean->label)) {
+      $bean->label = NULL;
+    }
+    node_object_prepare($bean);
+    $form_state['bean'] = $bean;
+  }
+  else {
+    $bean = $form_state['bean'];
+  }
+  
   $form['label'] = array(
     '#type' => 'textfield',
     '#title' => t('Label'),
@@ -201,7 +216,7 @@ function bean_form_validate($form, &$form_state) {
  * Submit function for bean form
  */
 function bean_form_submit($form, &$form_state) {
-  $bean = $form_state['values']['bean'];
+  $bean = bean_form_submit_build_bean($form, $form_state);
   $insert = empty($bean->bid);
   $bean->setValues($form_state['values']);
   field_attach_submit('bean', $bean, $form, $form_state);
@@ -227,6 +242,40 @@ function bean_form_submit($form, &$form_state) {
     drupal_set_message(t('The block could not be saved.'), 'error');
     $form_state['rebuild'] = TRUE;
   }
+}
+
+/**
+ * Updates the form state's node entity by processing this submission's values.
+ *
+ * This is the default builder function for the node form. It is called
+ * during the "Save" and "Preview" submit handlers to retrieve the entity to
+ * save or preview. This function can also be called by a "Next" button of a
+ * wizard to update the form state's entity with the current step's values
+ * before proceeding to the next step.
+ *
+ * @see bean_form()
+ * @see node_form_submit_build_node()
+ */
+function bean_form_submit_build_bean($form, &$form_state) {
+
+  // @todo Legacy support for modules that extend the node form with form-level
+  //   submit handlers that adjust $form_state['values'] prior to those values
+  //   being used to update the entity. Module authors are encouraged to instead
+  //   adjust the node directly within a hook_node_submit() implementation. For
+  //   Drupal 8, evaluate whether the pattern of triggering form-level submit
+  //   handlers during button-level submit processing is worth supporting
+  //   properly, and if so, add a Form API function for doing so.
+  unset($form_state['submit_handlers']);
+  form_execute_handlers('submit', $form, $form_state);
+
+  $bean = $form_state['bean'];
+  entity_form_submit_build_entity('bean', $bean, $form, $form_state);
+
+  foreach (module_implements('bean_submit') as $module) {
+    $function = $module . '_bean_submit';
+    $function($node, $form, $form_state);
+  }
+  return $bean;
 }
 
 /**

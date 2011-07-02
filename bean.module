@@ -55,8 +55,6 @@ function bean_entity_info() {
 function bean_menu() {
   $items = array();
 
-
-
   $items['block/add'] = array(
     'title' => 'Add Block',
     'page callback' => 'bean_add_page',
