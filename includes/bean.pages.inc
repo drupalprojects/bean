@@ -89,7 +89,7 @@ function bean_list() {
     // Render an unordered list of operations links.
     $rows[$bean->bid]['operations'] = array(
       'data' => array(
-        '#theme' => 'links__node_operations',
+        '#theme' => 'links__bean_operations',
         '#links' => $operations,
         '#attributes' => array('class' => array('links', 'inline')),
       ),
@@ -134,14 +134,13 @@ function theme_bean_add_list($variables) {
  */
 function bean_form($form, &$form_state, $bean) {
   
-  // During initial form build, add the node entity to the form state for use
+  // During initial form build, add the bean entity to the form state for use
   // during form building and processing. During a rebuild, use what is in the
   // form state.
   if (!isset($form_state['bean'])) {
     if (!isset($bean->label)) {
       $bean->label = NULL;
     }
-    node_object_prepare($bean);
     $form_state['bean'] = $bean;
   }
   else {
@@ -245,9 +244,9 @@ function bean_form_submit($form, &$form_state) {
 }
 
 /**
- * Updates the form state's node entity by processing this submission's values.
+ * Updates the form state's bean entity by processing this submission's values.
  *
- * This is the default builder function for the node form. It is called
+ * This is the default builder function for the bean form. It is called
  * during the "Save" and "Preview" submit handlers to retrieve the entity to
  * save or preview. This function can also be called by a "Next" button of a
  * wizard to update the form state's entity with the current step's values
@@ -258,10 +257,10 @@ function bean_form_submit($form, &$form_state) {
  */
 function bean_form_submit_build_bean($form, &$form_state) {
 
-  // @todo Legacy support for modules that extend the node form with form-level
+  // @todo Legacy support for modules that extend the bean form with form-level
   //   submit handlers that adjust $form_state['values'] prior to those values
   //   being used to update the entity. Module authors are encouraged to instead
-  //   adjust the node directly within a hook_node_submit() implementation. For
+  //   adjust the bean directly within a hook_bean_submit() implementation. For
   //   Drupal 8, evaluate whether the pattern of triggering form-level submit
   //   handlers during button-level submit processing is worth supporting
   //   properly, and if so, add a Form API function for doing so.
@@ -273,13 +272,13 @@ function bean_form_submit_build_bean($form, &$form_state) {
 
   foreach (module_implements('bean_submit') as $module) {
     $function = $module . '_bean_submit';
-    $function($node, $form, $form_state);
+    $function($bean, $form, $form_state);
   }
   return $bean;
 }
 
 /**
- * Button submit function: handle the 'Delete' button on the node form.
+ * Button submit function: handle the 'Delete' button on the bean form.
  */
 function bean_form_delete_submit($form, &$form_state) {
   $destination = array();
@@ -288,7 +287,7 @@ function bean_form_delete_submit($form, &$form_state) {
     unset($_GET['destination']);
   }
   $bean = $form_state['values']['bean'];
-  $form_state['redirect'] = array('node/' . $bean->bid . '/delete', array('query' => $destination));
+  $form_state['redirect'] = array('block/' . $bean->bid . '/delete', array('query' => $destination));
 }
 
 /**
@@ -307,7 +306,7 @@ function bean_delete_confirm($form, &$form_state, $bean) {
 }
 
 /**
- * Execute node deletion
+ * Execute bean deletion
  */
 function bean_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
