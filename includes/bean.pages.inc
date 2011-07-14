@@ -46,22 +46,22 @@ function bean_add_page() {
 
 function bean_list() {
   $rows = array();
-  
+
   // Build the sortable table header.
   $header = array(
     'title' => array('data' => t('Title'), 'field' => 'b.label', 'sort'=>'asc'),
     'type' => array('data' => t('Type'), 'field' => 'b.type'),
     'operations' => array('data' => t('Operations')),
   );
-  
+
   $sql_query = db_select('bean', 'b');
-  
+
   $sql_query->fields('b', array('bid', 'label', 'type'));
   $sql_query = $sql_query->extend('TableSort')->extend('PagerDefault')->limit(50);
   $beans = $sql_query->orderByHeader($header)->execute();
-  
+
   $destination = drupal_get_destination();
-  
+
   foreach($beans as $bean) {
     $rows[$bean->bid] = array (
     'title' => array(
@@ -98,7 +98,7 @@ function bean_list() {
 
   $output = theme('table', array('header' => $header, 'rows' => $rows));
   $output .= theme('pager');
-  
+
   return $output;
 }
 
@@ -133,7 +133,7 @@ function theme_bean_add_list($variables) {
  * Bean form
  */
 function bean_form($form, &$form_state, $bean) {
-  
+
   // During initial form build, add the bean entity to the form state for use
   // during form building and processing. During a rebuild, use what is in the
   // form state.
@@ -146,7 +146,7 @@ function bean_form($form, &$form_state, $bean) {
   else {
     $bean = $form_state['bean'];
   }
-  
+
   $form['label'] = array(
     '#type' => 'textfield',
     '#title' => t('Label'),
@@ -208,7 +208,7 @@ function bean_form_validate($form, &$form_state) {
   field_attach_form_validate('bean', $bean, $form, $form_state);
   $form_state['values']['bean'] = $bean;
 
-  $bean->validate($form_state['values']);
+  $bean->validate($form_state['values'], $form_state);
 }
 
 /**

@@ -60,7 +60,7 @@ abstract class bean_plugin implements bean_type_plugin_interface {
   /**
    * THe plugin submit function
    */
-  public function validate($values) {}
+  public function validate($values, &$form_state) {}
 
   /**
    * Return the block content.

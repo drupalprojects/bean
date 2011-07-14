@@ -80,7 +80,7 @@ interface bean_type_plugin_interface {
    * @abstract
    * @param  $values
    */
-  public function validate($values);
+  public function validate($values, &$form_state);
 
   /**
    * Return the block content.
@@ -183,7 +183,7 @@ class Bean extends Entity {
   /**
    * Validate the plugin form
    */
-  public function validate($values) {
+  public function validate($values, &$form_state) {
     $this->plugin->validate($values);
   }
 
