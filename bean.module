@@ -123,7 +123,7 @@ function bean_menu() {
     'page callback' => 'bean_list',
     'access arguments' => array('administer beans'),
     'file' => 'includes/bean.pages.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
   );
 
   return $items;
