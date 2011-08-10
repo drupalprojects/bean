@@ -57,7 +57,17 @@ function bean_list() {
   $sql_query = db_select('bean', 'b');
 
   $sql_query->fields('b', array('bid', 'label', 'type'));
-  $sql_query = $sql_query->extend('TableSort')->extend('PagerDefault')->limit(50);
+  $sql_query = $sql_query->extend('TableSort')->extend('PagerDefault');
+  // Add filter
+  $filters = bean_get_filter();
+  if (empty($filters)) {
+    $sql_query->limit(50);
+  }
+  else {
+    $sql_query->limit($filters['per_page']);
+    $sql_query->condition('type', $filters['types'], 'IN');
+  }
+
   $beans = $sql_query->orderByHeader($header)->execute();
 
   $destination = drupal_get_destination();
@@ -96,7 +106,8 @@ function bean_list() {
     );
   }
 
-  $output = theme('table', array('header' => $header, 'rows' => $rows));
+  $output = drupal_render(drupal_get_form('bean_filter_form'));
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
   $output .= theme('pager');
 
   return $output;
@@ -317,4 +328,95 @@ function bean_delete_confirm_submit($form, &$form_state) {
   }
 
   $form_state['redirect'] = '<front>';
+}
+
+function bean_filter_form($form, &$form_state) {
+  $filters = bean_get_filter();
+
+  $form['filters'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Filters'),
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
+  );
+
+  $type_options = array();
+  foreach (bean_get_types() as $type) {
+    $type_options[$type->type] = $type->getLabel();
+  }
+
+  $form['filters']['types'] = array(
+    '#type' => 'select',
+    '#title' => t('Type'),
+    '#multiple' => TRUE,
+    '#options' => $type_options,
+    '#default_value' => $filters['types'],
+  );
+
+  $form['filters']['per_page'] = array(
+    '#type' => 'select',
+    '#title' => t('Items Per Page'),
+    '#multiple' => FALSE,
+    '#options' => array(20 => '20', 50 => '50', 100 => '100', 200 => '200', 500 => '500'),
+    '#default_value' => $filters['per_page'],
+  );
+
+  $form['filters']['filter'] = array(
+    '#type' => 'submit',
+    '#value' => t('Filter'),
+    '#submit' => array('bean_filter_submit'),
+  );
+  $form['filters']['reset'] = array(
+    '#type' => 'submit',
+    '#value' => t('Reset'),
+    '#submit' => array('bean_reset_filter_submit'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit function for filter
+ */
+function bean_filter_submit($form, &$form_state) {
+  $filters = array(
+    'types' => $form_state['values']['filters']['types'],
+    'per_page' => $form_state['values']['filters']['per_page'],
+  );
+
+  bean_set_filter($filters);
+
+  drupal_goto('admin/content/blocks');
+
+}
+
+function bean_reset_filter_submit($form, &$form_state) {
+  bean_reset_filter();
+
+  drupal_goto('admin/content/blocks');
+}
+
+/**
+ * Set the filter in the session
+ */
+function bean_set_filter($filter) {
+  $_SESSION['bean-filter'] = $filter;
+}
+
+/**
+ * Get the filter
+ */
+function bean_get_filter() {
+  $filters = !empty($_SESSION['bean-filter']) ? $_SESSION['bean-filter'] : array();
+  $types = empty($filters['types']) ? array() : $filters['types'];
+  $per_page = empty($filters['per_page']) ? array() : $filters['per_page'];
+  return compact('types', 'per_page');
+}
+
+/**
+ * Reset the filter
+ */
+function bean_reset_filter() {
+  unset($_SESSION['bean-filter']);
 }
