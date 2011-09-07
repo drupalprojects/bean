@@ -72,6 +72,8 @@ function bean_list() {
 
   $destination = drupal_get_destination();
 
+  $beans = $beans ?: array();
+
   foreach($beans as $bean) {
     $rows[$bean->bid] = array (
     'title' => array(
@@ -106,7 +108,8 @@ function bean_list() {
     );
   }
 
-  $output = drupal_render(drupal_get_form('bean_filter_form'));
+  $bean_filter_form = drupal_get_form('bean_filter_form');
+  $output = drupal_render($bean_filter_form);
   $output .= theme('table', array('header' => $header, 'rows' => $rows));
   $output .= theme('pager');
 

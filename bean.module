@@ -309,7 +309,12 @@ function bean_get_all_beans() {
     $result = $query
       ->entityCondition('entity_type', 'bean')
       ->execute();
-    $beans = bean_load_multiple(array_keys($result['bean']));
+    if (isset($result['bean'])) {
+      $beans = bean_load_multiple(array_keys($result['bean']));
+    }
+    else {
+      $beans = array();
+    }
   }
 
   return $beans;
