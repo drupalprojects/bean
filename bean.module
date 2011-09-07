@@ -302,7 +302,17 @@ function bean_load_plugin_class_all() {
  * Load all beans
  */
 function bean_get_all_beans() {
-  return bean_load_multiple(FALSE);
+  $beans = &drupal_static(__FUNCTION__);
+
+  if (!isset($beans)) {
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'bean')
+      ->execute();
+    $beans = bean_load_multiple(array_keys($result['bean']));
+  }
+
+  return $beans;
 }
 
 /**
