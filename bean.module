@@ -19,6 +19,7 @@ function bean_entity_info() {
       'entity keys' => array(
         'id' => 'bid',
         'bundle' => 'type',
+        'label' => 'title',
       ),
       'bundles' => array(),
       'bundle keys' => array(
@@ -47,6 +48,23 @@ function bean_entity_info() {
   }
 
   return $return;
+}
+
+/**
+ * Implements hook_translation_info().
+ */
+function bean_translation_info($types = NULL) {
+  $info = array(
+    'bean' => array(
+      'translation' => array(
+        'entity_translation' => array(
+          'base path' => 'block/%bean',
+        ),
+      ),
+    ),
+  );
+
+  return isset($types) ? array_intersect_key($info, $types) : $info;
 }
 
 /**
