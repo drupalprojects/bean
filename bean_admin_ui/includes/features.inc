@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Features module hooks
+ */
+
+/**
  * Implements hook_features_pipe_MODULE_alter().
  */
 function bean_admin_ui_features_pipe_bean_type_alter(&$pipe, $data, $export) {
@@ -13,4 +18,3 @@ function bean_admin_ui_features_pipe_bean_type_alter(&$pipe, $data, $export) {
     }
   }
 }
-

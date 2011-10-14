@@ -18,14 +18,14 @@ class BeanMetadataController extends EntityDefaultMetadataController {
       'label' => t('Label'),
       'description' => t('The bean label'),
       'getter callback' => 'entity_property_getter_method',
-			'schema field' => 'label',
+      'schema field' => 'label',
     );
 
     $properties['title'] = array(
       'label' => t('Title'),
       'description' => t('The bean title'),
       'getter callback' => 'entity_property_getter_method',
-			'schema field' => 'title',
+      'schema field' => 'title',
     );
 
     $properties['type'] = array(

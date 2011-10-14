@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Bean classes and plugin interface
+ */
+
+/**
  * Interface for Plugin Classes
  */
 interface bean_type_plugin_interface {

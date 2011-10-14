@@ -6,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_schema
+ * Implements of hook_schema().
  */
 function bean_admin_ui_schema() {
   $schema['bean_type'] = array(
@@ -63,7 +63,7 @@ function bean_admin_ui_schema() {
  */
 function bean_admin_ui_update_7001() {
   db_drop_primary_key('bean_type');
-  
+
   // Add a type_id column for use by CTools.
   $spec = array(
     'description' => 'The Type ID of this block. Only used internally by CTools',
@@ -76,7 +76,7 @@ function bean_admin_ui_update_7001() {
     'primary key' => array('type_id'),
   );
   db_add_field('bean_type', 'type_id', $spec, $new_keys);
-  
+
   // Add the options column.
   $spec = array(
     'description' => 'Block content configuration.',
@@ -84,7 +84,7 @@ function bean_admin_ui_update_7001() {
     'size' => 'big',
   );
   db_add_field('bean_type', 'options', $spec);
-  
+
   // Adjust the type column so tat it doesn't clash with CTools.
   $spec = array(
     'description' => 'The machine-readable name of this bean type.',
@@ -101,6 +101,6 @@ function bean_admin_ui_update_7001() {
 
   // Force a cache flush to ensure CTools plugins can be found and menus are rebuilt.
   cache_clear_all('*', 'cache', TRUE);
-  
+
   return t('Added new fields required for CTools exportable support.');
 }

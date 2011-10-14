@@ -49,7 +49,7 @@ function bean_list() {
 
   // Build the sortable table header.
   $header = array(
-    'title' => array('data' => t('Title'), 'field' => 'b.label', 'sort'=>'asc'),
+    'title' => array('data' => t('Title'), 'field' => 'b.label', 'sort' => 'asc'),
     'type' => array('data' => t('Type'), 'field' => 'b.type'),
     'operations' => array('data' => t('Operations')),
   );
@@ -65,9 +65,9 @@ function bean_list() {
   }
   else {
     $sql_query->limit($filters['per_page']);
-		if (!empty($filters['types'])) {
-			$sql_query->condition('type', $filters['types'], 'IN');
-		}
+    if (!empty($filters['types'])) {
+      $sql_query->condition('type', $filters['types'], 'IN');
+    }
   }
 
   $beans = $sql_query->orderByHeader($header)->execute();
@@ -76,16 +76,16 @@ function bean_list() {
 
   $beans = $beans ? $beans : array();
 
-  foreach($beans as $bean) {
-    $rows[$bean->bid] = array (
-    'title' => array(
-      'data' => array(
-        '#type' => 'link',
-        '#title' => $bean->label,
-        '#href' => 'block/' . $bean->bid,
+  foreach ($beans as $bean) {
+    $rows[$bean->bid] = array(
+      'title' => array(
+        'data' => array(
+          '#type' => 'link',
+          '#title' => $bean->label,
+          '#href' => 'block/' . $bean->bid,
+        ),
       ),
-    ),
-    'type' => check_plain($bean->type),
+      'type' => check_plain($bean->type),
     );
 
     // Build a list of all the accessible operations for the current bean.
@@ -134,7 +134,7 @@ function theme_bean_add_list($variables) {
   if ($content) {
     $output = '<dl class="bean-type-list">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l('Add ' . $item->getLabel(), 'block/add/' . str_replace('_', '-', $item->type)) . '</dt>';
+      $output .= '<dt>' . l(t('Add @label', array('@label' => $item->getLabel())), 'block/add/' . str_replace('_', '-', $item->type)) . '</dt>';
     }
     $output .= '</dl>';
   }
@@ -328,7 +328,7 @@ function bean_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
     $bean = $form['#bean'];
     $bean->delete();
-    watchdog('block', '@type: deleted %title.', array('@type' => $bean->type, '%title' => $bean->label));
+    watchdog('bean', '@type: deleted %title.', array('@type' => $bean->type, '%title' => $bean->label));
     drupal_set_message(t('@type %title has been deleted.', array('@type' => $bean->type, '%title' => $bean->label)));
   }
 

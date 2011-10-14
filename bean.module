@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements hook_entity_info()
+ * Implements hook_entity_info().
  */
 function bean_entity_info() {
   $return = array(
@@ -82,7 +82,7 @@ function bean_menu() {
   );
 
   foreach (bean_get_types() as $type) {
-   if (!empty($type)) {
+    if (!empty($type)) {
       $items['block/add/' . $type->buildURL()] = array(
         'title' => $type->getLabel(),
         'title callback' => 'check_plain',
@@ -377,7 +377,7 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
       $bean->setPlugin();
       $bean->setFields();
     } catch (BeanException $e) {
-      watchdog(WATCHDOG_ERROR, t('Bid: @bid Bean not loaded correctly', array('@bid' => $bean->bid)));
+      watchdog('bean', 'Bid: @bid Bean not loaded correctly', array('@bid' => $bean->bid), WATCHDOG_ERROR);
     }
     $beans[$bid] = $bean;
   }
@@ -386,7 +386,7 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
 }
 
 /**
- * Implements hook_permissions()
+ * Implements hook_permissions().
  */
 function bean_permission() {
   $perms = array(
@@ -533,7 +533,7 @@ function bean_block_info() {
 }
 
 /**
- * Implements hook_block_view
+ * Implements hook_block_view().
  */
 function bean_block_view($delta = '') {
   $bean = bean_load($delta);
@@ -577,7 +577,7 @@ function bean_bean_types_api_info() {
 }
 
 /**
- * Implements hook_ctools_plugin_type()
+ * Implements hook_ctools_plugin_type().
  */
 function bean_ctools_plugin_type() {
   return array(
@@ -597,7 +597,7 @@ function bean_ctools_plugin_type() {
 }
 
 /**
- * Implements hook_ctools_plugin_directory()
+ * Implements hook_ctools_plugin_directory().
  */
 function bean_ctools_plugin_directory($module, $type) {
   if ($module == 'bean') {
@@ -606,7 +606,7 @@ function bean_ctools_plugin_directory($module, $type) {
 }
 
 /**
- * Implements hook_bean_types()
+ * Implements hook_bean_types().
  */
 function bean_bean_types() {
   $plugins = array();

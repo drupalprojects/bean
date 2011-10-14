@@ -19,7 +19,7 @@ class bean_custom extends bean_plugin {
       db_delete('bean')
       ->condition('type', $this->type)
       ->execute();
-    } 
+    }
     db_delete('bean_type')
     ->condition('name', $this->type)
     ->execute();
@@ -42,7 +42,7 @@ class bean_custom extends bean_plugin {
 
     bean_reset();
   }
-  
+
   public function getExportStatus() {
     return $this->plugin_info['export_status'];
   }
