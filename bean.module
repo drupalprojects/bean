@@ -77,7 +77,7 @@ function bean_menu() {
     'title' => 'Add Block',
     'page callback' => 'bean_add_page',
     'access arguments' => array('add'),
-    'access callback' => 'bean_access',
+    'access callback' => 'bean_add_page_access',
     'file' => 'includes/bean.pages.inc',
   );
 
@@ -436,18 +436,17 @@ function bean_type_access($op, $type = NULL, $account = NULL) {
  *   The operation being performed. One of 'view', 'update', 'create', 'delete'
  *   or just 'edit' (being the same as 'create' or 'update').
  * @param $bean
- *   Optionally a bean or a bean type o check access for. If nothing is
+ *   Optionally a bean or a bean type to check access for. If nothing is
  *   given, access for all beans is determined.
  * @param $account
- *   The user to check for. Leave it to NULL to check for the global user.
+ *   The user to check for. Leave it to NULL to check for the current user.
  * @return boolean
  *   Whether access is allowed or not.
  */
 function bean_access($op, $bean = NULL, $account = NULL) {
-  if (user_access('administer beans', $account)) {
-    return TRUE;
-  }
+  $rights = &drupal_static(__FUNCTION__, array());
 
+  // Only real permissions are view, delete, create and edit
   switch ($op) {
     case 'view':
     case 'delete':
@@ -461,22 +460,70 @@ function bean_access($op, $bean = NULL, $account = NULL) {
       $op = 'edit';
   }
 
+  // If no user object is supplied, the access check is for the current user.
+  if (empty($account)) {
+    $account = $GLOBALS['user'];
+  }
+
+  $cid = is_object($bean) ? $bean->bid : $bean;
+
+  // If we've already checked access for this node, user and op, return from
+  // cache.
+  if (isset($rights[$account->uid][$cid][$op])) {
+    return $rights[$account->uid][$cid][$op];
+  }
+
+  // administer beans wins
+  if (user_access('administer beans', $account)) {
+    return TRUE;
+  }
+
+  // We grant access to the bean if both of the following conditions are met:
+  // - No modules say to deny access.
+  // - At least one module says to grant access.
+  // If no module specified either allow or deny, we fall back to the default.
+  $access = module_invoke_all('bean_access', $bean, $op, $account);
+  if (in_array(FALSE, $access, TRUE)) {
+    $rights[$account->uid][$cid][$op] = FALSE;
+    return FALSE;
+  }
+  elseif (in_array(TRUE, $access, TRUE)) {
+    $rights[$account->uid][$cid][$op] = TRUE;
+    return TRUE;
+  }
+
   if (isset($bean) && $type_name = $bean->type) {
     if (user_access("$op any $type_name bean", $account)) {
+      $rights[$account->uid][$cid][$op] = TRUE;
       return TRUE;
     }
-
   }
   else {
     // Here we are looking for access to any of the types
     foreach (bean_get_types() as $bean_type) {
       $perm = $op . ' any ' . $bean_type->type . ' bean';
       if (user_access($perm, $account)) {
+        $rights[$account->uid][$cid][$op] = TRUE;
         return TRUE;
       }
     }
   }
 
+  return FALSE;
+}
+
+/**
+ * Access callback for the general Bean add page (block/add).
+ */
+function bean_add_page_access() {
+  if (user_access('administer bean types') || user_access('administer beans')) {
+    return TRUE;
+  }
+  foreach (bean_get_types() as $bean_type) {
+    if (bean_access('create', $bean_type->type)) {
+      return TRUE;
+    }
+  }
   return FALSE;
 }
 
