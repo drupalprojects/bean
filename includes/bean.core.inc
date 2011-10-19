@@ -114,6 +114,7 @@ class Bean extends Entity {
   public $title;
   public $type;
   public $data;
+  public $delta;
   protected $plugin;
 
   /**
@@ -164,7 +165,7 @@ class Bean extends Entity {
   public function setFields() {
     // NOTE: When setFields is caled externally $this->data is already unserializd.
     if (!empty($this->plugin)) {
-      $values = is_array($this->data)? $this->data : unserialize($this->data);
+      $values = is_array($this->data) ? $this->data : unserialize($this->data);
       foreach ($this->plugin->values() as $field => $default) {
         $this->$field = isset($values[$field]) ? $values[$field] : $default;
       }
@@ -239,6 +240,12 @@ class Bean extends Entity {
    * Override the save to add clearing of caches
    */
   public function save() {
+    // Set the delta if it's not set already
+    if (empty($this->delta)) {
+      // Base it on the label and make sure it isn't too long for the database
+      $this->delta = drupal_clean_css_identifier(strtolower($this->label));
+      $this->delta = substr($this->delta, 0, 32);
+    }
     $return = parent::save();
     block_flush_caches();
     return $return;

@@ -17,6 +17,12 @@ function bean_schema() {
         'not null' => TRUE,
         'description' => 'Primary Key: Unique bean item ID.',
       ),
+      'delta' => array(
+        'description' => "The bean's {block}.delta.",
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
       'label' => array(
         'description' => 'The Displays in the Admin page.',
         'type' => 'varchar',
@@ -53,6 +59,9 @@ function bean_schema() {
       ),
     ),
     'primary key' => array('bid'),
+    'unique keys' => array(
+      'delta' => array('delta'),
+    ),
   );
 
   return $schema;
@@ -64,4 +73,22 @@ function bean_schema() {
 function bean_update_7001() {
   registry_rebuild();
   return t('Registry has been rebuilt');
+}
+
+/**
+ * Add delta field.
+ */
+function bean_update_7002() {
+  $spec = array(
+    'description' => "The bean's {block}.delta.",
+    'type' => 'varchar',
+    'initial' => '',
+    'length' => 32,
+    'not null' => TRUE,
+  );
+  db_add_field('bean', 'delta', $spec);
+  db_update('bean')
+    ->expression('delta', 'bid')
+    ->execute();
+  return t('Bean delta field added.');
 }

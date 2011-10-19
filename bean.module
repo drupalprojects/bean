@@ -356,6 +356,28 @@ function bean_load($bid, $reset = FALSE) {
 }
 
 /**
+ * Fetch a bean object by its delta.
+ *
+ * @param $delta
+ *   String specifying the bean delta.
+ * @param $reset
+ *   A boolean indicating that the internal cache should be reset.
+ * @return
+ *   A fully-loaded $bean object or FALSE if it cannot be loaded.
+ */
+function bean_load_delta($delta, $reset = FALSE) {
+  $result = db_select('bean', 'b')
+    ->fields('b', array('bid'))
+    ->condition('delta', $delta)
+    ->execute();
+  if ($bid = $result->fetchField()) {
+    $beans = bean_load_multiple(array($bid), array(), $reset);
+    return reset($beans);
+  }
+  return FALSE;
+}
+
+/**
  * Load multiple beans based on certain conditions.
  *
  * @param $bids
@@ -570,7 +592,7 @@ function bean_block_info() {
   $blocks = array();
   $beans = bean_get_all_beans();
   foreach ($beans as $bean) {
-    $blocks[$bean->bid] = array(
+    $blocks[$bean->delta] = array(
       'info' => $bean->label,
       'cache' => $bean->getInfo('cache_level'),
     );

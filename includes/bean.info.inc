@@ -28,6 +28,13 @@ class BeanMetadataController extends EntityDefaultMetadataController {
       'schema field' => 'title',
     );
 
+    $properties['delta'] = array(
+      'getter callback' => 'entity_property_getter_method',
+      'required' => TRUE,
+      'schema filed' => 'delta',
+      'description' => t('The bean delta.'),
+    );
+
     $properties['type'] = array(
       'type' => 'bean_type',
       'getter callback' => 'entity_property_getter_method',
