@@ -605,7 +605,7 @@ function bean_block_info() {
  * Implements hook_block_view().
  */
 function bean_block_view($delta = '') {
-  $bean = bean_load($delta);
+  $bean = bean_load_delta($delta);
 
   if (bean_access('view', $bean) && $bean) {
     return array(
