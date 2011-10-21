@@ -26,7 +26,7 @@ function bean_edit($bean) {
 function bean_add($type) {
   $bean = bean_create(array('type' => $type));
 
-  return drupal_get_form('bean_form', $bean);
+  return drupal_get_form('bean_form', $bean, $type);
 }
 
 /**
@@ -148,7 +148,7 @@ function theme_bean_add_list($variables) {
 /**
  * Bean form
  */
-function bean_form($form, &$form_state, $bean) {
+function bean_form($form, &$form_state, $bean, $type = NULL) {
 
   // During initial form build, add the bean entity to the form state for use
   // during form building and processing. During a rebuild, use what is in the
@@ -156,6 +156,9 @@ function bean_form($form, &$form_state, $bean) {
   if (!isset($form_state['bean'])) {
     if (!isset($bean->label)) {
       $bean->label = NULL;
+    }
+    if (isset($type)) {
+      $bean->type = $type;
     }
     $form_state['bean'] = $bean;
   }
@@ -177,6 +180,22 @@ function bean_form($form, &$form_state, $bean) {
     '#description' => t('The Title of the block.'),
     '#default_value' => $bean->title,
   );
+
+  // The view mode
+  if (user_access('edit bean view mode')) {
+    $bean_info = $bean->entityInfo();
+    $view_modes = array_keys($bean_info['view modes']);
+    $view_modes = array_combine($view_modes, $view_modes);
+
+    $form['view_mode'] = array(
+      '#title' => t('View Mode'),
+      '#description' => t('Edit the view mode of the Bean'),
+      '#default_value' => $bean->view_mode,
+      '#type' => 'select',
+      '#required' => TRUE,
+      '#options' => $view_modes,
+    );
+  }
 
   $form['bean'] = array(
     '#type' => 'value',
@@ -220,6 +239,7 @@ function bean_form_validate($form, &$form_state) {
   $bean = $form_state['values']['bean'];
   $bean->label = $form_state['values']['label'];
   $bean->title = $form_state['values']['title'];
+  $bean->view_mode = $form_state['values']['view_mode'];
 
   field_attach_form_validate('bean', $bean, $form, $form_state);
   $form_state['values']['bean'] = $bean;

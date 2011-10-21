@@ -44,6 +44,13 @@ function bean_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'view_mode' => array(
+        'description' => 'The View mode to use as the bean.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => 'full',
+      ),
       'data' => array(
         'type' => 'text',
         'not null' => FALSE,
@@ -91,4 +98,22 @@ function bean_update_7002() {
     ->expression('delta', 'bid')
     ->execute();
   return t('Bean delta field added.');
+}
+
+/**
+ * Add view_mode field.
+ */
+function bean_update_7003() {
+  $spec = array(
+    'description' => "The view mode of the ean.",
+    'type' => 'varchar',
+    'initial' => 'full',
+    'length' => 32,
+    'not null' => TRUE,
+  );
+  db_add_field('bean', 'view_mode', $spec);
+  db_update('bean')
+    ->fields(array('view_mode' => 'full'))
+    ->execute();
+  return t('Bean view mode field added.');
 }

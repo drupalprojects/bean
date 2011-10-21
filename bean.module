@@ -29,7 +29,13 @@ function bean_entity_info() {
       'uri callback' => 'entity_class_uri',
       'access callback' => 'bean_access',
       'module' => 'bean',
-      'metadata controller class' => 'BeanMetadataController'
+      'metadata controller class' => 'BeanMetadataController',
+      'view modes' => array(
+        'full' => array(
+          'label' => t('Full content'),
+          'custom settings' => FALSE,
+        ),
+      )
     ),
   );
 
@@ -420,6 +426,10 @@ function bean_permission() {
       'title' => t('Administer beans'),
       'description' => t('Edit and view all beans.'),
     ),
+    'edit bean view mode' => array(
+      'title' => t('Change the View Mode of the Bean'),
+      'description' => t('Ability to change the view mode on teh bean form'),
+    ),
   );
 
   // Add a Permission for each entity type
@@ -609,7 +619,7 @@ function bean_block_view($delta = '') {
 
   if (bean_access('view', $bean) && $bean) {
     return array(
-      'content' => $bean->view(),
+      'content' => $bean->view($bean->view_mode),
       'subject' => $bean->title,
     );
   }

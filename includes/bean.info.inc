@@ -28,6 +28,14 @@ class BeanMetadataController extends EntityDefaultMetadataController {
       'schema field' => 'title',
     );
 
+    $properties['view_mode'] = array(
+      'label' => t('View Mode'),
+      'description' => t('View mode of the bean'),
+      'getter callback' => 'entity_property_getter_method',
+      'schema field' => 'view_mode',
+      'required' => TRUE,
+    );
+
     $properties['delta'] = array(
       'getter callback' => 'entity_property_getter_method',
       'description' => t('The delta of the block'),
