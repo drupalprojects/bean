@@ -30,6 +30,8 @@ class BeanMetadataController extends EntityDefaultMetadataController {
 
     $properties['delta'] = array(
       'getter callback' => 'entity_property_getter_method',
+      'description' => t('The delta of the block'),
+      'label' => t('Block Delta'),
       'required' => TRUE,
       'schema filed' => 'delta',
       'description' => t('The bean delta.'),
