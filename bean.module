@@ -514,8 +514,8 @@ function bean_access($op, $bean = NULL, $account = NULL) {
     return TRUE;
   }
 
-  if (isset($bean) && $type_name = $bean->type) {
-    if (user_access("$op any $type_name bean", $account)) {
+  if (isset($bean) && isset($bean->type)) {
+    if (user_access("$op any {$bean->type} bean", $account)) {
       $rights[$account->uid][$cid][$op] = TRUE;
       return TRUE;
     }
