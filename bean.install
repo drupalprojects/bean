@@ -49,7 +49,7 @@ function bean_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'default' => 'full',
+        'default' => 'default',
       ),
       'data' => array(
         'type' => 'text',
@@ -105,15 +105,15 @@ function bean_update_7002() {
  */
 function bean_update_7003() {
   $spec = array(
-    'description' => "The view mode of the ean.",
+    'description' => "The view mode of the bean.",
     'type' => 'varchar',
-    'initial' => 'full',
+    'initial' => 'default',
     'length' => 32,
     'not null' => TRUE,
   );
   db_add_field('bean', 'view_mode', $spec);
   db_update('bean')
-    ->fields(array('view_mode' => 'full'))
+    ->fields(array('view_mode' => 'default'))
     ->execute();
   return t('Bean view mode field added.');
 }

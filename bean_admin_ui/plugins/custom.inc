@@ -64,7 +64,7 @@ class bean_custom extends bean_plugin {
     return array();
   }
 
-  public function view($bean, $content, $view_mode = 'full', $langcode = NULL) {
+  public function view($bean, $content, $view_mode = 'default', $langcode = NULL) {
     return $content;
   }
 }

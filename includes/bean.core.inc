@@ -103,7 +103,7 @@ interface bean_type_plugin_interface {
    * @return
    *   Return a renderable content array.
    */
-  public function view($bean, $content, $view_mode = 'full', $langcode = NULL);
+  public function view($bean, $content, $view_mode = 'default', $langcode = NULL);
 }
 
 /**
@@ -231,7 +231,7 @@ class Bean extends Entity {
    *
    * @see entity_view()
    */
-  public function view($view_mode = 'full', $langcode = NULL) {
+  public function view($view_mode = 'default', $langcode = NULL) {
     $content = parent::view($view_mode, $langcode);
 
     return $this->plugin->view($this, $content, $view_mode, $langcode);

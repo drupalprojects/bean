@@ -31,8 +31,8 @@ function bean_entity_info() {
       'module' => 'bean',
       'metadata controller class' => 'BeanMetadataController',
       'view modes' => array(
-        'full' => array(
-          'label' => t('Full content'),
+        'default' => array(
+          'label' => t('Default'),
           'custom settings' => FALSE,
         ),
       )
