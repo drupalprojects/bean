@@ -75,7 +75,7 @@ abstract class bean_plugin implements bean_type_plugin_interface {
    * @return
    *   Return a renderable content array.
    */
-  public function view($bean, $content, $view_mode = 'full', $langcode = NULL) {}
+  public function view($bean, $content, $view_mode = 'default', $langcode = NULL) {}
 }
 
 /**
@@ -90,7 +90,7 @@ class bean_default extends bean_plugin {
     return array();
   }
 
-  public function view($bean, $content, $view_mode = 'full', $langcode = NULL) {
+  public function view($bean, $content, $view_mode = 'default', $langcode = NULL) {
     return $content;
   }
 }
