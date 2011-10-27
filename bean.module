@@ -615,14 +615,19 @@ function bean_block_info() {
  * Implements hook_block_view().
  */
 function bean_block_view($delta = '') {
+  $return = array();
   $bean = bean_load_delta($delta);
 
   if (bean_access('view', $bean) && $bean) {
-    return array(
+    $return = array(
       'content' => $bean->view($bean->view_mode),
       'subject' => $bean->title,
     );
+
+    $return['content']['#contextual_links']['bean'] = array('block', array($bean->internalIdentifier()));
   }
+
+  return $return;
 }
 
 /**
@@ -714,15 +719,6 @@ function bean_theme() {
       'variables' => array('content' => NULL),
     ),
   );
-}
-
-/**
- * Implements hook_block_view_alter().
- */
-function bean_block_view_alter(&$data, $block) {
-  if ($block->module == 'bean') {
-    $data['content']['#contextual_links']['bean'] = array('block', array($block->delta));
-  }
 }
 
 /**
