@@ -231,7 +231,7 @@ class Bean extends Entity {
    *
    * @see entity_view()
    */
-  public function view($view_mode = 'default', $langcode = NULL) {
+  public function view($view_mode = 'default', $langcode = NULL, $page = NULL) {
     $content = parent::view($view_mode, $langcode);
 
     return $this->plugin->view($this, $content, $view_mode, $langcode);
