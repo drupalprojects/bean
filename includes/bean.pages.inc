@@ -172,6 +172,7 @@ function bean_form($form, &$form_state, $bean, $type = NULL) {
     '#required' => TRUE,
     '#default_value' => $bean->label,
     '#description' => t('Name that displays in the admin interface'),
+    '#weight' => -10,
   );
 
   $form['title'] = array(
@@ -179,6 +180,7 @@ function bean_form($form, &$form_state, $bean, $type = NULL) {
     '#title' => t('Title'),
     '#description' => t('The Title of the block.'),
     '#default_value' => $bean->title,
+    '#weight' => -9,
   );
 
   // The view mode
@@ -194,6 +196,7 @@ function bean_form($form, &$form_state, $bean, $type = NULL) {
       '#type' => 'select',
       '#required' => TRUE,
       '#options' => $view_modes,
+      '#weight' => -8,
     );
   }
 
