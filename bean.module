@@ -13,7 +13,7 @@ function bean_entity_info() {
     'bean' => array(
       'label' => t('Block'),
       'entity class' => 'Bean',
-      'controller class' => 'EntityAPIController',
+      'controller class' => 'BeanEntityAPIController',
       'base table' => 'bean',
       'fieldable' => TRUE,
       'entity keys' => array(
@@ -399,18 +399,7 @@ function bean_load_delta($delta, $reset = FALSE) {
  * @see bean_load()
  */
 function bean_load_multiple($bids = array(), $conditions = array(), $reset = FALSE) {
-  $beans = entity_load('bean', $bids, $conditions, $reset);
-  foreach ($beans as $bid => $bean) {
-    try {
-      $bean->setPlugin();
-      $bean->setFields();
-    } catch (BeanException $e) {
-      watchdog('bean', 'Bid: @bid Bean not loaded correctly', array('@bid' => $bean->bid), WATCHDOG_ERROR);
-    }
-    $beans[$bid] = $bean;
-  }
-
-  return $beans;
+  return entity_load('bean', $bids, $conditions, $reset);
 }
 
 /**

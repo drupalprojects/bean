@@ -133,39 +133,44 @@ class Bean extends Entity {
     return $this->label;
   }
 
-  public function __construct($values = array()) {
+  public function __construct(array $values = array()) {
     parent::__construct($values, 'bean');
-    // Load the plugin info
-    // NOTE: When this is called as part of entity_load, $values seems to be
-    // empty, which makes it impossible to load the plugin and field data.
-    // in this case, we don't do this now and rely on the caller of entity_load to
-    // do it manually.
+  }
+
+  protected function setUp() {
+    parent::setUp();
     if (!empty($this->type)) {
-      $this->setPlugin();
+      $plugin = bean_load_plugin_class($this->type);
+      $this->loadUp($plugin);
+    }
+  }
+
+  /**
+   * This is a work around for version of PDO that call __construct() before
+   * it loads up the object with values from the DB.
+   */
+  public function loadUp(bean_type_plugin_interface $plugin) {
+    if (empty($this->plugin)) {
+      $this->setPlugin($plugin);
       $this->setFields();
     }
   }
 
   /**
    * Load and set the plugin info.
-   * FIXME: This should probably be be private, but we need to be able to call it
-   * externally for now (see note in __construct).
+   * This can be called externally via loadUP()
    */
-  public function setPlugin() {
-    $this->plugin = bean_load_plugin_class($this->type);
-    if (!($this->plugin instanceof bean_type_plugin_interface)) {
-      throw new BeanException('Plugin Not Loaded');
-    }
+  protected  function setPlugin($plugin) {
+    $this->plugin = $plugin;
   }
 
   /**
    * Set the fields from the defaults and plugin
-   * FIXME: This should probably be be private, but we need to be able to call it
-   * externally for now (see note in __construct).
+   * This can be called externally via loadUP()
    */
-  public function setFields() {
-    // NOTE: When setFields is caled externally $this->data is already unserializd.
-    if (!empty($this->plugin)) {
+  protected function setFields() {
+    // NOTE: When setFields is called externally $this->data is already unserialized.
+    if (!empty($this->plugin) && !empty($this->type)) {
       $values = is_array($this->data) ? $this->data : unserialize($this->data);
       foreach ($this->plugin->values() as $field => $default) {
         $this->$field = isset($values[$field]) ? $values[$field] : $default;
@@ -277,6 +282,116 @@ class Bean extends Entity {
       ->execute();
 
     parent::delete();
+  }
+}
+
+class BeanEntityAPIController extends EntityAPIController {
+  protected function setPlugin(Bean $bean) {
+    static $plugins = array();
+
+    if (empty($plugins[$bean->type])) {
+      $plugins[$bean->type] = bean_load_plugin_class($bean->type);
+      $bean->loadUp($plugins[$bean->type]);
+    }
+  }
+
+  /**
+   * Overridden.
+   * @see EntityAPIController#load($ids, $conditions)
+   *
+   * We need to load the plugin and set the defaults before
+   * anything else is donw to the record
+   */
+  public function load($ids = array(), $conditions = array()) {
+    $entities = array();
+
+    // Revisions are not statically cached, and require a different query to
+    // other conditions, so separate the revision id into its own variable.
+    if ($this->revisionKey && isset($conditions[$this->revisionKey])) {
+      $revision_id = $conditions[$this->revisionKey];
+      unset($conditions[$this->revisionKey]);
+    }
+    else {
+      $revision_id = FALSE;
+    }
+
+    // Create a new variable which is either a prepared version of the $ids
+    // array for later comparison with the entity cache, or FALSE if no $ids
+    // were passed. The $ids array is reduced as items are loaded from cache,
+    // and we need to know if it's empty for this reason to avoid querying the
+    // database when all requested entities are loaded from cache.
+    $passed_ids = !empty($ids) ? array_flip($ids) : FALSE;
+
+    // Try to load entities from the static cache.
+    if ($this->cache && !$revision_id) {
+      $entities = $this->cacheGet($ids, $conditions);
+      // If any entities were loaded, remove them from the ids still to load.
+      if ($passed_ids) {
+        $ids = array_keys(array_diff_key($passed_ids, $entities));
+      }
+    }
+
+    // Load any remaining entities from the database. This is the case if $ids
+    // is set to FALSE (so we load all entities), if there are any ids left to
+    // load or if loading a revision.
+    if (!($this->cacheComplete && $ids === FALSE && !$conditions) && ($ids === FALSE || $ids || $revision_id)) {
+      $queried_entities = array();
+      foreach ($this->query($ids, $conditions, $revision_id) as $record) {
+        // This is what was overridden
+        $this->setPlugin($record);
+        // Skip entities already retrieved from cache.
+        if (isset($entities[$record->{$this->idKey}])) {
+          continue;
+        }
+
+        // Take care of serialized columns.
+        $schema = drupal_get_schema($this->entityInfo['base table']);
+
+        foreach ($schema['fields'] as $field => $info) {
+          if (!empty($info['serialize']) && isset($record->$field)) {
+            $record->$field = unserialize($record->$field);
+            // Support automatic merging of 'data' fields into the entity.
+            if (!empty($info['merge']) && is_array($record->$field)) {
+              foreach ($record->$field as $key => $value) {
+                $record->$key = $value;
+              }
+              unset($record->$field);
+            }
+          }
+        }
+
+        $queried_entities[$record->{$this->idKey}] = $record;
+      }
+    }
+
+    // Pass all entities loaded from the database through $this->attachLoad(),
+    // which attaches fields (if supported by the entity type) and calls the
+    // entity type specific load callback, for example hook_node_load().
+    if (!empty($queried_entities)) {
+      $this->attachLoad($queried_entities, $revision_id);
+      $entities += $queried_entities;
+    }
+
+    if ($this->cache) {
+      // Add entities to the cache if we are not loading a revision.
+      if (!empty($queried_entities) && !$revision_id) {
+        $this->cacheSet($queried_entities);
+
+        // Remember if we have cached all entities now.
+        if (!$conditions && $ids === FALSE) {
+          $this->cacheComplete = TRUE;
+        }
+      }
+    }
+    // Ensure that the returned array is ordered the same as the original
+    // $ids array if this was passed in and remove any invalid ids.
+    if ($passed_ids && $passed_ids = array_intersect_key($passed_ids, $entities)) {
+      foreach ($passed_ids as $id => $value) {
+        $passed_ids[$id] = $entities[$id];
+      }
+      $entities = $passed_ids;
+    }
+    return $entities;
   }
 }
 
