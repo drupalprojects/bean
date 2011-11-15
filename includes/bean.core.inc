@@ -134,11 +134,17 @@ class Bean extends Entity {
   }
 
   public function __construct(array $values = array()) {
+    // If this is new then set the type first
+    if (isset($values['is_new'])) {
+      $this->type = isset($values['type']) ? $values['type'] : '';
+    }
+
     parent::__construct($values, 'bean');
   }
 
   protected function setUp() {
     parent::setUp();
+    
     if (!empty($this->type)) {
       $plugin = bean_load_plugin_class($this->type);
       $this->loadUp($plugin);
