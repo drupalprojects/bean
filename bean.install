@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements of hook_schema().
+ * Implements hook_schema().
  */
 function bean_schema() {
   $schema['bean'] = array(
@@ -73,6 +73,17 @@ function bean_schema() {
 
   return $schema;
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function bean_uninstall() {
+  // Bypass entity_load() as we cannot use it here.
+  foreach (bean_get_types() as $bean_type) {
+    field_attach_delete_bundle('bean', $bean_type->type);
+  }
+}
+
 
 /**
  * Update Registry to implement new Code Interface
