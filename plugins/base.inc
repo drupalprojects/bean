@@ -44,6 +44,21 @@ abstract class bean_plugin implements bean_type_plugin_interface {
   }
 
   /**
+   * Define the form values and their defaults
+   *
+   * Be sure to call combine the results form the parent::values() with yours
+   */
+  public function values() {
+    return array(
+      'view_mode' => 'default',
+    );
+  }
+
+  public function form($bean) {
+    return array();
+  }
+
+  /**
    * Add a Bean to the plugin
    */
   public function setBean($bean) {
@@ -75,21 +90,6 @@ abstract class bean_plugin implements bean_type_plugin_interface {
    * @return
    *   Return a renderable content array.
    */
-  public function view($bean, $content, $view_mode = 'default', $langcode = NULL) {}
-}
-
-/**
- * Example Implementation
- */
-class bean_default extends bean_plugin {
-  public function values() {
-    return array();
-  }
-
-  public function form($bean) {
-    return array();
-  }
-
   public function view($bean, $content, $view_mode = 'default', $langcode = NULL) {
     return $content;
   }

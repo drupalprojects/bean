@@ -199,6 +199,12 @@ function bean_form($form, &$form_state, $bean, $type = NULL) {
       '#weight' => -8,
     );
   }
+  else {
+    $form['view_mode'] = array(
+      '#type' => 'value',
+      '#value' => $bean->view_mode,
+    );
+  }
 
   $form['bean'] = array(
     '#type' => 'value',

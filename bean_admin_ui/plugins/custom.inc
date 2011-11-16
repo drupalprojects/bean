@@ -55,16 +55,4 @@ class bean_custom extends bean_plugin {
   public function setLabel($label) {
     $this->plugin_info['label'] = $label;
   }
-
-  public function values() {
-    return array();
-  }
-
-  public function form($bean) {
-    return array();
-  }
-
-  public function view($bean, $content, $view_mode = 'default', $langcode = NULL, $page = NULL) {
-    return $content;
-  }
 }
