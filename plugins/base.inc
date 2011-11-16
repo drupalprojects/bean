@@ -54,7 +54,7 @@ abstract class bean_plugin implements bean_type_plugin_interface {
     );
   }
 
-  public function form($bean) {
+  public function form($bean, $form, &$form_state) {
     return array();
   }
 

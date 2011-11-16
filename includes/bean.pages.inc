@@ -212,7 +212,7 @@ function bean_form($form, &$form_state, $bean, $type = NULL) {
   );
 
   // Get the Bean type form
-  $form += $bean->getForm();
+  $form += $bean->getForm($form, $form_state);
 
   // Add the buttons.
   $form['actions'] = array('#type' => 'actions');

@@ -75,9 +75,11 @@ interface bean_type_plugin_interface {
    * The Bean object will be either loaded from the database or filled with the defaults.
    *
    * @param $bean
+   * @param $form
+   * @param $form_state
    * @return form array
    */
-  public function form($bean);
+  public function form($bean, $form, &$form_state);
 
   /**
    * Validate function for bean type form
@@ -195,8 +197,8 @@ class Bean extends Entity {
   /**
    * Get the plugin form
    */
-  public function getForm() {
-    return $this->plugin->form($this);
+  public function getForm($form, &$form_state) {
+    return $this->plugin->form($this, $form, $form_state);
   }
 
   /**

@@ -10,7 +10,7 @@
  */
 function hook_bean_types_api_info() {
   return array(
-    'api' => 1,
+    'api' => 3,
   );
 }
 
