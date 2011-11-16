@@ -254,10 +254,23 @@ class Bean extends Entity {
   public function save() {
     // Set the delta if it's not set already
     if (empty($this->delta)) {
+      $max_length = 32;
       // Base it on the label and make sure it isn't too long for the database
       $this->delta = drupal_clean_css_identifier(strtolower($this->label));
-      $this->delta = substr($this->delta, 0, 32);
+      $this->delta = substr($this->delta, 0, $max_length);
+
+      // Check if delta is unique
+      if (bean_load_delta($this->delta)) {
+        $i = 0;
+        $separator = '-';
+        $original_delta = $this->delta;
+        do {
+          $unique_suffix = $separator . $i++;
+          $this->delta = substr($original_delta, 0, $max_length - drupal_strlen($unique_suffix)) . $unique_suffix;
+        } while (bean_load_delta($this->delta));
+      }
     }
+    
     $return = parent::save();
     block_flush_caches();
     return $return;
