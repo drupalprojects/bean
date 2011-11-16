@@ -638,14 +638,14 @@ function bean_types_hook_name() {
  * The current version of the API
  */
 function bean_current_version() {
-  return 2;
+  return 3;
 }
 
 /**
  * The minimal version
  */
 function bean_min_version() {
-  return 2;
+  return 3;
 }
 
 /**
