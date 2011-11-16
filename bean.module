@@ -101,7 +101,7 @@ function bean_menu() {
     }
   }
 
-  $items['block/%bean'] = array(
+  $items['block/%bean_delta'] = array(
     'title' => 'Block',
     'page callback' => 'bean_view',
     'page arguments' => array(1),
@@ -110,7 +110,7 @@ function bean_menu() {
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['block/%bean/view'] = array(
+  $items['block/%bean_delta/view'] = array(
     'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_NONE,
@@ -118,7 +118,7 @@ function bean_menu() {
   );
 
 
-  $items['block/%bean/edit'] = array(
+  $items['block/%bean_delta/edit'] = array(
     'title' => 'Edit',
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
@@ -129,7 +129,7 @@ function bean_menu() {
     'file' => 'includes/bean.pages.inc',
   );
 
-  $items['block/%bean/delete'] = array(
+  $items['block/%bean_delta/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bean_delete_confirm', 1),
@@ -382,6 +382,13 @@ function bean_load_delta($delta, $reset = FALSE) {
     return reset($beans);
   }
   return FALSE;
+}
+
+/**
+ * Menu callbac to load a bean by the delta
+ */
+function bean_delta_load($delta) {
+  return bean_load_delta($delta);
 }
 
 /**

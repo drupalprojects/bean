@@ -8,15 +8,15 @@
 /**
  * View the Bean
  */
-function bean_view($bean) {
-  drupal_set_title($bean->title);
+function bean_view(Bean $bean) {
+  drupal_set_title($bean->label());
   return $bean->view();
 }
 
 /**
  * Edit bean page callback
  */
-function bean_edit($bean) {
+function bean_edit(Bean $bean) {
   return drupal_get_form('bean_form', $bean);
 }
 
@@ -56,7 +56,7 @@ function bean_list() {
 
   $sql_query = db_select('bean', 'b');
 
-  $sql_query->fields('b', array('bid', 'label', 'type'));
+  $sql_query->fields('b', array('bid', 'label', 'type', 'delta'));
   $sql_query = $sql_query->extend('TableSort')->extend('PagerDefault');
   // Add filter
   $filters = bean_get_filter();
@@ -82,7 +82,7 @@ function bean_list() {
         'data' => array(
           '#type' => 'link',
           '#title' => $bean->label,
-          '#href' => 'block/' . $bean->bid,
+          '#href' => 'block/' . $bean->delta,
         ),
       ),
       'type' => check_plain($bean->type),
@@ -92,12 +92,12 @@ function bean_list() {
     $operations = array();
     $operations['edit'] = array(
       'title' => t('edit'),
-      'href' => 'block/' . $bean->bid . '/edit',
+      'href' => 'block/' . $bean->delta . '/edit',
       'query' => $destination,
     );
     $operations['delete'] = array(
       'title' => t('delete'),
-      'href' => 'block/' . $bean->bid . '/delete',
+      'href' => 'block/' . $bean->delta . '/delete',
       'query' => $destination,
     );
     // Render an unordered list of operations links.
@@ -148,7 +148,7 @@ function theme_bean_add_list($variables) {
 /**
  * Bean form
  */
-function bean_form($form, &$form_state, $bean, $type = NULL) {
+function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
 
   // During initial form build, add the bean entity to the form state for use
   // during form building and processing. During a rebuild, use what is in the
@@ -261,13 +261,13 @@ function bean_form_validate($form, &$form_state) {
  */
 function bean_form_submit($form, &$form_state) {
   $bean = bean_form_submit_build_bean($form, $form_state);
-  $insert = empty($bean->bid);
   $bean->setValues($form_state['values']);
+  $insert = $bean->internalIdentifier();
   field_attach_submit('bean', $bean, $form, $form_state);
   $bean->save();
 
-  $watchdog_args = array('@type' => $bean->type, '%title' => $bean->label);
-  $t_args = array('@type' => $bean->typeName(), '%title' => $bean->label);
+  $watchdog_args = array('@type' => $bean->typeName(), '%title' => $bean->label());
+  $t_args = array('@type' => $bean->typeName(), '%title' => $bean->label());
 
   if ($insert) {
     watchdog('bean', '@type: added %title.', $watchdog_args, WATCHDOG_NOTICE, $bean->viewURL());
@@ -277,7 +277,8 @@ function bean_form_submit($form, &$form_state) {
     watchdog('bean', '@type: updated %title.', $watchdog_args, WATCHDOG_NOTICE, $bean->viewURL());
     drupal_set_message(t('@type %title has been updated.', $t_args));
   }
-  if ($bean->bid) {
+
+  if ($bean->identifier()) {
     $form_state['redirect'] = $bean->viewURL();
   }
   else {
@@ -332,7 +333,7 @@ function bean_form_delete_submit($form, &$form_state) {
     unset($_GET['destination']);
   }
   $bean = $form_state['values']['bean'];
-  $form_state['redirect'] = array('block/' . $bean->bid . '/delete', array('query' => $destination));
+  $form_state['redirect'] = array($bean->deleteURL(), array('query' => $destination));
 }
 
 /**
@@ -342,8 +343,8 @@ function bean_delete_confirm($form, &$form_state, $bean) {
   $form['#bean'] = $bean;
 
   return confirm_form($form,
-    t('Are you sure you want to delete %title?', array('%title' => $bean->label)),
-    'block/' . $bean->bid,
+    t('Are you sure you want to delete %title?', array('%title' => $bean->label())),
+    $bean->viewUrl(),
     t('This action cannot be undone.'),
     t('Delete'),
     t('Cancel')
@@ -357,8 +358,8 @@ function bean_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
     $bean = $form['#bean'];
     $bean->delete();
-    watchdog('bean', '@type: deleted %title.', array('@type' => $bean->type, '%title' => $bean->label));
-    drupal_set_message(t('@type %title has been deleted.', array('@type' => $bean->type, '%title' => $bean->label)));
+    watchdog('bean', '@type: deleted %title.', array('@type' => $bean->typeName(), '%title' => $bean->label()));
+    drupal_set_message(t('@type %title has been deleted.', array('@type' => $bean->typeName(), '%title' => $bean->label())));
   }
 
   $form_state['redirect'] = '<front>';

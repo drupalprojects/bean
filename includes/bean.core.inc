@@ -209,17 +209,40 @@ class Bean extends Entity {
   }
 
   /**
-   * Edit URL
+   * URL string
    */
-  public function editURL() {
-    return 'block/' . $this->identifier() . '/edit';
+  public function url() {
+    $uri = $this->defaultUri();
+    return $uri['path'];
+  }
+
+  /**
+   * Build the URL string
+   */
+  protected function buildURL($type) {
+    $url = $this->url();
+    return $url . '/' . $type;
   }
 
   /**
    * View URL
    */
   public function viewURL() {
-    return 'block/' . $this->identifier();
+    return $this->buildURL('view');
+  }
+
+  /**
+   * View URL
+   */
+  public function editURL() {
+    return $this->buildURL('edit');
+  }
+
+  /**
+   * View URL
+   */
+  public function deleteURL() {
+    return $this->buildURL('delete');
   }
 
   /**
@@ -282,27 +305,28 @@ class Bean extends Entity {
    * Override the delete to remove the fields and blocks
    */
   public function delete() {
-    // Delete the field values
-    field_attach_delete('bean', $this);
+    if ($this->internalIdentifier()) {
+      // Delete the field values
+      field_attach_delete('bean', $this);
 
-    // Delete any blocks
-    // @see block_custom_block_delete_submit()
-    db_delete('block')
-      ->condition('module', 'bean')
-      ->condition('delta', $this->bid)
-      ->execute();
-    db_delete('block_role')
-      ->condition('module', 'bean')
-      ->condition('delta', $this->bid)
-      ->execute();
+      // Delete any blocks
+      // @see block_custom_block_delete_submit()
+      db_delete('block')
+        ->condition('module', 'bean')
+        ->condition('delta', $this->identifier())
+        ->execute();
+      db_delete('block_role')
+        ->condition('module', 'bean')
+        ->condition('delta', $this->identifier())
+        ->execute();
 
-    // @see node_form_block_custom_block_delete_submit()
-    db_delete('block_node_type')
-      ->condition('module', 'bean')
-      ->condition('delta', $this->bid)
-      ->execute();
-
-    parent::delete();
+      // @see node_form_block_custom_block_delete_submit()
+      db_delete('block_node_type')
+        ->condition('module', 'bean')
+        ->condition('delta', $this->identifier())
+        ->execute();
+      entity_get_controller($this->entityType)->delete(array($this->internalIdentifier())); 
+    }
   }
 }
 
