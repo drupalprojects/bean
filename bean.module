@@ -711,6 +711,7 @@ function bean_theme() {
   return array(
     'bean' => array(
       'render element' => 'entity',
+      'template' => 'bean',
     ),
     'bean_add_list' => array(
       'variables' => array('content' => NULL),

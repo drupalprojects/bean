@@ -1,5 +1,10 @@
 Current API VERSION: 3.
 
+bean 7.x-1.x-dev
+================
+Issue #1344146 by aheimlich: Fixed bean.tpl.php not being used.
+
+
 bean 7.x-1.0-beta8
 ==================
 Update to use new entity api methods. Code clean up and minor bug fixes in delete and redirects
@@ -13,7 +18,7 @@ Update hook_uninstall to add field_attach_delete_bundle
 
 bean 7.x-1.0-beta7
 ==================
-DO NOT USE THIS REALEASE
+DO NOT USE THIS RELEASE
 
 bean 7.x-1.0-beta6
 ==================
