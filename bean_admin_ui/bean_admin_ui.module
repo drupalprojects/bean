@@ -57,15 +57,6 @@ function bean_admin_ui_menu() {
 }
 
 /**
- * Implements hook_ctools_plugin_directory()
- */
-function bean_admin_ui_ctools_plugin_directory($module, $type) {
-  if ($module == 'bean') {
-    return 'plugins';
-  }
-}
-
-/**
  * Implements hook_bean_types_api_info().
  */
 function bean_admin_ui_bean_types_api_info() {
@@ -137,8 +128,8 @@ function _bean_admin_default_plugin() {
     'type' => '',
     'editable' => TRUE,
     'handler' => array(
-      'path' => drupal_get_path('module', 'bean_admin_ui') . '/plugins',
-      'file' => 'custom.inc',
+      'info_file' => TRUE,
+      'file' => 'bean_custom.info',
       'class' => 'bean_custom',
       'parent' => 'bean',
     ),

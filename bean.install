@@ -128,3 +128,11 @@ function bean_update_7003() {
     ->execute();
   return t('Bean view mode field added.');
 }
+
+/**
+ * Update Registry to implement new Code Interface
+ */
+function bean_update_7004() {
+  registry_rebuild();
+  return t('Registry has been rebuilt');
+}

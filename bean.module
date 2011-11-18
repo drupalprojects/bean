@@ -666,12 +666,15 @@ function bean_ctools_plugin_type() {
       'cache' => TRUE,
       'use hooks' => TRUE,
       'classes' => array('handler'),
+      'info file' => TRUE,
+      'alterable' => TRUE,
       'defaults' => array(
         'label' => t('Block'),
         'cache_level' => DRUPAL_CACHE_PER_ROLE,
         // Editable in the block type UI
         // THESE should have 'bean_custom' as the class
         'editable' => FALSE,
+        'view_mode' => 'default',
       ),
     ),
   );
@@ -679,24 +682,22 @@ function bean_ctools_plugin_type() {
 
 /**
  * Implements hook_ctools_plugin_directory().
- */
+ *
 function bean_ctools_plugin_directory($module, $type) {
   if ($module == 'bean') {
     return 'plugins';
   }
-}
+}*/
 
 /**
  * Implements hook_bean_types().
  */
 function bean_bean_types() {
   $plugins = array();
-  $plugin_path = drupal_get_path('module', 'bean') . '/plugins';
 
   $plugins['bean'] = array(
     'handler' => array(
-      'path' => $plugin_path,
-      'file' => 'base.inc',
+      'file' => 'bean.info',
       'class' => 'bean_plugin',
     ),
   );
