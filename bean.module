@@ -621,7 +621,7 @@ function bean_block_view($delta = '') {
       'subject' => $bean->title,
     );
 
-    $return['content']['#contextual_links']['bean'] = array('block', array($bean->internalIdentifier()));
+    $return['content']['#contextual_links']['bean'] = array('block', array($bean->Identifier()));
   }
 
   return $return;
