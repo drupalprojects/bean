@@ -18,6 +18,7 @@ function hook_bean_types_api_info() {
  * Implements hook_bean_types().
  *
  * Beans uses ctools plugins to define the block types.
+ * All plugin files must be registered in the .info file.
  */
 function hook_bean_types() {
   $plugins = array();
@@ -28,8 +29,7 @@ function hook_bean_types() {
       'class' => 'class_name',
       'parent' => 'bean',
     ),
-    'path' => drupal_get_path('module', 'my_module') . '/plugins/bean',
-    'file' => 'plugin.inc',
+    'file' => 'mymodule.info',
   );
 
   return $plugins;

@@ -3,6 +3,7 @@ Current API VERSION: 3.
 bean 7.x-1.x-dev
 ================
 Issue #1344146 by aheimlich: Fixed bean.tpl.php not being used.
+Change how beans types classes are loaded.  Use the Code Registry rather then ctols includes
 
 
 bean 7.x-1.0-beta8

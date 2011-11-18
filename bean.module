@@ -681,15 +681,6 @@ function bean_ctools_plugin_type() {
 }
 
 /**
- * Implements hook_ctools_plugin_directory().
- *
-function bean_ctools_plugin_directory($module, $type) {
-  if ($module == 'bean') {
-    return 'plugins';
-  }
-}*/
-
-/**
  * Implements hook_bean_types().
  */
 function bean_bean_types() {
