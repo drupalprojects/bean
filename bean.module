@@ -425,7 +425,7 @@ function bean_permission() {
     ),
     'edit bean view mode' => array(
       'title' => t('Change the View Mode of the Bean'),
-      'description' => t('Ability to change the view mode on teh bean form'),
+      'description' => t('Ability to change the view mode on the bean form'),
     ),
   );
 
