@@ -12,7 +12,7 @@ Each Bean type is defined by a ctools plugin and are fieldable.
 Currently Bean Types are only defined in hook_bean_plugins().
 
 If you enable beans_admin_ui you can add/edit bean types at
-admin/structure/block/types
+admin/structure/block_types
 
 Beans
 -----

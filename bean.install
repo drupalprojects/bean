@@ -78,6 +78,8 @@ function bean_schema() {
  * Implements hook_uninstall().
  */
 function bean_uninstall() {
+  // Make sure bean.module is include
+  require dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bean.module';
   // Bypass entity_load() as we cannot use it here.
   foreach (bean_get_types() as $bean_type) {
     field_attach_delete_bundle('bean', $bean_type->type);
@@ -135,4 +137,13 @@ function bean_update_7003() {
 function bean_update_7004() {
   registry_rebuild();
   return t('Registry has been rebuilt');
+}
+
+/**
+ * Rebuild the menus
+ */
+function bean_update_7005() {
+  registry_rebuild();
+  menu_rebuild();
+  return t('Registry and Menu have been rebuilt');
 }

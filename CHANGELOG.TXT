@@ -1,7 +1,10 @@
 Current API VERSION: 3.
 
-bean 7.x-1.x-dev
+bean 7.x-1.0-beta9
 ================
+Issue #1359472 by indytechcook: Error while uninstalling bean.
+Issue #1356088 by indytechcook:  Changed path of block types.
+Issue #1355818 by Draknek: Fixed Typo in permission description.
 Issue #1344146 by aheimlich: Fixed bean.tpl.php not being used.
 Change how beans types classes are loaded.  Use the Code Registry rather then cto0ls includes
   - API CHANGE NOTICE This requires you to have the plugin files in the info file.
