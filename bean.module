@@ -45,9 +45,9 @@ function bean_entity_info() {
       $return['bean']['bundles'][$type->type] = array(
         'label' => $type->getLabel(),
         'admin' => array(
-          'path' => 'admin/structure/block/types/manage/%bean_type',
-          'real path' => 'admin/structure/block/types/manage/' . $type->buildURL(),
-          'bundle argument' => 5,
+          'path' => 'admin/structure/block_types/manage/%bean_type',
+          'real path' => 'admin/structure/block_types/manage/' . $type->buildURL(),
+          'bundle argument' => 4,
           'access arguments' => array('administer bean types'),
         )
       );

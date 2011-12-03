@@ -24,13 +24,13 @@ function bean_admin_ui_admin_page() {
     $row[] = array('data' => $export_status);
     // Edit and delete buttons
     if ($bean_type->isEditable()) {
-      $row[] = array('data' => l(t('Edit'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/edit'));
+      $row[] = array('data' => l(t('Edit'), 'admin/structure/block_types/manage/' . $bean_type->buildURL() . '/edit'));
       switch ($export_status) {
         case 'Normal':
-          $row[] = array('data' => l(t('Delete'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/delete'));
+          $row[] = array('data' => l(t('Delete'), 'admin/structure/block_types/manage/' . $bean_type->buildURL() . '/delete'));
           break;
         case 'Overridden':
-          $row[] = array('data' => l(t('Revert'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/delete'));
+          $row[] = array('data' => l(t('Revert'), 'admin/structure/block_types/manage/' . $bean_type->buildURL() . '/delete'));
           break;
         case 'Default':
           $row[] = array();
@@ -40,10 +40,10 @@ function bean_admin_ui_admin_page() {
 
     if ($field_ui) {
       // Manage fields.
-      $row[] = array('data' => l(t('manage fields'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/fields'));
+      $row[] = array('data' => l(t('manage fields'), 'admin/structure/block_types/manage/' . $bean_type->buildURL() . '/fields'));
 
       // Display fields.
-      $row[] = array('data' => l(t('manage display'), 'admin/structure/block/types/manage/' . $bean_type->buildURL() . '/display'));
+      $row[] = array('data' => l(t('manage display'), 'admin/structure/block_types/manage/' . $bean_type->buildURL() . '/display'));
     }
     $rows[] = $row;
   }
@@ -144,7 +144,7 @@ function bean_admin_ui_type_form_submit(&$form, &$form_state) {
   $bean_type->type = $form_state['values']['name'];
   $bean_type->setLabel($form_state['values']['label']);
   $bean_type->save($form_state['values']['new']);
-  $form_state['redirect'] = 'admin/structure/block/types';
+  $form_state['redirect'] = 'admin/structure/block_types';
   ctools_include('export');
 }
 
@@ -152,7 +152,7 @@ function bean_admin_ui_type_form_submit(&$form, &$form_state) {
  * Form API submit callback for the delete button.
  */
 function bean_admin_ui_type_form_submit_delete(&$form, &$form_state) {
-  $form_state['redirect'] = 'admin/structure/block/types/manage/' . $form_state['bean_type']->type . '/delete';
+  $form_state['redirect'] = 'admin/structure/block_types/manage/' . $form_state['bean_type']->type . '/delete';
 }
 
 /**
@@ -176,10 +176,10 @@ function bean_admin_ui_type_delete_confirm($form, &$form_state, $type) {
   }
   $caption .= '<p>' . t('This action cannot be undone.') . '</p>';
 
-  return confirm_form($form, $message, 'admin/structure/block/types', $caption, $action);
+  return confirm_form($form, $message, 'admin/structure/block_types', $caption, $action);
 }
 
 function bean_admin_ui_type_delete_confirm_submit($form, &$form_state) {
   $form_state['values']['type']->delete();
-  $form_state['redirect'] = 'admin/structure/block/types';
+  $form_state['redirect'] = 'admin/structure/block_types';
 }
