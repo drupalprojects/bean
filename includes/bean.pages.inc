@@ -58,16 +58,12 @@ function bean_list() {
 
   $sql_query->fields('b', array('bid', 'label', 'type', 'delta'));
   $sql_query = $sql_query->extend('TableSort')->extend('PagerDefault');
-  // Add filter
+
+  // Add filters
   $filters = bean_get_filter();
-  if (empty($filters)) {
-    $sql_query->limit(50);
-  }
-  else {
-    $sql_query->limit($filters['per_page']);
-    if (!empty($filters['types'])) {
-      $sql_query->condition('type', $filters['types'], 'IN');
-    }
+  $sql_query->limit($filters['per_page']);
+  if (!empty($filters['types'])) {
+    $sql_query->condition('type', $filters['types'], 'IN');
   }
 
   $beans = $sql_query->orderByHeader($header)->execute();
@@ -443,10 +439,10 @@ function bean_set_filter($filter) {
  * Get the filter
  */
 function bean_get_filter() {
-  $filters = !empty($_SESSION['bean-filter']) ? $_SESSION['bean-filter'] : array();
-  $types = empty($filters['types']) ? array() : $filters['types'];
-  $per_page = empty($filters['per_page']) ? array() : $filters['per_page'];
-  return compact('types', 'per_page');
+  // Pull any saved values from the session...
+  $filters = isset($_SESSION['bean-filter']) ? $_SESSION['bean-filter'] : array();
+  // ...fill in gaps with default values.
+  return $filters + array('types' => array(), 'per_page' => 50);
 }
 
 /**
