@@ -29,7 +29,6 @@ function hook_bean_types() {
       'class' => 'class_name',
       'parent' => 'bean',
     ),
-    'file' => 'mymodule.info',
   );
 
   return $plugins;

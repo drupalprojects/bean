@@ -1,5 +1,10 @@
 Current API VERSION: 3.
 
+bean 7.x-1.x-dev
+================
+Issue #1288438 by drewish: Fixed Definitive broken admin page, when filter type isn't set.
+fixing schema field for delta in bean.info.inc by tim.cosgrove
+
 bean 7.x-1.0-beta9
 ================
 Issue #1359472 by indytechcook: Error while uninstalling bean.
@@ -9,8 +14,6 @@ Issue #1344146 by aheimlich: Fixed bean.tpl.php not being used.
 Change how beans types classes are loaded.  Use the Code Registry rather then cto0ls includes
   - API CHANGE NOTICE This requires you to have the plugin files in the info file.
   - You no longer need to specify a "path" in the plugin.
-  - The file of the plugin should be the modules info file "mymodule.info"
-
 
 bean 7.x-1.0-beta8
 ==================
