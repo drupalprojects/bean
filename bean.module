@@ -36,7 +36,27 @@ function bean_entity_info() {
           'label' => t('Default'),
           'custom settings' => FALSE,
         ),
-      )
+      ),
+      'field replacement' => array(
+        'title' => array(
+          'field' => array(
+            'type' => 'text',
+            'cardinality' => 1,
+            'translatable' => TRUE,
+          ),
+          'instance' => array(
+            'label' => t('Title'),
+            'description' => t('The Title of the block.'),
+            'required' => FALSE,
+            'settings' => array(
+              'text_processing' => 0,
+            ),
+            'widget' => array(
+              'weight' => -5,
+            ),
+          ),
+        ),
+      ),
     ),
   );
 
