@@ -4,6 +4,9 @@ bean 7.x-1.x-dev
 ================
 Issue #1288438 by drewish: Fixed Definitive broken admin page, when filter type isn't set.
 fixing schema field for delta in bean.info.inc by tim.cosgrove
+Issue #1376902 by indytechcook: Fixed Plugin container of plugin type bean:types points to nonexistent file.
+Issue #1371280 by duellj: Fixed New %bean_delta() URL breaks translations.
+Issue #1371362 by duellj: Added Provide integration with title.module for translatable block titles.
 
 bean 7.x-1.0-beta9
 ================

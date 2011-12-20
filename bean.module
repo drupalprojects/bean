@@ -85,7 +85,9 @@ function bean_translation_info($types = NULL) {
     'bean' => array(
       'translation' => array(
         'entity_translation' => array(
-          'base path' => 'block/%bean',
+          'class' => 'EntityTranslationBeanHandler',
+          'base path' => 'block/%bean_delta',
+          'path wildcard' => '%bean_delta',
         ),
       ),
     ),
