@@ -137,7 +137,6 @@ function _bean_admin_default_plugin() {
     'editable' => TRUE,
     'handler' => array(
       'info_file' => TRUE,
-      'file' => 'bean_custom.info',
       'class' => 'bean_custom',
       'parent' => 'bean',
     ),
