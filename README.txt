@@ -18,3 +18,12 @@ Beans
 -----
 
 Beans can be added at block/add
+
+Example Bean Type Plugins
+-------------------------
+https://github.com/opensourcery/os_slideshow
+http://drupal.org/project/beanslide
+http://treehouseagency.com/blog/neil-hastings/2011/09/21/building-custom...
+http://drupal.org/sandbox/brantwynn/1369224
+http://drupal.org/sandbox/brantwynn/1376658
+https://gist.github.com/1460818
