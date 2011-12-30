@@ -1,4 +1,4 @@
-Current API VERSION: 3.
+Current API VERSION: 4.
 
 bean 7.x-1.x-dev
 ================
@@ -7,6 +7,14 @@ fixing schema field for delta in bean.info.inc by tim.cosgrove
 Issue #1376902 by indytechcook: Fixed Plugin container of plugin type bean:types points to nonexistent file.
 Issue #1371280 by duellj: Fixed New %bean_delta() URL breaks translations.
 Issue #1371362 by duellj: Added Provide integration with title.module for translatable block titles.
+Issue #1351694 by indytechcook: Check if bean type class exists when loading bean.
+Issue #1387242 by brantwynn and indytechcook: Bean module not aligned with Drupal's coding standards.
+- API Change:  Changed the name of class name for Drupal Standards.  All plugins will need to be updated
+    - bean_plugin renamed to BeanPlugin
+    - bean_default renamed to BeanDefault
+    - bean_type_plugin_interface renamed to BeanTypePluginInterface
+    - bean_custom rename to BeanCustom
+
 
 bean 7.x-1.0-beta9
 ================
@@ -75,7 +83,7 @@ Fix for compatibility with latest version of EntityAPI.
 bean 7.x-1.0-beta1
 ==================
 API Change
-The interface bean_type_plugin_interface has changed the validate method to include &$form_state as the second argument. Be sure to change any plugins using the validate method.
+The interface BeanTypePluginInterface has changed the validate method to include &$form_state as the second argument. Be sure to change any plugins using the validate method.
 
 #1221210: Filters for admin/content/blocks: Add filters to bean listing
 #1239596: Remove the .gitignore file from the repository: Remove .gitignore
@@ -86,7 +94,7 @@ Fix some small code style issues
 #1207152: Form level submit handlers not called when bean save button is used - ensure that form level submit handlers are called when bean save button is used
 Using block_flush_caches() which triggers _block_rehash() for all themes to clear related caches when a bean is saved.
 Adding a dependency on the block module.
-Adding check to ensure that the bean_type_plugin_interface interface is loaded.
+Adding check to ensure that the BeanTypePluginInterface interface is loaded.
 Adding check to verify that the bean plugin class loaded successfully.
 
 bean 7.x-1.0-alpha4

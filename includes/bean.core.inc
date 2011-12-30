@@ -8,7 +8,7 @@
 /**
  * Interface for Plugin Classes
  */
-interface bean_type_plugin_interface {
+interface BeanTypePluginInterface {
 
   /**
    * Constructor
@@ -16,6 +16,7 @@ interface bean_type_plugin_interface {
    * Plugin info should be called using bean_fetch_plugin_info().
    *
    * @abstract
+   *
    * @param  $plugin_info array of information from the ctools plugin.
    */
   public function __construct($plugin_info);
@@ -27,6 +28,7 @@ interface bean_type_plugin_interface {
    * otherwise the entire plugin will be returned
    *
    * @abstract
+   *
    * @param  $key
    * @return array of plugin info for value froma key
    */
@@ -36,6 +38,7 @@ interface bean_type_plugin_interface {
    * Build the URL string for the plugin
    *
    * @abstract
+   *
    * @return url
    */
   public function buildURL();
@@ -44,6 +47,7 @@ interface bean_type_plugin_interface {
    * Get the label name of the plugin
    *
    * @abstract
+   *
    * @return label of the type
    */
   public function getLabel();
@@ -52,6 +56,7 @@ interface bean_type_plugin_interface {
    * Set the Bean object for later use
    *
    * @abstract
+   *
    * @param Bean $bean
    */
   public function setBean($bean);
@@ -60,6 +65,7 @@ interface bean_type_plugin_interface {
    * Is this type editable?
    *
    * @abstract
+   *
    * @return boolean
    */
   public function isEditable();
@@ -85,6 +91,7 @@ interface bean_type_plugin_interface {
    * Validate function for bean type form
    *
    * @abstract
+   *
    * @param  $values
    * @param $form_state
    */
@@ -122,9 +129,12 @@ class Bean extends Entity {
 
   /**
    * Get Plugin info
+   *
+   * @param $key
+   *  The plugin key to get the info for.
    */
   public function getInfo($key = NULL) {
-    if ($this->plugin instanceof bean_type_plugin_interface) {
+    if ($this->plugin instanceof BeanTypePluginInterface) {
       return $this->plugin->getInfo($key);
     }
 
@@ -136,7 +146,7 @@ class Bean extends Entity {
   }
 
   public function __construct(array $values = array()) {
-    // If this is new then set the type first
+    // If this is new then set the type first.
     if (isset($values['is_new'])) {
       $this->type = isset($values['type']) ? $values['type'] : '';
     }
@@ -160,9 +170,9 @@ class Bean extends Entity {
   public function loadUp($plugin) {
     if (empty($this->plugin)) {
       // If the plugin has been disabled, the $plugin will be a boolean.
-      // just load the base plugin so something will render
-      if (!($plugin instanceof bean_type_plugin_interface)) {
-        $plugin = bean_load_plugin_class('bean_default');
+      // just load the base plugin so something will render.
+      if (!($plugin instanceof BeanTypePluginInterface)) {
+        $plugin = bean_load_plugin_class('BeanDefault');
       }
 
       $this->setPlugin($plugin);
@@ -286,11 +296,11 @@ class Bean extends Entity {
     // Set the delta if it's not set already
     if (empty($this->delta)) {
       $max_length = 32;
-      // Base it on the label and make sure it isn't too long for the database
+      // Base it on the label and make sure it isn't too long for the database.
       $this->delta = drupal_clean_css_identifier(strtolower($this->label));
       $this->delta = substr($this->delta, 0, $max_length);
 
-      // Check if delta is unique
+      // Check if delta is unique.
       if (bean_load_delta($this->delta)) {
         $i = 0;
         $separator = '-';
@@ -388,7 +398,7 @@ class BeanEntityAPIController extends EntityAPIController {
     if (!($this->cacheComplete && $ids === FALSE && !$conditions) && ($ids === FALSE || $ids || $revision_id)) {
       $queried_entities = array();
       foreach ($this->query($ids, $conditions, $revision_id) as $record) {
-        // This is what was overridden
+        // This is what was overridden.
         $this->setPlugin($record);
         // Skip entities already retrieved from cache.
         if (isset($entities[$record->{$this->idKey}])) {

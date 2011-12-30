@@ -78,7 +78,7 @@ function bean_schema() {
  * Implements hook_uninstall().
  */
 function bean_uninstall() {
-  // Make sure bean.module is include
+  // Make sure bean.module is include.
   require dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bean.module';
   // Bypass entity_load() as we cannot use it here.
   foreach (bean_get_types() as $bean_type) {

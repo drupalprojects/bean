@@ -10,7 +10,7 @@
  */
 function hook_bean_types_api_info() {
   return array(
-    'api' => 3,
+    'api' => 4,
   );
 }
 
@@ -25,8 +25,10 @@ function hook_bean_types() {
 
   $plugins['plugin_key'] = array(
     'label' => t('Title'),
+    // This is optional.  Set it to TRUE if you do not want the plugin to be displayed in the UI
+    'abstract' => FALSE,
     'handler' => array(
-      'class' => 'class_name',
+      'class' => 'ClassName',
       'parent' => 'bean',
     ),
   );
@@ -61,5 +63,3 @@ function hook_bean_access($bean, $op, $account) {
 function hook_bean_form_submit($form, $form_state) {
 
 }
-
-?>

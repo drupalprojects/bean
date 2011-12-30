@@ -65,11 +65,11 @@ function bean_entity_info() {
       $return['bean']['bundles'][$type->type] = array(
         'label' => $type->getLabel(),
         'admin' => array(
-          'path' => 'admin/structure/block_types/manage/%bean_type',
-          'real path' => 'admin/structure/block_types/manage/' . $type->buildURL(),
+          'path' => 'admin/structure/block-types/manage/%bean_type',
+          'real path' => 'admin/structure/block-types/manage/' . $type->buildURL(),
           'bundle argument' => 4,
           'access arguments' => array('administer bean types'),
-        )
+        ),
       );
     }
   }
@@ -232,17 +232,16 @@ function bean_fetch_plugin_info($plugin = NULL) {
   ctools_include('plugins');
 
   if (empty($plugins)) {
-    // Check the cache
     if (($cache = cache_get('bean_plugins')) && !empty($cache->data)) {
       $plugins = $cache->data;
     }
     else {
       $plugins = ctools_get_plugins('bean', 'types');
 
-      // Only use modules with the same version
+      // Only use modules with the same version.
       $allowed_modules = array_keys(ctools_plugin_api_info('bean', 'types', bean_current_version(), bean_min_version()));
       foreach ($plugins as $key => $plugin_value) {
-        if (!in_array($plugin_value['module'], $allowed_modules)) {
+        if (!in_array($plugin_value['module'], $allowed_modules) || ($plugin_value['abstract'])) {
           unset($plugins[$key]);
         }
       }
@@ -254,7 +253,7 @@ function bean_fetch_plugin_info($plugin = NULL) {
     return $plugins;
   }
   else {
-    // Make sure the plugin is in the cache
+    // Make sure the plugin is in the cache.
     if (!isset($plugins[$plugin])) {
       $plugin_info = ctools_get_plugins('bean', 'types', $plugin);
       if (empty($allowed_modules)) {
@@ -267,7 +266,7 @@ function bean_fetch_plugin_info($plugin = NULL) {
       }
     }
 
-    // If we still don't have the plugin then return NULL
+    // If we still don't have the plugin then return NULL.
     if (empty($plugins[$plugin])) {
       return NULL;
     }
@@ -281,25 +280,16 @@ function bean_fetch_plugin_info($plugin = NULL) {
  */
 function bean_reset() {
   ctools_include('plugins');
-  // Clear ctools cache
+  // Clear ctools cache.
   ctools_get_plugins_reset();
   drupal_static_reset('ctools_plugins');
   drupal_static_reset('ctools_plugin_type_info_loaded');
   drupal_static_reset('ctools_plugin_type_info');
 
-  // Clear the bean cache
+  // Clear the bean cache.
   drupal_static_reset('bean_fetch_plugin_info');
   drupal_static_reset('bean_load_plugin_class');
 
-
-  //cache_clear_all();
-
-  //$core = array('cache', 'cache_filter', 'cache_bootstrap', 'cache_page');
-  //$cache_tables = array_merge(module_invoke_all('flush_caches'), $core);
-  //foreach ($cache_tables as $table) {
-  //  cache_clear_all('*', $table, TRUE);
-  //}
-  //drupal_flush_all_caches();
   // Flush plugin caches and rebuild the menu
   cache_clear_all('bean_plugins', 'cache');
   cache_clear_all('ctools_plugin_type_info', 'cache');
@@ -451,7 +441,7 @@ function bean_permission() {
     ),
   );
 
-  // Add a Permission for each entity type
+  // Add a Permission for each entity type.
   foreach (bean_get_types() as $bean_type) {
     $bean_type_name = check_plain($bean_type->type);
     $perms += array(
@@ -518,13 +508,11 @@ function bean_access($op, $bean = NULL, $account = NULL) {
 
   $cid = is_object($bean) ? $bean->bid : $bean;
 
-  // If we've already checked access for this node, user and op, return from
-  // cache.
+  // If we've already checked access for this node, user and op, return from cache.
   if (isset($rights[$account->uid][$cid][$op])) {
     return $rights[$account->uid][$cid][$op];
   }
 
-  // administer beans wins
   if (user_access('administer beans', $account)) {
     return TRUE;
   }
@@ -550,7 +538,7 @@ function bean_access($op, $bean = NULL, $account = NULL) {
     }
   }
   else {
-    // Here we are looking for access to any of the types
+    // Here we are looking for access to any of the types.
     foreach (bean_get_types() as $bean_type) {
       $perm = $op . ' any ' . $bean_type->type . ' bean';
       if (user_access($perm, $account)) {
@@ -660,14 +648,14 @@ function bean_types_hook_name() {
  * The current version of the API
  */
 function bean_current_version() {
-  return 3;
+  return 4;
 }
 
 /**
  * The minimal version
  */
 function bean_min_version() {
-  return 3;
+  return 4;
 }
 
 /**
@@ -691,6 +679,7 @@ function bean_ctools_plugin_type() {
       'info file' => TRUE,
       'alterable' => TRUE,
       'defaults' => array(
+        'abstract' => FALSE,
         'label' => t('Block'),
         'cache_level' => DRUPAL_CACHE_PER_ROLE,
         // Editable in the block type UI
@@ -710,13 +699,14 @@ function bean_bean_types() {
 
   $plugins['bean'] = array(
     'handler' => array(
-      'class' => 'bean_plugin',
+      'class' => 'BeanPlugin',
     ),
   );
 
   $plugins['bean_default'] = array(
+    'abstract' => TRUE,
     'handler' => array(
-      'class' => 'bean_default',
+      'class' => 'BeanDefault',
       'parent' => 'bean',
     ),
   );

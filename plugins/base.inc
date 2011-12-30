@@ -5,7 +5,7 @@
  * Base Plugin Class
  */
 
-abstract class bean_plugin implements bean_type_plugin_interface {
+abstract class BeanPlugin implements BeanTypePluginInterface {
   protected $plugin_info;
   public $type;
 
@@ -91,4 +91,4 @@ abstract class bean_plugin implements bean_type_plugin_interface {
   }
 }
 
-class bean_default extends bean_plugin {}
+class BeanDefault extends BeanPlugin {}

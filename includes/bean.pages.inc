@@ -59,7 +59,7 @@ function bean_list() {
   $sql_query->fields('b', array('bid', 'label', 'type', 'delta'));
   $sql_query = $sql_query->extend('TableSort')->extend('PagerDefault');
 
-  // Add filters
+  // Add filters.
   $filters = bean_get_filter();
   $sql_query->limit($filters['per_page']);
   if (!empty($filters['types'])) {
@@ -135,7 +135,6 @@ function theme_bean_add_list($variables) {
     $output .= '</dl>';
   }
   else {
-    //$output = '<p>' . t('You have not created any block types yet. Go to the <a href="@create-content">block type creation page</a> to add a new bean type.', array('@create-content' => url('admin/structure/block_types/add'))) . '</p>';
     $output = '<p>' . t('You have not created any block types yet.') . '</p>';
   }
   return $output;
@@ -179,7 +178,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#weight' => -9,
   );
 
-  // The view mode
+  // The view mode.
   if (user_access('edit bean view mode')) {
     $bean_info = $bean->entityInfo();
     $view_modes = array_keys($bean_info['view modes']);
@@ -207,7 +206,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#value' => $bean,
   );
 
-  // Get the Bean type form
+  // Get the Bean type form.
   $form += $bean->getForm($form, $form_state);
 
   // Add the buttons.
@@ -439,7 +438,7 @@ function bean_set_filter($filter) {
  * Get the filter
  */
 function bean_get_filter() {
-  // Pull any saved values from the session...
+  // Pull any saved values from the session.
   $filters = isset($_SESSION['bean-filter']) ? $_SESSION['bean-filter'] : array();
   // ...fill in gaps with default values.
   return $filters + array('types' => array(), 'per_page' => 50);

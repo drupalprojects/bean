@@ -8,7 +8,7 @@
 /**
  * DO NOT USE THIS BEAN.  ONLY USED FOR THE UI PLUGINS
  */
-class bean_custom extends bean_plugin {
+class BeanCustom extends BeanPlugin {
   /**
    * Delete the record from the database.
    */
@@ -43,12 +43,15 @@ class bean_custom extends bean_plugin {
     bean_reset();
   }
 
+  /**
+   * Get the export status
+   */
   public function getExportStatus() {
     return $this->plugin_info['export_status'];
   }
 
   /**
-   * Set the label
+   * Set the label.
    *
    * @param label
    */
