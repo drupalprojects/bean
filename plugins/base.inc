@@ -90,3 +90,5 @@ abstract class bean_plugin implements bean_type_plugin_interface {
     return $content;
   }
 }
+
+class bean_default extends bean_plugin {}

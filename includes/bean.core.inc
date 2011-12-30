@@ -157,8 +157,14 @@ class Bean extends Entity {
    * This is a work around for version of PDO that call __construct() before
    * it loads up the object with values from the DB.
    */
-  public function loadUp(bean_type_plugin_interface $plugin) {
+  public function loadUp($plugin) {
     if (empty($this->plugin)) {
+      // If the plugin has been disabled, the $plugin will be a boolean.
+      // just load the base plugin so something will render
+      if (!($plugin instanceof bean_type_plugin_interface)) {
+        $plugin = bean_load_plugin_class('bean_default');
+      }
+
       $this->setPlugin($plugin);
       $this->setFields();
     }

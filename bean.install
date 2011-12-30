@@ -147,3 +147,11 @@ function bean_update_7005() {
   menu_rebuild();
   return t('Registry and Menu have been rebuilt');
 }
+
+/**
+ * Rebuild the registry to include new translation class
+ */
+function bean_update_7006() {
+  registry_rebuild();
+  return t('Registry and Menu have been rebuilt');
+}

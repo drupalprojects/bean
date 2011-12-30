@@ -407,7 +407,7 @@ function bean_load_delta($delta, $reset = FALSE) {
 }
 
 /**
- * Menu callbac to load a bean by the delta
+ * Menu callback to load a bean by the delta
  */
 function bean_delta_load($delta) {
   return bean_load_delta($delta);
@@ -710,8 +710,14 @@ function bean_bean_types() {
 
   $plugins['bean'] = array(
     'handler' => array(
-      'file' => 'bean.info',
       'class' => 'bean_plugin',
+    ),
+  );
+
+  $plugins['bean_default'] = array(
+    'handler' => array(
+      'class' => 'bean_default',
+      'parent' => 'bean',
     ),
   );
 
