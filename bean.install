@@ -86,6 +86,27 @@ function bean_uninstall() {
   }
 }
 
+/**
+ * Implements hook_disable().
+ */
+function bean_disable() {
+  // Remove all of the currently placed blocks
+
+  // Delete any blocks
+  // @see block_custom_block_delete_submit()
+  db_delete('block')
+    ->condition('module', 'bean')
+    ->execute();
+  db_delete('block_role')
+    ->condition('module', 'bean')
+    ->execute();
+
+  // @see node_form_block_custom_block_delete_submit()
+  db_delete('block_node_type')
+    ->condition('module', 'bean')
+    ->execute();
+}
+
 
 /**
  * Update Registry to implement new Code Interface
