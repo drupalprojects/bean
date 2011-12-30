@@ -1,4 +1,4 @@
-Bean (Block Entities Aren't Nodes)
+Bean (Bean Entities Aren't Nodes)
 ==================================
 
 The bean module was created to have the flexibility of

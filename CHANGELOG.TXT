@@ -1,6 +1,6 @@
 Current API VERSION: 4.
 
-bean 7.x-1.x-dev
+bean 7.x-1.0-beta10
 ================
 Issue #1288438 by drewish: Fixed Definitive broken admin page, when filter type isn't set.
 fixing schema field for delta in bean.info.inc by tim.cosgrove
