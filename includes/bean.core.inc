@@ -316,6 +316,7 @@ class Bean extends Entity {
     
     $return = parent::save();
     block_flush_caches();
+    cache_clear_all('bean:' . $this->delta . ':', 'cache_block', TRUE);
     return $return;
   }
 
