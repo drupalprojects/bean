@@ -144,7 +144,7 @@ function bean_admin_ui_type_form_submit(&$form, &$form_state) {
   $bean_type->type = $form_state['values']['name'];
   $bean_type->setLabel($form_state['values']['label']);
   $bean_type->save($form_state['values']['new']);
-  $form_state['redirect'] = 'admin/structure/block_types';
+  $form_state['redirect'] = 'admin/structure/block-types';
   ctools_include('export');
 }
 
