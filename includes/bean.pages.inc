@@ -126,13 +126,15 @@ function bean_list() {
 function theme_bean_add_list($variables) {
   $content = $variables['content'];
   $output = '';
+  $blocks = array();
 
   if ($content) {
-    $output = '<dl class="bean-type-list">';
     foreach ($content as $item) {
-      $output .= '<dt>' . l(t('Add @label', array('@label' => $item->getLabel())), 'block/add/' . str_replace('_', '-', $item->type)) . '</dt>';
+      $title = l(t('<span class="icon"></span>@label', array('@label' => $item->getLabel())), 'block/add/' . str_replace('_', '-', $item->type), array('html' => TRUE));
+      $description = (!is_array($item->getDescription())) ? '<div class="description">' . $item->getDescription() . '</div>' : '';
+      $blocks[] = '<li>' . $title . $description . '</li>';
     }
-    $output .= '</dl>';
+    $output = '<ul class="bean-type-list admin-list">' . implode('', $blocks) . '</ul>';
   }
   else {
     $output = '<p>' . t('You have not created any block types yet.') . '</p>';
