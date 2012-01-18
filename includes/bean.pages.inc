@@ -127,13 +127,17 @@ function theme_bean_add_list($variables) {
   $content = $variables['content'];
   $output = '';
   $blocks = array();
+  $i = 0;
 
   if ($content) {
     foreach ($content as $item) {
       $title = l(t('<span class="icon"></span>@label', array('@label' => $item->getLabel())), 'block/add/' . str_replace('_', '-', $item->type), array('html' => TRUE));
       $description = (!is_array($item->getDescription())) ? '<div class="description">' . $item->getDescription() . '</div>' : '';
-      $blocks[] = '<li>' . $title . $description . '</li>';
+      //creative way to setup sorting by label; add number to prevent duplicate keys
+      $blocks[str_replace(' ', '', $item->getLabel()) . '_' . $i] = '<li>' . $title . $description . '</li>';
+      $i++;
     }
+    ksort($blocks);
     $output = '<ul class="bean-type-list admin-list">' . implode('', $blocks) . '</ul>';
   }
   else {
