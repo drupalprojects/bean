@@ -104,6 +104,14 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
     '#disabled' => $disabled,
   );
 
+  $form['description'] = array(
+    '#title' => t('Description'),
+    '#type' => 'textarea',
+    '#default_value' => $bean_type->getDescription(),
+    '#description' => t('The description of this block type.'),
+    '#disabled' => $disabled,
+  );
+
   // Machine-readable type name.
   $form['name'] = array(
     '#type' => 'machine_name',
@@ -146,6 +154,7 @@ function bean_admin_ui_type_form_submit(&$form, &$form_state) {
   $bean_type = $form_state['values']['bean_type'];
   $bean_type->type = $form_state['values']['name'];
   $bean_type->setLabel($form_state['values']['label']);
+  $bean_type->setDescription($form_state['values']['description']);
   $bean_type->save($form_state['values']['new']);
   $form_state['redirect'] = 'admin/structure/block-types';
   ctools_include('export');

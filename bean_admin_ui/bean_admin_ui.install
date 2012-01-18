@@ -104,3 +104,19 @@ function bean_admin_ui_update_7001() {
 
   return t('Added new fields required for CTools exportable support.');
 }
+
+/**
+ * Add description column to bean
+ *
+ */
+function bean_admin_ui_update_7002() {
+  // Add the description column.
+  $spec = array(
+    'description' => 'Block description.',
+    'type' => 'text',
+    'size' => 'medium',
+  );
+  db_add_field('bean_type', 'description', $spec);
+
+  return t('Added description field to beans.');
+}
