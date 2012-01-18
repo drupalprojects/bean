@@ -11,6 +11,7 @@
 function bean_admin_ui_admin_page() {
   $field_ui = module_exists('field_ui');
   $rows = array();
+  $i = 0;
 
   foreach (bean_get_types() as $bean_type) {
     $row = array();
@@ -45,8 +46,10 @@ function bean_admin_ui_admin_page() {
       // Display fields.
       $row[] = array('data' => l(t('manage display'), 'admin/structure/block-types/manage/' . $bean_type->buildURL() . '/display'));
     }
-    $rows[] = $row;
+    //creative way to setup sorting rows; add number to prevent dual keys
+    $rows[str_replace(' ', '', $bean_type->getLabel()) . '_' . $i] = $row;
   }
+  ksort($rows);
 
   $header = array(t('Name'), t('Status'), array('data' => t('Operations'), 'colspan' => $field_ui ? '6' : '4'));
 
