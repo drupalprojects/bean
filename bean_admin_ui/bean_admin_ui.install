@@ -49,6 +49,11 @@ function bean_admin_ui_schema() {
         'type' => 'text',
         'size' => 'big',
       ),
+      'description' => array(
+        'description' => 'The description of this bean type.',
+        'type' => 'text',
+        'size' => 'medium',
+      ),
     ),
     'primary key' => array('type_id'),
     'unique keys' => array(
