@@ -64,6 +64,7 @@ function bean_entity_info() {
     if (!empty($type)) {
       $return['bean']['bundles'][$type->type] = array(
         'label' => $type->getLabel(),
+        'description' => $type->getDescription(),
         'admin' => array(
           'path' => 'admin/structure/block-types/manage/%bean_type',
           'real path' => 'admin/structure/block-types/manage/' . $type->buildURL(),
@@ -681,6 +682,7 @@ function bean_ctools_plugin_type() {
       'defaults' => array(
         'abstract' => FALSE,
         'label' => t('Block'),
+        'description' => '',
         'cache_level' => DRUPAL_CACHE_PER_ROLE,
         // Editable in the block type UI
         // THESE should have 'bean_custom' as the class

@@ -52,7 +52,7 @@ function bean_admin_ui_schema() {
       'description' => array(
         'description' => 'The description of this bean type.',
         'type' => 'text',
-        'size' => 'medium',
+        'size' => 'big',
       ),
     ),
     'primary key' => array('type_id'),
@@ -119,7 +119,7 @@ function bean_admin_ui_update_7002() {
   $spec = array(
     'description' => 'Block description.',
     'type' => 'text',
-    'size' => 'medium',
+    'size' => 'big',
   );
   db_add_field('bean_type', 'description', $spec);
 
