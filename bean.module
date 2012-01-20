@@ -313,12 +313,28 @@ function bean_load_plugin_class($plugin_key = NULL) {
 
   if (!isset($cache[$plugin_key])) {
     ctools_include('plugins');
-    if ($class = ctools_plugin_load_class('bean', 'types', $plugin_key, 'handler')) {
+    $class = ctools_plugin_load_class('bean', 'types', $plugin_key, 'handler');
+    if ($class && bean_check_plugin_class($class)) {
       $cache[$plugin_key] = new $class(bean_fetch_plugin_info($plugin_key));
     }
   }
 
   return isset($cache[$plugin_key]) ? $cache[$plugin_key] : FALSE;
+}
+
+/**
+ * Check the plugin type class
+ *
+ * @param $class
+ *  The name of the class
+ */
+function bean_check_plugin_class($class) {
+  $ref_class = new ReflectionClass($class);
+  if (in_array('BeanTypePluginInterface', $ref_class->getInterfaceNames())) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**
