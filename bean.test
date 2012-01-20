@@ -17,6 +17,14 @@ class BeanUnitTests extends DrupalUnitTestCase {
     );
 
   }
+
+  /**
+   * Test the URL of the bean types
+   */
+
+  /**
+   * Test the URL of the bean
+   */
 }
 
 /**
@@ -54,52 +62,20 @@ class BeanTestPlugins extends DrupalWebTestCase {
    * Test loading of the plugin
    */
   function testBeanLoadPlugin() {
-    // Fetch the test plugin
-    $plugin = bean_fetch_plugin_info($this->plugin_name);
-
-    // Get the defaults
-    $plugin_def = bean_ctools_plugin_type();
-    $plugin_def = $plugin_def['defaults'];
-    // Add in the customs
-    $plugin_def = $this->beanPluginDefinition() + $plugin_def;
-
-    // The plugin and the definition should be the same
-    $this->assertEqual($plugin, $plugin_def, t('Plugin Definition should be correct'));
-
     // Load the class
-    try {
-      $plugin_class = bean_load_plugin_class($this->plugin_name);
-    }
-    catch (Exception $e) {
-      $this->assert('fail', t('Bean type should use the BeanTypePluginInterface interface'));
-    }
+    $plugin_class = bean_load_plugin_class($this->plugin_name);
 
     // Plugin should be implement the BeanTypePluginInterface interface
     if ($plugin_class instanceof BeanTypePluginInterface) {
-      $this->assert('pass', t('Bean type should use the BeanTypePluginInterface interface'));
+      $this->pass(t('Bean type should use the BeanTypePluginInterface interface'));
     }
     else {
-      $this->assert('fail', t('Bean type should use the BeanTypePluginInterface interface'));
-    }
-  }
-
-  /**
-   * Test that a bean type can load if the class doesn't exist
-   */
-  public function testMissingBeanType() {
-    try {
-      $plugin_class = bean_load_plugin_class($this->plugin_name);
-    }
-    catch (Exception $e) {
-      $this->assert('fail', t('A bean type should load if the class no longer exists'));
+      $this->fail(t('Bean type should use the BeanTypePluginInterface interface'));
     }
 
-    if ($plugin_class instanceof BeanTypePluginInterface) {
-      $this->assert('pass', t('A bean type should load if the class no longer exists'));
-    }
-    else {
-      $this->assert('fail', t('A bean type should load if the class no longer exists'));
-    }
+    // Verify that a bean plugin with an invalid class does not load
+    $this->assertFalse(bean_load_plugin_class('test_no_bean'), t('Bean type should not load with an invalid class'));
+    $this->assertFalse(bean_load_plugin_class('test_wrong_class'), t('Bean type should not load with an invalid class'));
   }
 
   // Test the fields are attached correctly
@@ -128,7 +104,7 @@ class BeanTestPlugins extends DrupalWebTestCase {
   }
 }
 
-class BeanTest extends BeanTestPlugins {
+class BeanTests extends BeanTestPlugins {
   public static function getInfo() {
     return array(
       'name' => 'Bean functionality',
@@ -176,7 +152,7 @@ class BeanTest extends BeanTestPlugins {
 
     // Try to load deleted bean
     $delete_bean = bean_load($delete_id, TRUE);
-    $this->assertNull($delete_bean, t('Bean Deleted'));
+    $this->assertFalse($delete_bean, t('Bean Deleted'));
 
     // Load by delta
     $delta_bean = bean_load_delta('test_bean2', TRUE);
@@ -184,13 +160,17 @@ class BeanTest extends BeanTestPlugins {
 
     // Test a bean with an invalid plugin
     $values['type'] = 'fake_plugin';
-    try {
-      $bean = bean_create($values);
-      $this->assertTrue(bean_save($bean), t('Bean with invalid type was saved'));
-    }
-    catch (BeanException $e) {
-      $this->assert('fail', t('Bean with invalid type was saved'));
-    }
+    $values['delta'] = 'fake_bean_plugin';
+    $bean = bean_create($values);
+    $this->assertTrue(bean_save($bean), t('Bean with invalid type was saved'));
+    $this->assertTrue(bean_load_delta('fake_bean_plugin'), t('Bean with an invalid plugin is loaded'));
+
+    // Test a bean with a plugin with an invalid class
+    $values['delta'] = 'missing_class';
+    $values['type'] = 'test_no_bean';
+    $bean = bean_create($values);
+    $this->assertTrue(bean_save($bean), t('Bean with a plugin that has an invalid class is saved'));
+    $this->assertTrue(bean_load_delta('missing_class'), t('Bean with a plugin that has an invalid class is loaded'));
   }
 
   /**
@@ -202,14 +182,13 @@ class BeanTest extends BeanTestPlugins {
     $this->assertResponse(200, t('Block Add Page is accessible'));
 
     // There should 2 plugins links
-    $this->assertLink(t('Test'), 0, t('A link to the bean add for each type should exist'));
-    $this->assertLink(t('Test 2'), 0, t('A link to the bean add for each type should exist'));
+    $this->assertLinkByHref('block/add/test-bean', 0, t('A link to the bean add for each type should exist'));
+    $this->assertLinkByHref('block/add/test-bean-2', 0, t('A link to the bean add for each type should exist'));
+    $this->assertNoLinkByHref('block/add/test-no-bean', t('A link to an invalid bean type should not exist'));
+    $this->assertNoLinkByHref('block/add/test-wrong-class', t('A link to an invalid bean type should not exist'));
 
     $this->drupalGet('block/add/test-bean');
     $this->assertResponse(200, t('Bean Add Page is accessible'));
-
-    $this->drupalGet('block/add/test-no-bean');
-    $this->assertResponse(200, t('Bean Add Page is accessible even if Class doe not exists'));
   }
 
   /**
@@ -234,10 +213,10 @@ class BeanTest extends BeanTestPlugins {
     $bean = bean_create($values);
     bean_save($bean);
 
-    $render = bean_view($bean);
+    $render = $bean->view();
     $output = drupal_render($render);
     // The title should be in the bean
-    $this->assertTrue(strpos($output, t('Test Bean')) !== FALSE, 'Bean has been rendered');
+    $this->assertTrue(strpos($output, $bean->label()) !== FALSE, 'Bean has been rendered');
   }
 
   /**

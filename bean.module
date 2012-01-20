@@ -598,6 +598,8 @@ function bean_delete(Bean $bean) {
  *   Array with the following keys:
  *   - "arguments" - Array with arguments that should be replaced on run time in
  *     the message type.
+ *
+ * @return Bean
  */
 function bean_create($values) {
   return entity_create('bean', $values);
@@ -704,13 +706,13 @@ function bean_bean_types() {
   $plugins = array();
 
   $plugins['bean'] = array(
-    'abstract' => TRUE,
     'handler' => array(
       'class' => 'BeanPlugin',
     ),
   );
 
   $plugins['bean_default'] = array(
+    'abstract' => TRUE,
     'handler' => array(
       'class' => 'BeanDefault',
       'parent' => 'bean',
@@ -719,6 +721,7 @@ function bean_bean_types() {
 
   return $plugins;
 }
+
 
 /**
  * Implements hook_theme().

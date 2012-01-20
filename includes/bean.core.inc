@@ -374,7 +374,7 @@ class BeanEntityAPIController extends EntityAPIController {
    * @see EntityAPIController#load($ids, $conditions)
    *
    * We need to load the plugin and set the defaults before
-   * anything else is donw to the record
+   * anything else is down to the record
    */
   public function load($ids = array(), $conditions = array()) {
     $entities = array();
