@@ -1,0 +1,316 @@
+<?php
+
+/**
+ * @file
+ * Tests for block.module.
+ */
+
+/**
+ * Test specific parts of the bean type class
+ */
+class BeanUnitTests extends DrupalUnitTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Bean Unit Tests',
+      'description' => 'Test that the individual methods of the bean and bean type classes work.',
+      'group' => 'Bean',
+    );
+
+  }
+}
+
+/**
+ * Test the API
+ */
+class BeanTestPlugins extends DrupalWebTestCase {
+  protected $admin_user;
+  protected $plugin_name;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Bean Plugin',
+      'description' => 'Test the bean plugin API.',
+      'group' => 'Bean',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('bean', 'ctools', 'entity', 'bean_test', 'block');
+
+    // Create and log in an administrative user
+    $this->admin_user = $this->drupalCreateUser(array(
+      'administer blocks',
+      'administer bean types',
+      'administer beans',
+      'access administration pages',
+    ));
+    $this->drupalLogin($this->admin_user);
+
+    // Test plugin name
+    $this->plugin_name = 'test_bean';
+  }
+
+  /**
+   * Test loading of the plugin
+   */
+  function testBeanLoadPlugin() {
+    // Fetch the test plugin
+    $plugin = bean_fetch_plugin_info($this->plugin_name);
+
+    // Get the defaults
+    $plugin_def = bean_ctools_plugin_type();
+    $plugin_def = $plugin_def['defaults'];
+    // Add in the customs
+    $plugin_def = $this->beanPluginDefinition() + $plugin_def;
+
+    // The plugin and the definition should be the same
+    $this->assertEqual($plugin, $plugin_def, t('Plugin Definition should be correct'));
+
+    // Load the class
+    try {
+      $plugin_class = bean_load_plugin_class($this->plugin_name);
+    }
+    catch (Exception $e) {
+      $this->assert('fail', t('Bean type should use the BeanTypePluginInterface interface'));
+    }
+
+    // Plugin should be implement the BeanTypePluginInterface interface
+    if ($plugin_class instanceof BeanTypePluginInterface) {
+      $this->assert('pass', t('Bean type should use the BeanTypePluginInterface interface'));
+    }
+    else {
+      $this->assert('fail', t('Bean type should use the BeanTypePluginInterface interface'));
+    }
+  }
+
+  /**
+   * Test that a bean type can load if the class doesn't exist
+   */
+  public function testMissingBeanType() {
+    try {
+      $plugin_class = bean_load_plugin_class($this->plugin_name);
+    }
+    catch (Exception $e) {
+      $this->assert('fail', t('A bean type should load if the class no longer exists'));
+    }
+
+    if ($plugin_class instanceof BeanTypePluginInterface) {
+      $this->assert('pass', t('A bean type should load if the class no longer exists'));
+    }
+    else {
+      $this->assert('fail', t('A bean type should load if the class no longer exists'));
+    }
+  }
+
+  // Test the fields are attached correctly
+  function testBeanPluginFields() {
+    // Define the field
+    $field = array(
+
+    );
+    // Define the widget
+    // Add the field to the plugin
+
+    $plugin_class = bean_load_plugin_class($this->plugin_name);
+
+    // Verify that the field is on the plugin
+  }
+
+  protected function beanPluginDefinition() {
+    return array(
+      'label' => t('Test'),
+      'description' => t('This is a test plugin'),
+      'handler' => array(
+        'class' => 'BeanTest',
+        'parent' => 'bean',
+      ),
+    );
+  }
+}
+
+class BeanTest extends BeanTestPlugins {
+  public static function getInfo() {
+    return array(
+      'name' => 'Bean functionality',
+      'description' => 'Test the bean API.',
+      'group' => 'Bean',
+    );
+  }
+
+  /**
+   * Test the bean API
+   */
+  public function testBeanAPI() {
+    $values = array(
+      'delta' => 'test_bean',
+      'label' => t('Test Bean'),
+      'title' => t('Test Bean'),
+      'type' => $this->plugin_name,
+      'view_mode' => 'default',
+      'data' => array(
+        'test_boolean' => FALSE,
+        'test_string' => t('New String'),
+        'test_array' => array(
+          'test_array_1' => 'new_value',
+        ),
+      ),
+    );
+
+    $bean = bean_create($values);
+    $this->assertTrue(bean_save($bean), t('Bean was saved'));
+
+    $values['label'] = $values['title'] = t('Test Bean 2');
+    $values['delta'] = 'test_bean2';
+    $bean = bean_create($values);
+    $this->assertTrue(bean_save($bean), t('Bean was saved'));
+
+    $beans = array_values(bean_load_multiple(FALSE, array('type' => $this->plugin_name)));
+    $this->assertEqual($beans[0]->label, t('Test Bean'), 'Created and loaded bean.');
+    $this->assertEqual($beans[1]->label, t('Test Bean 2'), 'Created and loaded bean.');
+
+    // Delete the first bean
+    $delete_id = $beans[0]->bid;
+    bean_delete($beans[0]);
+
+    $bean = $beans[1];
+
+    // Try to load deleted bean
+    $delete_bean = bean_load($delete_id, TRUE);
+    $this->assertNull($delete_bean, t('Bean Deleted'));
+
+    // Load by delta
+    $delta_bean = bean_load_delta('test_bean2', TRUE);
+    $this->assertEqual($delta_bean->identifier(), $bean->identifier(), t('Bean loaded by delta'));
+
+    // Test a bean with an invalid plugin
+    $values['type'] = 'fake_plugin';
+    try {
+      $bean = bean_create($values);
+      $this->assertTrue(bean_save($bean), t('Bean with invalid type was saved'));
+    }
+    catch (BeanException $e) {
+      $this->assert('fail', t('Bean with invalid type was saved'));
+    }
+  }
+
+  /**
+   * Verity that the correct links appear
+   */
+  function testBeanLinks() {
+    $this->drupalGet('block/add');
+    // Verify the block add pages exists
+    $this->assertResponse(200, t('Block Add Page is accessible'));
+
+    // There should 2 plugins links
+    $this->assertLink(t('Test'), 0, t('A link to the bean add for each type should exist'));
+    $this->assertLink(t('Test 2'), 0, t('A link to the bean add for each type should exist'));
+
+    $this->drupalGet('block/add/test-bean');
+    $this->assertResponse(200, t('Bean Add Page is accessible'));
+
+    $this->drupalGet('block/add/test-no-bean');
+    $this->assertResponse(200, t('Bean Add Page is accessible even if Class doe not exists'));
+  }
+
+  /**
+   * Tests viewing beans.
+   */
+  function testRendering() {
+    $values = array(
+      'delta' => 'test_bean',
+      'label' => t('Test Bean'),
+      'title' => t('Test Bean'),
+      'type' => $this->plugin_name,
+      'view_mode' => 'default',
+      'data' => array(
+        'test_boolean' => FALSE,
+        'test_string' => t('New String'),
+        'test_array' => array(
+          'test_array_1' => 'new_value',
+        ),
+      ),
+    );
+
+    $bean = bean_create($values);
+    bean_save($bean);
+
+    $render = bean_view($bean);
+    $output = drupal_render($render);
+    // The title should be in the bean
+    $this->assertTrue(strpos($output, t('Test Bean')) !== FALSE, 'Bean has been rendered');
+  }
+
+  /**
+   * Test the bean form
+   */
+  function testBeanForm() {
+    // Verify that the bean form is accessible
+    $this->drupalGet('block/add/test-bean');
+    // Verify the core fields are there
+    $this->assertFieldById('edit-label', '', t('Label exists on bean add form.'));
+    $this->assertFieldById('edit-title', '', t('Title exists on bean add form.'));
+    $this->assertFieldById('edit-view-mode', '', t('View Mode exists on bean add form.'));
+  }
+}
+
+/**
+ * This should test the access to beans
+ */
+class BeanAccess extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Bean Access',
+      'description' => 'Test the access to beans.',
+      'group' => 'Bean',
+    );
+  }
+}
+
+/**
+ * Integration Tests
+ */
+class BeanIntegrationTests extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Bean Integration Tests',
+      'description' => 'Make sure everythng works from the front end.',
+      'group' => 'Bean',
+    );
+  }
+
+  protected function setUp() {
+    parent::setUp();
+  }
+
+  /**
+   * Test that reactions when there are no bean types
+   */
+
+  /**
+   * Test adding a bean
+   */
+  public function testBeanAdd() {
+
+  }
+
+  /**
+   * Test Editing a Bean
+   */
+  public function testBeanEdit() {
+
+  }
+
+  /**
+   * Test Deleting a Bean
+   */
+  public function testBeanDelete() {
+
+  }
+
+  /**
+   * Place a bean block on the page
+   */
+  public function testBeanPlacement() {
+
+  }
+}

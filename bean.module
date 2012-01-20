@@ -688,6 +688,10 @@ function bean_ctools_plugin_type() {
         // THESE should have 'bean_custom' as the class
         'editable' => FALSE,
         'view_mode' => 'default',
+        'handler' => array(
+          'class' => 'BeanDefault',
+          'parent' => 'bean'
+        ),
       ),
     ),
   );
@@ -700,13 +704,13 @@ function bean_bean_types() {
   $plugins = array();
 
   $plugins['bean'] = array(
+    'abstract' => TRUE,
     'handler' => array(
       'class' => 'BeanPlugin',
     ),
   );
 
   $plugins['bean_default'] = array(
-    'abstract' => TRUE,
     'handler' => array(
       'class' => 'BeanDefault',
       'parent' => 'bean',

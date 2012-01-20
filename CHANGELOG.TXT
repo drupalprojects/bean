@@ -4,6 +4,7 @@ bean 7.x-1.x
 ================
 Added description to beans
 Improve block/add and admin/structure/block-types by alphabetizing and making more consistent with node/add
+Added Tests
 
 bean 7.x-1.0-beta10
 ================
