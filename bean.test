@@ -27,12 +27,38 @@ class BeanUnitTests extends DrupalUnitTestCase {
    */
 }
 
+abstract class BeanSetup extends DrupalWebTestCase {
+  protected $admin_user;
+  protected $plugin_name;
+
+
+  function setUp() {
+    parent::setUp('bean', 'ctools', 'entity', 'bean_test', 'block');
+    $this->addAdminUser();
+  }
+
+  function addAdminUser() {
+    $permissions = array(
+      'administer blocks',
+      'administer bean types',
+      'administer beans',
+      'access administration pages',
+      'access content',
+    );
+
+    $permissions += array_keys(bean_permission());
+    $this->admin_user = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($this->admin_user);
+
+    // Test plugin name
+    $this->plugin_name = 'test_bean';
+  }
+}
+
 /**
  * Test the API
  */
-class BeanTestPlugins extends DrupalWebTestCase {
-  protected $admin_user;
-  protected $plugin_name;
+class BeanTestPlugins extends BeanSetup {
 
   public static function getInfo() {
     return array(
@@ -42,31 +68,16 @@ class BeanTestPlugins extends DrupalWebTestCase {
     );
   }
 
-  function setUp() {
-    parent::setUp('bean', 'ctools', 'entity', 'bean_test', 'block');
-
-    // Create and log in an administrative user
-    $this->admin_user = $this->drupalCreateUser(array(
-      'administer blocks',
-      'administer bean types',
-      'administer beans',
-      'access administration pages',
-    ));
-    $this->drupalLogin($this->admin_user);
-
-    // Test plugin name
-    $this->plugin_name = 'test_bean';
-  }
-
   /**
    * Test loading of the plugin
    */
   function testBeanLoadPlugin() {
     // Load the class
-    $plugin_class = bean_load_plugin_class($this->plugin_name);
+    $plugin_class = bean_load_plugin_class('test_bean');
+    $plugin_class_name = get_class($plugin_class);
 
     // Plugin should be implement the BeanTypePluginInterface interface
-    if ($plugin_class instanceof BeanTypePluginInterface) {
+    if (bean_check_plugin_class($plugin_class_name)) {
       $this->pass(t('Bean type should use the BeanTypePluginInterface interface'));
     }
     else {
@@ -78,33 +89,39 @@ class BeanTestPlugins extends DrupalWebTestCase {
     $this->assertFalse(bean_load_plugin_class('test_wrong_class'), t('Bean type should not load with an invalid class'));
   }
 
-  // Test the fields are attached correctly
-  function testBeanPluginFields() {
-    // Define the field
-    $field = array(
+  /**
+   * Verity that the correct links appear
+   */
+  function testBeanTypeLinks() {
+    $this->drupalGet('block/add');
+    // Verify the block add pages exists
+    $this->assertResponse(200, t('Block Add Page is accessible'));
 
-    );
-    // Define the widget
-    // Add the field to the plugin
-
-    $plugin_class = bean_load_plugin_class($this->plugin_name);
-
-    // Verify that the field is on the plugin
+    // There should 2 plugins links
+    $this->assertLinkByHref('block/add/test-bean', 0, t('A link to the bean add for each type should exist'));
+    $this->assertLinkByHref('block/add/test-bean-2', 0, t('A link to the bean add for each type should exist'));
+    $this->assertNoLinkByHref('block/add/test-no-bean', t('A link to an invalid bean type should not exist'));
+    $this->assertNoLinkByHref('block/add/test-wrong-class', t('A link to an invalid bean type should not exist'));
   }
 
-  protected function beanPluginDefinition() {
-    return array(
-      'label' => t('Test'),
-      'description' => t('This is a test plugin'),
-      'handler' => array(
-        'class' => 'BeanTest',
-        'parent' => 'bean',
-      ),
-    );
+
+  /**
+   * Test the bean form
+   */
+  function testBeanTypeForm() {
+
+    foreach (bean_get_types() as $type) {
+      $this->drupalGet("block/add/{$type->buildUrl()}");
+
+      // Verify the core fields are there
+      $this->assertFieldById('edit-label', '', t('Label exists on bean add form.'));
+      $this->assertFieldById('edit-title', '', t('Title exists on bean add form.'));
+      $this->assertFieldById('edit-view-mode', '', t('View Mode exists on bean add form.'));
+    }
   }
 }
 
-class BeanTests extends BeanTestPlugins {
+class BeanTests extends BeanSetup {
   public static function getInfo() {
     return array(
       'name' => 'Bean functionality',
@@ -174,24 +191,6 @@ class BeanTests extends BeanTestPlugins {
   }
 
   /**
-   * Verity that the correct links appear
-   */
-  function testBeanLinks() {
-    $this->drupalGet('block/add');
-    // Verify the block add pages exists
-    $this->assertResponse(200, t('Block Add Page is accessible'));
-
-    // There should 2 plugins links
-    $this->assertLinkByHref('block/add/test-bean', 0, t('A link to the bean add for each type should exist'));
-    $this->assertLinkByHref('block/add/test-bean-2', 0, t('A link to the bean add for each type should exist'));
-    $this->assertNoLinkByHref('block/add/test-no-bean', t('A link to an invalid bean type should not exist'));
-    $this->assertNoLinkByHref('block/add/test-wrong-class', t('A link to an invalid bean type should not exist'));
-
-    $this->drupalGet('block/add/test-bean');
-    $this->assertResponse(200, t('Bean Add Page is accessible'));
-  }
-
-  /**
    * Tests viewing beans.
    */
   function testRendering() {
@@ -213,22 +212,10 @@ class BeanTests extends BeanTestPlugins {
     $bean = bean_create($values);
     bean_save($bean);
 
-    $render = $bean->view();
-    $output = drupal_render($render);
-    // The title should be in the bean
-    $this->assertTrue(strpos($output, $bean->label()) !== FALSE, 'Bean has been rendered');
-  }
+    $this->drupalGet("block/{$bean->identifier()}");
+    $this->assertResponse(200, t('Bean Page is viewable'));
+    $this->assertText($bean->label(), t('Bean Page is viewable'));
 
-  /**
-   * Test the bean form
-   */
-  function testBeanForm() {
-    // Verify that the bean form is accessible
-    $this->drupalGet('block/add/test-bean');
-    // Verify the core fields are there
-    $this->assertFieldById('edit-label', '', t('Label exists on bean add form.'));
-    $this->assertFieldById('edit-title', '', t('Title exists on bean add form.'));
-    $this->assertFieldById('edit-view-mode', '', t('View Mode exists on bean add form.'));
   }
 }
 

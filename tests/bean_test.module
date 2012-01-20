@@ -58,7 +58,7 @@ function bean_test_bean_types() {
   return $plugins;
 }
 
-class BeanTestPlugin extends BeanPlugin implements BeanTypePluginInterface {
+class BeanTestPlugin extends BeanPlugin {
   public function values() {
     return array(
       'test_boolean' => TRUE,
@@ -93,4 +93,4 @@ class BeanTestPlugin extends BeanPlugin implements BeanTypePluginInterface {
   }
 }
 
-class BeanPluginWrong {};
+class BeanPluginWrong {}
