@@ -305,8 +305,10 @@ function bean_reset() {
 /**
  * Load a widget class
  *
- * @param $plugin key - the key fo the plugin
- * @return an object from the plugin
+ * @param $plugin_key string
+ *  the key fo the plugin
+ * @return BeanTypePluginInterface | Boolean
+ *  An instance of the bean class or FALSE if not loaded
  */
 function bean_load_plugin_class($plugin_key = NULL) {
   $cache = &drupal_static(__FUNCTION__);
@@ -325,8 +327,9 @@ function bean_load_plugin_class($plugin_key = NULL) {
 /**
  * Check the plugin type class
  *
- * @param $class
- *  The name of the class
+ * @param $class string
+ *  The name of the bean type class
+ * @return Boolean
  */
 function bean_check_plugin_class($class) {
   $ref_class = new ReflectionClass($class);
@@ -610,7 +613,7 @@ function bean_delete(Bean $bean) {
 /**
  * Helper to easily create a bean.
  *
- * @param $values
+ * @param $values array
  *   Array with the following keys:
  *   - "arguments" - Array with arguments that should be replaced on run time in
  *     the message type.
