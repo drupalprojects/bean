@@ -174,6 +174,34 @@ function bean_menu() {
     'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
   );
 
+  if (module_exists('devel')) {
+    $devel_path = drupal_get_path('module', 'devel');
+    $items['block/%bean_delta/devel'] = array(
+      'title' => 'Devel',
+      'page callback' => 'devel_load_object',
+      'page arguments' => array('bean', 1),
+      'access arguments' => array('administer beans'),
+      'type' => MENU_LOCAL_TASK,
+      'file' => 'devel.pages.inc',
+      'file path' => $devel_path,
+      'weight' => 100,
+    );
+    $items['block/%bean_delta/devel/load'] = array(
+      'title' => 'Load',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    );
+    $items['block/%bean_delta/devel/render'] = array(
+      'title' => 'Render',
+      'page callback' => 'devel_render_object',
+      'page arguments' => array('bean', 1),
+      'access arguments' => array('administer beans'),
+      'file' => 'devel.pages.inc',
+      'file path' => $devel_path,
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 100,
+    );
+  }
+
   return $items;
 }
 
@@ -273,7 +301,6 @@ function bean_fetch_plugin_info($plugin = NULL) {
     }
     return $plugins[$plugin];
   }
-
 }
 
 /**
@@ -444,11 +471,11 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
  */
 function bean_permission() {
   $perms = array(
-    'administer bean types' =>  array(
+    'administer bean types' => array(
       'title' => t('Administer block types'),
       'description' => t('Create and delete fields on beans, and set their permissions.'),
     ),
-    'administer beans' =>  array(
+    'administer beans' => array(
       'title' => t('Administer beans'),
       'description' => t('Edit and view all beans.'),
     ),
@@ -622,6 +649,18 @@ function bean_create($values) {
 }
 
 /**
+ * View the Bean
+ */
+function bean_view(Bean $bean, $view_mode = 'default', $langcode = NULL) {
+  if (!isset($langcode)) {
+    $langcode = $GLOBALS['language_content']->language;
+  }
+
+  drupal_set_title($bean->label());
+  return $bean->view($view_mode, $langcode);
+}
+
+/**
  * Implements hook_block_info().
  */
 function bean_block_info() {
@@ -737,7 +776,6 @@ function bean_bean_types() {
 
   return $plugins;
 }
-
 
 /**
  * Implements hook_theme().
