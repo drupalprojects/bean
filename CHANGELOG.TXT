@@ -8,6 +8,7 @@ Added Tests
 Issue #1389446 by rogical: Added config link in info file.
 Issue #1216572 by duellj: Fixed Block cache not flushed after editing a bean.
 fixing a couple of errant block_types (underscore)
+Issue #1345966 by brantwynn and indytechcook: Change bean page to use EntityFieldQuery
 
 
 bean 7.x-1.0-beta10

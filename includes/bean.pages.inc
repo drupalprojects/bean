@@ -41,18 +41,39 @@ function bean_list() {
 
   // Build the sortable table header.
   $header = array(
-    'title' => array('data' => t('Title'), 'field' => 'b.label', 'sort' => 'asc'),
-    'type' => array('data' => t('Type'), 'field' => 'b.type'),
+    'title' => array(
+      'data' => 'Title',
+      'type' => 'property',
+      'specifier' => 'title',
+      'sort' => 'asc'
+    ),
+    'type' => array(
+      'data' => 'Type',
+      'type' => 'entity',
+      'specifier' => 'bundle',
+    ),
     'operations' => array('data' => t('Operations')),
   );
 
+  $filters = bean_get_filter();
+
+
   $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'bean');
+  $query->entityCondition('entity_type', 'bean')
+    ->tableSort($header)
+    ->pager($filters['per_page']);
+
+  if (!empty($filters['types'])) {
+    $query->entityCondition('bundle', $filters['types'], 'IN');
+  }
+
   $result = $query->execute();
-
-  $destination = drupal_get_destination();
-
-  $beans = bean_load_multiple(array_keys($result['bean']));
+  if (!empty($result)) {
+    $beans = bean_load_multiple(array_keys($result['bean']));
+  }
+  else {
+    $beans = array();
+  }
 
   foreach ($beans as $bean) {
     $rows[$bean->bid] = array(
@@ -65,6 +86,8 @@ function bean_list() {
       ),
       'type' => check_plain($bean->type),
     );
+
+    $destination = drupal_get_destination();
 
     // Build a list of all the accessible operations for the current bean.
     $operations = array();
