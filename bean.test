@@ -21,6 +21,21 @@ class BeanUnitTests extends DrupalUnitTestCase {
   /**
    * Test the URL of the bean types
    */
+  function testBeanTypeURL() {
+    $test_plugin = array(
+      'label' => t('Test'),
+      'name' => 'test_name',
+      'description' => t('This is a test plugin'),
+      'handler' => array(
+        'class' => 'BeanTestPlugin',
+        'parent' => 'bean',
+      ),
+    );
+
+    $bean_type = new BeanDefault($test_plugin);
+    $bean_type->type = "test_name";
+    $this->assertEqual($bean_type->buildURL(), "test-name", t('URL is formatted correctly.'));
+  }
 
   /**
    * Test the URL of the bean
