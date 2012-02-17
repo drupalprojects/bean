@@ -190,6 +190,17 @@ class BeanTests extends BeanSetup {
     $delta_bean = bean_load_delta('test_bean2', TRUE);
     $this->assertEqual($delta_bean->identifier(), $bean->identifier(), t('Bean loaded by delta'));
 
+    // Test devel pages
+    if (module_exists('devel')) {
+      $this->drupalGet("block/{$bean->identifier()}/devel");
+      $this->assertResponse(200, t('Devel load page is viewable'));
+      $this->assertText($bean->label(), t('Devel load page is viewable'));
+
+      $this->drupalGet("block/{$bean->identifier()}/devel/render");
+      $this->assertResponse(200, t('Devel render page is viewable'));
+      $this->assertText($bean->label(), t('Devel render page is viewable'));
+    }
+
     // Test a bean with an invalid plugin
     $values['type'] = 'fake_plugin';
     $values['delta'] = 'fake_bean_plugin';

@@ -6,14 +6,6 @@
  */
 
 /**
- * View the Bean
- */
-function bean_view(Bean $bean) {
-  drupal_set_title($bean->label());
-  return $bean->view();
-}
-
-/**
  * Edit bean page callback
  */
 function bean_edit(Bean $bean) {
@@ -54,23 +46,13 @@ function bean_list() {
     'operations' => array('data' => t('Operations')),
   );
 
-  $sql_query = db_select('bean', 'b');
-
-  $sql_query->fields('b', array('bid', 'label', 'type', 'delta'));
-  $sql_query = $sql_query->extend('TableSort')->extend('PagerDefault');
-
-  // Add filters.
-  $filters = bean_get_filter();
-  $sql_query->limit($filters['per_page']);
-  if (!empty($filters['types'])) {
-    $sql_query->condition('type', $filters['types'], 'IN');
-  }
-
-  $beans = $sql_query->orderByHeader($header)->execute();
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'bean');
+  $result = $query->execute();
 
   $destination = drupal_get_destination();
 
-  $beans = $beans ? $beans : array();
+  $beans = bean_load_multiple(array_keys($result['bean']));
 
   foreach ($beans as $bean) {
     $rows[$bean->bid] = array(
