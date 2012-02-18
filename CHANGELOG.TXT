@@ -1,6 +1,9 @@
 Current API VERSION: 4.
 
-bean 7.x-1.x
+bean 7.x-1.x-dev
+================
+
+bean 7.x-1.0-rc1
 ================
 Added description to beans
 Improve block/add and admin/structure/block-types by alphabetizing and making more consistent with node/add
