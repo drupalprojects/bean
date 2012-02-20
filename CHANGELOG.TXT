@@ -2,6 +2,7 @@ Current API VERSION: 4.
 
 bean 7.x-1.x-dev
 ================
+Fixed issue with bean type filter at admin/content/blocks
 
 bean 7.x-1.0-rc1
 ================
