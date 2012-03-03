@@ -692,7 +692,9 @@ function bean_block_view($delta = '') {
       'subject' => $bean->title,
     );
 
-    $return['content']['#contextual_links']['bean'] = array('block', array($bean->Identifier()));
+    if (!empty($return['content']) && module_exists('contextual')) {
+      $return['content']['#contextual_links']['bean'] = array('block', array($bean->Identifier()));
+    }
   }
 
   return $return;
