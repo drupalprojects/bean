@@ -386,7 +386,7 @@ function bean_filter_form($form, &$form_state) {
   foreach (bean_get_types() as $type) {
     $type_options[$type->type] = $type->getLabel();
   }
-  sort($type_options);
+  asort($type_options);
 
   $form['filters']['types'] = array(
     '#type' => 'select',
