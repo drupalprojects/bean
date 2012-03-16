@@ -111,7 +111,7 @@ function bean_admin_ui_get_types() {
       // Drupal installation by trying to get bean types; if we did, we'd query a
       // nonexistent table.
       if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install' &&
-          drupal_get_installed_schema_version('bean_admin_ui', TRUE) == SCHEMA_UNINSTALLED) {
+        drupal_get_installed_schema_version('bean_admin_ui', TRUE) == SCHEMA_UNINSTALLED) {
         $bean_types = array();
       }
       else {

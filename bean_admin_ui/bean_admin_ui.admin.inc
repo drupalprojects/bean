@@ -13,7 +13,7 @@ function bean_admin_ui_admin_page() {
   $rows = array();
   $i = 0;
 
-  foreach (bean_get_types() as $bean_type) {
+  foreach (block_custom_get_types() as $bean_type) {
     $row = array();
     $row[] = array('data' => $bean_type->getLabel());
     if (method_exists($bean_type, 'getExportStatus')) {
