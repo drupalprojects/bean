@@ -158,3 +158,19 @@ function bean_admin_ui_features_api() {
   }
   return $api;
 }
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function bean_admin_ui_modules_enabled($modules) {
+  $beans_found = FALSE;
+  foreach ($modules as $module) {
+    if (function_exists($module .'_bean_types')) {
+      $beans_found = TRUE;
+    }
+  }
+  // Flush bean caches and statics if any of the enabled modules provide bean types.
+  if ($beans_found) {
+    bean_reset();
+  }
+}
