@@ -111,10 +111,18 @@ function bean_list() {
     );
   }
 
-  $bean_filter_form = drupal_get_form('bean_filter_form');
-  $output = drupal_render($bean_filter_form);
-  $output .= theme('table', array('header' => $header, 'rows' => $rows));
-  $output .= theme('pager');
+  $output = array(
+    'bean_filter_form' => drupal_get_form('bean_filter_form'),
+    'bean_content' => array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#empty' => t('There are no Block Available'),
+    ),
+    'pager' => array(
+      '#theme' => 'pager',
+    ),
+  );
 
   return $output;
 }
