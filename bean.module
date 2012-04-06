@@ -818,3 +818,28 @@ function bean_menu_local_tasks_alter(&$data, $router_item, $root_path) {
     }
   }
 }
+
+/**
+ * Implements hook_workbench_create_alter().
+ */
+function bean_workbench_create_alter(&$output) {
+  $items = array();
+  $i = 0;
+  foreach (bean_get_types() as $bean_type) {
+    $items[str_replace(' ', '', $bean_type->getLabel()) . '_' . $i] = array(
+      'title' => $bean_type->getLabel(),
+      'href' => 'block/add/' . $bean_type->buildURL(),
+      'description' => $bean_type->getDescription(),
+      'localized_options' => array(),
+    );
+    $i++;
+  }
+
+  ksort($blocks);
+
+  $output['bean_types'] = array(
+    '#title' => t('Create Blocks'),
+    '#markup' => theme('node_add_list', array('content' => $items)),
+    '#theme' => 'workbench_element',
+  );
+}

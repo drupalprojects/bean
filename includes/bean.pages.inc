@@ -138,7 +138,6 @@ function bean_list() {
  */
 function theme_bean_add_list($variables) {
   $content = $variables['content'];
-  $output = '';
   $blocks = array();
   $i = 0;
 
