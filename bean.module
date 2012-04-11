@@ -268,7 +268,7 @@ function bean_fetch_plugin_info($plugin = NULL) {
       $plugins = ctools_get_plugins('bean', 'types');
 
       // Only use modules with the same version.
-      $allowed_modules = array_keys(ctools_plugin_api_info('bean', 'types', bean_current_version(), bean_min_version()));
+      $allowed_modules = array_keys(ctools_plugin_api_info('bean', 'types', bean_min_version(), bean_current_version()));
       foreach ($plugins as $key => $plugin_value) {
         if (!in_array($plugin_value['module'], $allowed_modules) || ($plugin_value['abstract'])) {
           unset($plugins[$key]);
@@ -711,7 +711,7 @@ function bean_types_hook_name() {
  * The current version of the API
  */
 function bean_current_version() {
-  return 4;
+  return 5;
 }
 
 /**
