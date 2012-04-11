@@ -843,3 +843,10 @@ function bean_workbench_create_alter(&$output) {
     '#theme' => 'workbench_element',
   );
 }
+
+/**
+ * Implements hook_modules_enabled()
+ */
+function bean_modules_enabled($modules) {
+  bean_reset();
+}
