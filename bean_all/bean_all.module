@@ -42,6 +42,6 @@ function bean_all_bean_types() {
  */
 function bean_all_bean_types_api_info() {
   return array(
-    'api' => 4,
+    'api' => 5,
   );
 }

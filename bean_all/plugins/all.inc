@@ -25,7 +25,7 @@ class BeanAll extends BeanPlugin {
   }
 
   public function view($bean, $content, $view_mode = 'default', $langcode = NULL) {
-    $block_object = $this->block_info;
+    $block_object = $this->getBlockInfo();
     $block_object->title = $block_object->info;
     $block_object->enabled = $block_object->page_match = TRUE;
     $blocks[$this->getBlockInfo('module') . "_" . $this->getBlockInfo('delta')] = $block_object;
@@ -36,6 +36,12 @@ class BeanAll extends BeanPlugin {
       = array('block', array($bean->delta));
 
     return $content;
+  }
+
+  public function submit(Bean $bean) {
+    $bean_values = (array) $bean;
+    module_invoke($this->getBlockInfo('module'), 'block_save', $this->getBlockInfo('delta'), $bean_values);
+    return $this;
   }
 
   protected function getBlockInfo($key = NULL) {
