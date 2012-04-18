@@ -9,6 +9,8 @@
  * Edit bean page callback
  */
 function bean_edit(Bean $bean) {
+  $type = bean_fetch_plugin_info($bean->type);
+  drupal_set_title(t('<em>Edit @type</em> @title', array('@type' => $type['label'], '@title' => $bean->label)), PASS_THROUGH);
   return drupal_get_form('bean_form', $bean);
 }
 
@@ -17,6 +19,8 @@ function bean_edit(Bean $bean) {
  */
 function bean_add($type) {
   $bean = bean_create(array('type' => $type));
+  $bean_type = bean_type_load($type);
+  drupal_set_title(t('Create @type block', array('@type' => $bean_type->getLabel())), PASS_THROUGH);
 
   return drupal_get_form('bean_form', $bean, $type);
 }
