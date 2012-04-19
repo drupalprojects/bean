@@ -2,12 +2,17 @@ Current API VERSION: 5.
 
 bean 7.x-1.x-dev
 ================
+
+bean 7.x-1.0-rc4
+================
 Issue #1510508: Added Integrate with Workbench.
 Issue #1503270 by Denes.Szabo|indytechcook:
   Added Block list displays the filter form when have not defined a bean type yet.
-Add Bean All Module
-- API Change: Add a BeanPlugin::Submit
-  - This change is passive and previous versions of API will still work
+Issue #1519730 by skwashd: Fixed Plugin @plugin of plugin type bean:@type points to nonexistent file bean_admin_ui()/BeanCustom.class.php for class handler.
+Issue #1537456 by barraponto|indytechcook: Fixed Better titles for bean/add/%bean-type and bean/edit/%bean-delta.
+Issue #1170188 by barraponto, alexweber | mrfelton: Added menu items for Bean Type edit, delete, manage fields, display fields pages.
+Issue #1491956 by recidive: Add UUID/Deploy support.
+
 
 bean 7.x-1.0-rc3
 ================
