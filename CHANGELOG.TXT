@@ -4,7 +4,7 @@ bean 7.x-1.x-dev
 ================
 Issue #1541802: Add back bean_all module
 Issue #1538852 by alexweber: Added 'Package" for Bean modules in .info file
-
+Issue #1535444 by indytechcook: Added permission for block_view() url.
 
 bean 7.x-1.0-rc4
 ================
