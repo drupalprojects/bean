@@ -128,8 +128,7 @@ function bean_menu() {
     'title' => 'Block',
     'page callback' => 'bean_view',
     'page arguments' => array(1),
-    'access arguments' => array('edit', 1),
-    'access callback' => 'bean_access',
+    'access arguments' => array('view bean page'),
     'file' => 'includes/bean.pages.inc',
   );
 
@@ -485,6 +484,10 @@ function bean_permission() {
     'edit bean view mode' => array(
       'title' => t('Change the View Mode of the Bean'),
       'description' => t('Ability to change the view mode on the bean form'),
+    ),
+    'view bean page' => array(
+      'title' => t('View Bean page'),
+      'description' => t('Visit !url', array('!url' => "block/<detla>")),
     ),
   );
 
