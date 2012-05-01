@@ -6,3 +6,4 @@ dependencies[] = bean
 files[] = plugins/custom.inc
 files[] = includes/features.inc
 configure = admin/structure/block-types
+package = Bean

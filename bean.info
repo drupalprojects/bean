@@ -9,3 +9,4 @@ files[] = bean.test
 dependencies[] = block
 dependencies[] = entity
 dependencies[] = ctools
+package = Bean
