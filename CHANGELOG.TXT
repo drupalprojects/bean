@@ -2,6 +2,9 @@ Current API VERSION: 5.
 
 bean 7.x-1.x-dev
 ================
+Issue #1541802: Add back bean_all module
+Issue #1538852 by alexweber: Added 'Package" for Bean modules in .info file
+
 
 bean 7.x-1.0-rc4
 ================
@@ -12,7 +15,6 @@ Issue #1519730 by skwashd: Fixed Plugin @plugin of plugin type bean:@type points
 Issue #1537456 by barraponto|indytechcook: Fixed Better titles for bean/add/%bean-type and bean/edit/%bean-delta.
 Issue #1170188 by barraponto, alexweber | mrfelton: Added menu items for Bean Type edit, delete, manage fields, display fields pages.
 Issue #1491956 by recidive: Add UUID/Deploy support.
-
 
 bean 7.x-1.0-rc3
 ================
