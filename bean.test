@@ -53,15 +53,12 @@ abstract class BeanSetup extends DrupalWebTestCase {
   }
 
   function addAdminUser() {
-    $permissions = array(
+    $permissions = array_keys(bean_permission());
+    $permissions += array(
       'administer blocks',
-      'administer bean types',
-      'administer beans',
       'access administration pages',
       'access content',
     );
-
-    $permissions += array_keys(bean_permission());
     $this->admin_user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->admin_user);
 
@@ -256,6 +253,13 @@ class BeanAccess extends DrupalWebTestCase {
       'group' => 'Bean',
     );
   }
+
+  /**
+   * Test
+   */
+  public function testAccess() {
+    $this->assertTrue(TRUE, t('Not implemented'));
+  }
 }
 
 /**
@@ -265,7 +269,7 @@ class BeanIntegrationTests extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Bean Integration Tests',
-      'description' => 'Make sure everythng works from the front end.',
+      'description' => 'Make sure everything works from the front end.',
       'group' => 'Bean',
     );
   }
@@ -282,27 +286,27 @@ class BeanIntegrationTests extends DrupalWebTestCase {
    * Test adding a bean
    */
   public function testBeanAdd() {
-
+    $this->assertTrue(TRUE, t('Not implemented'));
   }
 
   /**
    * Test Editing a Bean
    */
   public function testBeanEdit() {
-
+    $this->assertTrue(TRUE, t('Not implemented'));
   }
 
   /**
    * Test Deleting a Bean
    */
   public function testBeanDelete() {
-
+    $this->assertTrue(TRUE, t('Not implemented'));
   }
 
   /**
    * Place a bean block on the page
    */
   public function testBeanPlacement() {
-
+    $this->assertTrue(TRUE, t('Not implemented'));
   }
 }

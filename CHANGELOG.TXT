@@ -2,6 +2,9 @@ Current API VERSION: 5.
 
 bean 7.x-1.x-dev
 ================
+Fixed unit testing issues with Bean permissions. febbraro
+Fixed the default plugin fall back for a Bean. febbraro
+Added default no-op tests on unimplemented unit tests. febbraro
 Issue #1541802: Add back bean_all module
 Issue #1538852 by alexweber: Added 'Package" for Bean modules in .info file
 Issue #1535444 by indytechcook: Added permission for block_view() url.
