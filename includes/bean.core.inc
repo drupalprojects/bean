@@ -191,7 +191,7 @@ class Bean extends Entity {
       // If the plugin has been disabled, the $plugin will be a boolean.
       // just load the base plugin so something will render.
       if (!($plugin instanceof BeanTypePluginInterface)) {
-        $plugin = bean_load_plugin_class('BeanDefault');
+        $plugin = bean_load_plugin_class('bean_default');
       }
 
       $this->setPlugin($plugin);
