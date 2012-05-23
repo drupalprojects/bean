@@ -8,6 +8,9 @@ Added default no-op tests on unimplemented unit tests. febbraro
 Issue #1541802: Add back bean_all module
 Issue #1538852 by alexweber: Added 'Package" for Bean modules in .info file
 Issue #1535444 by indytechcook: Added permission for block_view() url.
+Issue #1535444 by barraponto: Fixed mis type in bean_permission.
+Issue #1541968 by alexweber: Fixed Fatal error when uninstalling Bean Admin UI.
+Issue #1510508 by mraichelson: Fixed issue with sorting with workbench integration
 
 bean 7.x-1.0-rc4
 ================
