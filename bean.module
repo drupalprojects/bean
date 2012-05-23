@@ -838,7 +838,7 @@ function bean_workbench_create_alter(&$output) {
     $i++;
   }
 
-  ksort($blocks);
+  ksort($items);
 
   $output['bean_types'] = array(
     '#title' => t('Create Blocks'),
