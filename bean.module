@@ -829,22 +829,26 @@ function bean_workbench_create_alter(&$output) {
   $items = array();
   $i = 0;
   foreach (bean_get_types() as $bean_type) {
-    $items[str_replace(' ', '', $bean_type->getLabel()) . '_' . $i] = array(
-      'title' => $bean_type->getLabel(),
-      'href' => 'block/add/' . $bean_type->buildURL(),
-      'description' => $bean_type->getDescription(),
-      'localized_options' => array(),
-    );
-    $i++;
+    if (bean_access('create', $bean_type->type)) {
+      $items[str_replace(' ', '', $bean_type->getLabel()) . '_' . $i] = array(
+        'title' => $bean_type->getLabel(),
+        'href' => 'block/add/' . $bean_type->buildURL(),
+        'description' => $bean_type->getDescription(),
+        'localized_options' => array(),
+      );
+      $i++;
+    }
   }
 
-  ksort($items);
+  if (!empty($items)) {
+    ksort($items);
 
-  $output['bean_types'] = array(
-    '#title' => t('Create Blocks'),
-    '#markup' => theme('node_add_list', array('content' => $items)),
-    '#theme' => 'workbench_element',
-  );
+    $output['bean_types'] = array(
+      '#title' => t('Create Blocks'),
+      '#markup' => theme('node_add_list', array('content' => $items)),
+      '#theme' => 'workbench_element',
+    );
+  }
 }
 
 /**
