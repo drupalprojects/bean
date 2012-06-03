@@ -11,6 +11,8 @@ Issue #1535444 by indytechcook: Added permission for block_view() url.
 Issue #1535444 by barraponto: Fixed mis type in bean_permission.
 Issue #1541968 by alexweber: Fixed Fatal error when uninstalling Bean Admin UI.
 Issue #1510508 by mraichelson: Fixed issue with sorting with workbench integration
+Issue #1510508 by jhedstrom: Fixed access permissions to workbench"
+Issue #1559944 by recidive, skwashd: Added Services support.
 
 bean 7.x-1.0-rc4
 ================
