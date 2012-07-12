@@ -2,6 +2,7 @@ Current API VERSION: 5.
 
 bean 7.x-1.x-dev
 ================
+Issue #1649312: Bean Usage sub-module
 Fixed unit testing issues with Bean permissions. febbraro
 Fixed the default plugin fall back for a Bean. febbraro
 Added default no-op tests on unimplemented unit tests. febbraro
