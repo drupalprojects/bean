@@ -984,3 +984,21 @@ function bean_services_resources() {
     ),
   );
 }
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function bean_field_extra_fields() {
+  $extra = array();
+  foreach (bean_get_types() as $type) {
+    $field = array(
+      'label' => t('Bean field: !title', array('!title' => 'Title')),
+      'weight' => -5,
+    );
+
+    $extra['bean'][$type->type]['form']['title'] = $field;
+    $extra['bean'][$type->type]['display']['title'] = $field;
+  }
+
+  return $extra;
+}
