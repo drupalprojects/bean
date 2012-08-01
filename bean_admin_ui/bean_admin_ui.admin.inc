@@ -38,6 +38,11 @@ function bean_admin_ui_admin_page() {
           break;
       }
     }
+    else {
+      // For the operations
+      $row[] = array();
+      $row[] = array();
+    }
 
     if ($field_ui) {
       // Manage fields.
