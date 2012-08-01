@@ -168,7 +168,7 @@ function bean_menu() {
     'title' => 'Blocks',
     'description' => 'Manage blocks used on your site.',
     'page callback' => 'bean_list',
-    'access arguments' => array('administer beans'),
+    'access arguments' => array('access bean overview'),
     'file' => 'includes/bean.pages.inc',
     'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
   );
@@ -480,6 +480,10 @@ function bean_permission() {
     'administer beans' => array(
       'title' => t('Administer beans'),
       'description' => t('Edit and view all beans.'),
+    ),
+    'access bean overview' => array(
+      'title' => t('Access the Bean overview page'),
+      'description' => t('Visit !url', array('!url' => "admin/content/blocks")),
     ),
     'edit bean view mode' => array(
       'title' => t('Change the View Mode of the Bean'),
