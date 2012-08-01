@@ -317,9 +317,16 @@ class Bean extends Entity {
     // Set the delta if it's not set already
     if (empty($this->delta)) {
       $max_length = 32;
+
       // Base it on the label and make sure it isn't too long for the database.
-      $this->delta = drupal_clean_css_identifier(strtolower($this->label));
-      $this->delta = substr($this->delta, 0, $max_length);
+      if (module_exists('transliteration')) {
+        $delta = drupal_clean_css_identifier(transliteration_get($this->label));
+      }
+      else {
+        $delta = drupal_clean_css_identifier(strtolower($this->label));;
+      }
+
+      $this->delta = substr($delta, 0, $max_length);
 
       // Check if delta is unique.
       if (bean_load_delta($this->delta)) {
