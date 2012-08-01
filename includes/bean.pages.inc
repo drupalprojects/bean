@@ -286,7 +286,7 @@ function bean_form_submit($form, &$form_state) {
   $watchdog_args = array('@type' => $bean->typeName(), '%title' => $bean->label());
   $t_args = array('@type' => $bean->typeName(), '%title' => $bean->label());
 
-  if ($insert) {
+  if (!$insert) {
     watchdog('bean', '@type: added %title.', $watchdog_args, WATCHDOG_NOTICE, $bean->viewURL());
     drupal_set_message(t('@type %title has been created.', $t_args));
   }
