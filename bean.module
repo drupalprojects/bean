@@ -493,6 +493,9 @@ function bean_permission() {
       'title' => t('View Bean page'),
       'description' => t('Visit !url', array('!url' => "block/<delta>")),
     ),
+    'administer bean settings' => array(
+      'title' => t('Administer Bean Settings'),
+    ),
   );
 
   // Add a Permission for each entity type.

@@ -1,11 +1,38 @@
 <?php
 
 /**
+ * Implements hook_menu().
+ */
+function bean_all_menu() {
+  $items = array();
+
+  $items['admin/config/system/bean-all'] = array(
+    'title' => 'Bean Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bean_all_settings_form'),
+    'access arguments' => array('administer bean settings'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_bean_types().
  */
 function bean_all_bean_types() {
   $plugins = array();
 
+  foreach (module_implements('block_info') as $module) {
+    if ($module !== 'bean') {
+      _bean_all_bean_types($plugins, $module);
+    }
+  }
+
+  return $plugins;
+}
+
+function _bean_all_bean_types(&$plugins, $module) {
   $default = array(
     'file' => 'all.inc',
     'path' => drupal_get_path('module', 'bean_all') . '/plugins',
@@ -15,26 +42,22 @@ function bean_all_bean_types() {
     ),
   );
 
-  foreach (module_implements('block_info') as $module) {
-    if ($module !== 'bean') {
-      $module_blocks = module_invoke($module, 'block_info');
-      if (!empty($module_blocks)) {
-        foreach ($module_blocks as $delta => $block) {
-          $block = (object) $block;
-          $block->module = $module;
-          $block->delta = $delta;
-          $plugins["$module-$delta"] = array(
-            'label' => $block->info,
-            'description' => $block->info,
-            'name' => "$module-$delta",
-            'block' => $block
-          ) + $default;
-        }
-      }
+  $module_blocks = module_invoke($module, 'block_info');
+
+  if (!empty($module_blocks)) {
+    bean_all_filter_blocks($module_blocks, $module);
+    foreach ($module_blocks as $delta => $block) {
+      $block = (object) $block;
+      $block->module = $module;
+      $block->delta = $delta;
+      $plugins["$module-$delta"] = array(
+        'label' => $block->info,
+        'description' => $block->info,
+        'name' => "$module-$delta",
+        'block' => $block
+      ) + $default;
     }
   }
-
-  return $plugins;
 }
 
 /**
@@ -47,26 +70,78 @@ function bean_all_bean_types_api_info() {
 }
 
 /**
- * Implements hook_block_info_alter().
+ * Get the block blacklist
  *
+ * @param $module
+ *  The module to pull the blacklist of
+ *
+ * @return array
+ *  if the array is empty then all blocks are allowed
+ */
+function bean_all_get_blacklist($module) {
+  $variable_name = bean_all_build_variable_name($module);
+
+  return variable_get($variable_name);
+}
+
+function bean_all_build_variable_name($module) {
+  $variable_name = "bean_all_blacklist";
+
+  if (isset($module)) {
+    $variable_name .= "_{$module}";
+  }
+
+  return $variable_name;
+}
+
+
+/**
+ * Implements hook_block_info_alter().
+ */
 function bean_all_block_info_alter(&$blocks, $theme, $code_blocks) {
-$blocks_to_ignore = array(
-'bean' => TRUE,
-'system' => array('main', 'help', 'powered-by'),
-);
+  foreach ($blocks as $module => $module_blocks) {
+    bean_all_filter_blocks($module_blocks, $module);
+    foreach ($module_blocks as $delta => $block) {
+      if (!isset($blocks_to_ignore[$module][$delta])) {
+        $blocks[$module][$delta]['status'] = FALSE;
+        $blocks[$module][$delta]['disabled'] = FALSE;
+      }
+    }
+  }
+}
 
-drupal_alter('bean_blocks_to_allow', $blocks_to_ignore);
+/**
+ * Filter a list of blocks for a module
+ */
+function bean_all_filter_blocks(&$blocks, $module) {
+  $black_list = bean_all_get_blacklist($module);
+  $blocks = array_diff_key($blocks, $black_list);
+}
 
-$modules_ignore = array_keys($blocks_to_ignore);
+function bean_all_settings_form($form, &$form_state) {
+  $form = array();
+  $module_info = system_rebuild_module_data();
 
-foreach ($blocks as $module => $module_blocks) {
-if (!(in_array($module, $modules_ignore) && $blocks_to_ignore[$module] === TRUE)) {
-foreach ($module_blocks as $delta => $block) {
-if (!isset($blocks_to_ignore[$module][$delta])) {
-$blocks[$module][$delta]['status'] = FALSE;
-$blocks[$module][$delta]['disabled'] = FALSE;
+  foreach (module_implements('block_info') as $module) {
+    if ($module !== 'bean') {
+      $module_blocks = module_invoke($module, 'block_info');
+      $variable_name = bean_all_build_variable_name($module);
+      $form[$variable_name] = array(
+        '#title' => $module_info[$module]->info['name'],
+        '#type' => 'vertical_tabs',
+      );
+      $form[$variable_name][$variable_name] = array(
+        '#type' => 'checkboxes',
+      );
+
+      $options = array();
+      foreach ($module_blocks as $delta => $block) {
+        $options[$delta] = $block['info'];
+      }
+
+      $form[$variable_name][$variable_name]['#options'] = $options;
+    }
+  }
+
+  return system_settings_form($form);
 }
-}
-}
-}
-}*/
