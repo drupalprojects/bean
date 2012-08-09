@@ -144,6 +144,11 @@ class Bean extends Entity {
   public $data;
   public $delta;
   public $view_mode;
+  public $bid;
+  public $vid;
+  public $created;
+  public $changed;
+  public $log;
   protected $plugin;
 
   /**
@@ -423,31 +428,49 @@ class BeanEntityAPIController extends EntityAPIController {
       }
     }
 
+    // Support the entitycache module if activated.
+    if (!empty($this->entityInfo['entity cache']) && !$revision_id && $ids && !$conditions) {
+      $cached_entities = EntityCacheControllerHelper::entityCacheGet($this, $ids, $conditions);
+      // If any entities were loaded, remove them from the ids still to load.
+      $ids = array_diff($ids, array_keys($cached_entities));
+      $entities += $cached_entities;
+
+      // Add loaded entities to the static cache if we are not loading a
+      // revision.
+      if ($this->cache && !empty($cached_entities) && !$revision_id) {
+        $this->cacheSet($cached_entities);
+      }
+    }
+
     // Load any remaining entities from the database. This is the case if $ids
     // is set to FALSE (so we load all entities), if there are any ids left to
     // load or if loading a revision.
     if (!($this->cacheComplete && $ids === FALSE && !$conditions) && ($ids === FALSE || $ids || $revision_id)) {
       $queried_entities = array();
       foreach ($this->query($ids, $conditions, $revision_id) as $record) {
-        // This is what was overridden.
-        $this->setPlugin($record);
         // Skip entities already retrieved from cache.
         if (isset($entities[$record->{$this->idKey}])) {
           continue;
         }
 
-        // Take care of serialized columns.
-        $schema = drupal_get_schema($this->entityInfo['base table']);
+        /************ Start Override *********************/
+        $this->setPlugin($record);
+        /************ End Override ***********************/
 
-        foreach ($schema['fields'] as $field => $info) {
-          if (!empty($info['serialize']) && isset($record->$field)) {
-            $record->$field = unserialize($record->$field);
-            // Support automatic merging of 'data' fields into the entity.
-            if (!empty($info['merge']) && is_array($record->$field)) {
-              foreach ($record->$field as $key => $value) {
-                $record->$key = $value;
+        // For DB-based entities take care of serialized columns.
+        if (!empty($this->entityInfo['base table'])) {
+          $schema = drupal_get_schema($this->entityInfo['base table']);
+
+          foreach ($schema['fields'] as $field => $info) {
+            if (!empty($info['serialize']) && isset($record->$field)) {
+              $record->$field = unserialize($record->$field);
+              // Support automatic merging of 'data' fields into the entity.
+              if (!empty($info['merge']) && is_array($record->$field)) {
+                foreach ($record->$field as $key => $value) {
+                  $record->$key = $value;
+                }
+                unset($record->$field);
               }
-              unset($record->$field);
             }
           }
         }
@@ -462,6 +485,28 @@ class BeanEntityAPIController extends EntityAPIController {
     if (!empty($queried_entities)) {
       $this->attachLoad($queried_entities, $revision_id);
       $entities += $queried_entities;
+    }
+
+    // If we load specific revision we should check whether it is current.
+    if ($revision_id) {
+      $record = current($entities);
+      if (isset($record->{$this->revisionKey})) {
+        $query = $this->buildQuery(array($record->{$this->idKey}), array($this->revisionKey => $record->{$this->revisionKey}));
+        $current_revision = $query->execute()->fetchAll();
+        $record->currentRevision = !empty($current_revision);
+      }
+    }
+    // If we loaded multiple entities they are all current revisions.
+    else {
+      foreach ($entities as &$record) {
+        $record->currentRevision = TRUE;
+      }
+    }
+
+    // Entitycache module support: Add entities to the entity cache if we are
+    // not loading a revision.
+    if (!empty($this->entityInfo['entity cache']) && !empty($queried_entities) && !$revision_id) {
+      EntityCacheControllerHelper::entityCacheSet($this, $queried_entities);
     }
 
     if ($this->cache) {
