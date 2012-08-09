@@ -23,11 +23,12 @@ function bean_all_bean_types() {
           $block = (object) $block;
           $block->module = $module;
           $block->delta = $delta;
-          $plugins["$module-$delta"] = array(
+          $name = "{$module}_{$delta}";
+          $plugins[$name] = array(
             'label' => $block->info,
             'description' => $block->info,
-            'name' => "$module-$delta",
-            'block' => $block
+            'name' => $name,
+            'block' => $block,
           ) + $default;
         }
       }
