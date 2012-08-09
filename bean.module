@@ -15,12 +15,15 @@ function bean_entity_info() {
       'entity class' => 'Bean',
       'controller class' => 'BeanEntityAPIController',
       'base table' => 'bean',
+      'revision table' => 'bean_revision',
       'fieldable' => TRUE,
       'entity keys' => array(
         'id' => 'bid',
         'bundle' => 'type',
         'label' => 'title',
         'name' => 'delta',
+        'set active revision' => 'set_active',
+        'revision' => 'vid',
       ),
       'bundles' => array(),
       'bundle keys' => array(
@@ -492,6 +495,9 @@ function bean_permission() {
     'view bean page' => array(
       'title' => t('View Bean page'),
       'description' => t('Visit !url', array('!url' => "block/<delta>")),
+    ),
+    'administer bean settings' => array(
+      'title' => t('Administer Bean Settings'),
     ),
   );
 
