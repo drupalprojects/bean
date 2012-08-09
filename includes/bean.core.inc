@@ -319,31 +319,16 @@ class Bean extends Entity {
    * Override the save to add clearing of caches
    */
   public function save() {
-    // Set the delta if it's not set already
     if (empty($this->delta)) {
-      $max_length = 32;
-
-      // Base it on the label and make sure it isn't too long for the database.
-      if (module_exists('transliteration')) {
-        $delta = drupal_clean_css_identifier(transliteration_get($this->label));
-      }
-      else {
-        $delta = drupal_clean_css_identifier(strtolower($this->label));;
-      }
-
-      $this->delta = substr($delta, 0, $max_length);
-
-      // Check if delta is unique.
-      if (bean_load_delta($this->delta)) {
-        $i = 0;
-        $separator = '-';
-        $original_delta = $this->delta;
-        do {
-          $unique_suffix = $separator . $i++;
-          $this->delta = substr($original_delta, 0, $max_length - drupal_strlen($unique_suffix)) . $unique_suffix;
-        } while (bean_load_delta($this->delta));
-      }
+      $this->checkDelta();
     }
+
+
+    if (empty($this->created)) {
+      $this->created = REQUEST_TIME;
+    }
+
+    $this->changed = REQUEST_TIME;
 
     $this->plugin->submit($this);
 
@@ -351,6 +336,34 @@ class Bean extends Entity {
     block_flush_caches();
     cache_clear_all('bean:' . $this->delta . ':', 'cache_block', TRUE);
     return $return;
+  }
+
+  /**
+   * Set the delta function
+   */
+  protected  function checkDelta() {
+    $max_length = 32;
+
+    // Base it on the label and make sure it isn't too long for the database.
+    if (module_exists('transliteration')) {
+      $delta = drupal_clean_css_identifier(transliteration_get($this->label));
+    }
+    else {
+      $delta = drupal_clean_css_identifier(strtolower($this->label));;
+    }
+
+    $this->delta = substr($delta, 0, $max_length);
+
+    // Check if delta is unique.
+    if (bean_load_delta($this->delta)) {
+      $i = 0;
+      $separator = '-';
+      $original_delta = $this->delta;
+      do {
+        $unique_suffix = $separator . $i++;
+        $this->delta = substr($original_delta, 0, $max_length - drupal_strlen($unique_suffix)) . $unique_suffix;
+      } while (bean_load_delta($this->delta));
+    }
   }
 
   /**
