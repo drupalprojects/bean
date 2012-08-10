@@ -22,7 +22,7 @@ function bean_entity_info() {
         'bundle' => 'type',
         'label' => 'title',
         'name' => 'delta',
-        'set active revision' => 'set_active',
+        'set active revision' => 'revision',
         'revision' => 'vid',
       ),
       'bundles' => array(),
@@ -157,7 +157,7 @@ function bean_menu() {
   $items['block/%bean_delta/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_delete_confirm', 1),
+    'page arguments' => array('bean_delete_revision_confirm', 1),
     'access callback' => 'bean_access',
     'access arguments' => array('delete', 1),
     'weight' => 1,
@@ -175,13 +175,51 @@ function bean_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['block/%bean_delta/revisions/%'] = array(
+    'title' => 'Revisions',
+    'page callback' => 'bean_view',
+    'page arguments' => array(1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('view', 1),
+    'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(1, 3),
+  );
+
   $items['block/%bean_delta/revisions/%/view'] = array(
     'title' => 'Revisions',
-    'page callback' => 'bean',
+    'page callback' => 'bean_view',
     'page arguments' => array(1),
-    'access arguments' => array('view bean revisions'),
+    'access callback' => 'bean_access',
+    'access arguments' => array('view', 1),
     'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(1, 3),
+    'weight' => -10,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_NONE,
+  );
+
+  $items['block/%bean_delta/revisions/%/edit'] = array(
+    'page callback' => 'bean_edit',
+    'page arguments' => array(1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('edit', 1),
+    'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(1, 3),
     'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  $items['block/%bean_delta/revisions/%/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bean_delete_confirm', 1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('delete', 1),
+    'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(1, 3),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_NONE,
   );
 
   $items['admin/content/blocks'] = array(
@@ -462,14 +500,18 @@ function bean_load_revision($bid, $vid, $reset = FALSE) {
  * @return Bean
  *   A fully-loaded $bean object or FALSE if it cannot be loaded.
  */
-function bean_load_delta($delta, $reset = FALSE) {
+function bean_load_delta($delta, $reset = FALSE, $revision = NULL) {
   $result = db_select('bean', 'b')
     ->fields('b', array('bid'))
     ->condition('delta', $delta)
     ->execute();
   if ($bid = $result->fetchField()) {
-    $beans = bean_load_multiple(array($bid), array(), $reset);
-    return reset($beans);
+    if ($revision) {
+      return bean_load_revision($bid, $revision, $reset);
+    }
+    else {
+      return bean_load($bid, $reset);
+    }
   }
   return FALSE;
 }
@@ -477,8 +519,8 @@ function bean_load_delta($delta, $reset = FALSE) {
 /**
  * Menu callback to load a bean by the delta
  */
-function bean_delta_load($delta) {
-  return bean_load_delta($delta);
+function bean_delta_load($delta, $revision = NULL) {
+  return bean_load_delta($delta, FALSE, $revision);
 }
 
 /**

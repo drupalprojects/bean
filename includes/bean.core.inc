@@ -149,6 +149,8 @@ class Bean extends Entity {
   public $created;
   public $changed;
   public $log;
+  public $uid;
+  public $currentRevision;
   protected $plugin;
 
   /**
@@ -323,6 +325,7 @@ class Bean extends Entity {
       $this->checkDelta();
     }
 
+    $this->setUid();
 
     if (empty($this->created)) {
       $this->created = REQUEST_TIME;
@@ -335,7 +338,17 @@ class Bean extends Entity {
     $return = parent::save();
     block_flush_caches();
     cache_clear_all('bean:' . $this->delta . ':', 'cache_block', TRUE);
+
     return $return;
+  }
+
+  /**
+   * Get the user
+   */
+  protected function setUid() {
+    global $user;
+
+    $this->uid = empty($this->uid) ? $user->uid : $this->uid;
   }
 
   /**

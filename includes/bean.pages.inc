@@ -200,6 +200,37 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#weight' => -9,
   );
 
+  $form['revision'] = array(
+    '#weight' => 10,
+  );
+
+  if (empty($bean->bid)) {
+    $form['revision']['#access'] = FALSE;
+  }
+
+  ctools_include('dependent');
+  ctools_add_js('dependent');
+
+  $form['revision']['revision'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Create new revision'),
+    '#default_value' => 1,
+    '#id' => 'edit-revision',
+  );
+
+  if (!bean_access('create', $bean) || !$bean->currentRevision) {
+    $form['revision']['revision']['#disabled'] = TRUE;
+    $form['revision']['revision']['#value'] = TRUE;
+  }
+
+  $form['revision']['log'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Log message'),
+    '#description' => t('Provide an explanation of the changes you are making. This will help other authors understand your motivations.'),
+    '#dependency' => array('edit-revision' => array(1)),
+    '#default_value' => '',
+  );
+
   // The view mode.
   if (user_access('edit bean view mode')) {
     $bean_info = $bean->entityInfo();
@@ -239,7 +270,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#weight' => 200,
     '#submit' => array('bean_form_submit'),
   );
-  if (!empty($bean->bid) && user_access('delete any ' . $bean->type . ' bean')) {
+  if (!empty($bean->bid) && bean_access('delete', $bean)) {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
@@ -266,6 +297,11 @@ function bean_form_validate($form, &$form_state) {
   $bean->label = $form_state['values']['label'];
   $bean->title = $form_state['values']['title'];
   $bean->view_mode = $form_state['values']['view_mode'];
+  $bean->revision = $form_state['values']['revision'];
+
+  if ($bean->revision) {
+    $bean->log = $form_state['values']['log'];
+  }
 
   field_attach_form_validate('bean', $bean, $form, $form_state);
   $form_state['values']['bean'] = $bean;
