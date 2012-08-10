@@ -8,6 +8,7 @@ Issue #1698548 by rsaddington: Fixed Block types tables has too many td's.
 Issue #1534722 by broeker, skwashd | tanc: Added Make custom bean forms compatible with Display Suite.
 Issue #1684250 by rimen|indytechcook: Transliteration module integration.
 Issue #1663264 by brantwynn: Fixed Status Message Text is wrong during Bean Create and Update.
+Issue #1717540 by jonhattan: Fixed [bean_all()] Fatal error when creating a block instance.
 
 bean 7.x-1.0-rc5
 ================

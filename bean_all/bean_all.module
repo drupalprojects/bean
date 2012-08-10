@@ -50,7 +50,8 @@ function _bean_all_bean_types(&$plugins, $module) {
       $block = (object) $block;
       $block->module = $module;
       $block->delta = $delta;
-      $plugins["$module-$delta"] = array(
+      $name = "{$module}_{$delta}";
+      $plugins[$name] = array(
         'label' => $block->info,
         'description' => $block->info,
         'name' => "$module-$delta",
