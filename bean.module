@@ -212,7 +212,7 @@ function bean_menu() {
   $items['block/%bean_delta/revisions/%/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_delete_confirm', 1),
+    'page arguments' => array('bean_delete_revision_confirm', 1),
     'access callback' => 'bean_access',
     'access arguments' => array('delete', 1),
     'file' => 'includes/bean.pages.inc',
@@ -545,8 +545,8 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
 /**
  * Delete a bean revision
  */
-function bean_delete_revision($revision) {
-  return entity_get_controller('bean')->revisionDelete($revision);
+function bean_delete_revision($vid) {
+  return entity_get_controller('bean')->revisionDelete($vid);
 }
 
 /**
