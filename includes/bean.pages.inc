@@ -218,11 +218,6 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#id' => 'edit-revision',
   );
 
-  if (!bean_access('create', $bean) || !$bean->currentRevision) {
-    $form['revision']['revision']['#disabled'] = TRUE;
-    $form['revision']['revision']['#value'] = TRUE;
-  }
-
   $form['revision']['log'] = array(
     '#type' => 'textarea',
     '#title' => t('Log message'),
@@ -297,9 +292,9 @@ function bean_form_validate($form, &$form_state) {
   $bean->label = $form_state['values']['label'];
   $bean->title = $form_state['values']['title'];
   $bean->view_mode = $form_state['values']['view_mode'];
-  $bean->revision = $form_state['values']['revision'];
+  $bean->is_new_revision = $form_state['values']['revision'];
 
-  if ($bean->revision) {
+  if ($bean->is_new_revision) {
     $bean->log = $form_state['values']['log'];
   }
 
@@ -552,7 +547,10 @@ function bean_revisions_page(Bean $bean) {
     'title' => array('data' => t('Title')),
     'author' => array('data' => t('Author')),
     'changed' => array('data' => t('Date Changed')),
-    'operations' => array('data' => t('Operations')),
+    'operations' => array(
+      'data' => t('Operations'),
+      'colspan' => 2,
+    ),
   );
 
   $rows = array();
@@ -561,17 +559,22 @@ function bean_revisions_page(Bean $bean) {
   $can_edit = bean_access('edit', $bean);
 
   foreach ($bean->revisions as $rev) {
-    $current = $rev->vid == $bean->identifier() ? TRUE : FALSE;
+    $current = $rev->vid == $bean->vid ? TRUE : FALSE;
     $user = user_load($rev->uid);
-    $row[$rev->vid]  = array(
-      'vid' => $rev->vid,
-      'title' => $current ? t('@label (Current Revision)', array('@label' => $rev->label)) : $rev->label,
+    $rows[$rev->vid]  = array(
+      'vid' => $current ? t('@label (Current Revision)', array('@label' => $rev->vid)) : $rev->vid,
+      'title' => array(
+        'data' => array(
+          '#type' => 'link',
+          '#title' => $rev->label,
+          '#href' => "block/{$rev->delta}/revisions/{$rev->vid}",
+        ),
+      ),
       'author' => format_username($user),
-      'changed' => format_date($rev->chagned),
+      'changed' => format_date($rev->changed),
     );
 
     $operations = array();
-    $col_count = 0;
 
     if ($can_edit) {
       $operations['edit'] = array(
@@ -579,7 +582,6 @@ function bean_revisions_page(Bean $bean) {
         'href' => "block/{$bean->delta}/revisions/{$rev->vid}/edit",
         'query' => drupal_get_destination(),
       );
-      $col_count++;
     }
 
     if ($can_delete) {
@@ -588,7 +590,6 @@ function bean_revisions_page(Bean $bean) {
         'href' => "block/{$bean->delta}/revisions/{$rev->vid}/delete",
         'query' => drupal_get_destination(),
       );
-      $col_count++;
     }
 
     $rows[$rev->vid]['operations'] = array(
@@ -599,8 +600,6 @@ function bean_revisions_page(Bean $bean) {
       ),
     );
   }
-
-  $header['operations']['colspan'] = $col_count;
 
   return array(
     '#theme' => 'table',

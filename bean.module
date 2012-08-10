@@ -22,7 +22,6 @@ function bean_entity_info() {
         'bundle' => 'type',
         'label' => 'title',
         'name' => 'delta',
-        'set active revision' => 'revision',
         'revision' => 'vid',
       ),
       'bundles' => array(),
@@ -157,7 +156,7 @@ function bean_menu() {
   $items['block/%bean_delta/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_delete_revision_confirm', 1),
+    'page arguments' => array('bean_delete_confirm', 1),
     'access callback' => 'bean_access',
     'access arguments' => array('delete', 1),
     'weight' => 1,
@@ -176,35 +175,38 @@ function bean_menu() {
   );
 
   $items['block/%bean_delta/revisions/%'] = array(
-    'title' => 'Revisions',
+    'title callback' => 'bean_revision_title',
+    'title arguments' => array(1),
     'page callback' => 'bean_view',
     'page arguments' => array(1),
     'access callback' => 'bean_access',
     'access arguments' => array('view', 1),
     'file' => 'includes/bean.pages.inc',
-    'load arguments' => array(1, 3),
+    'type' => MENU_LOCAL_TASK,
+    'load arguments' => array(3),
   );
 
   $items['block/%bean_delta/revisions/%/view'] = array(
-    'title' => 'Revisions',
+    'title' => 'View',
     'page callback' => 'bean_view',
     'page arguments' => array(1),
     'access callback' => 'bean_access',
     'access arguments' => array('view', 1),
     'file' => 'includes/bean.pages.inc',
-    'load arguments' => array(1, 3),
+    'load arguments' => array(3),
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_NONE,
   );
 
   $items['block/%bean_delta/revisions/%/edit'] = array(
+    'title' => 'Edit',
     'page callback' => 'bean_edit',
     'page arguments' => array(1),
     'access callback' => 'bean_access',
     'access arguments' => array('edit', 1),
     'file' => 'includes/bean.pages.inc',
-    'load arguments' => array(1, 3),
+    'load arguments' => array(3),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
@@ -216,7 +218,7 @@ function bean_menu() {
     'access callback' => 'bean_access',
     'access arguments' => array('delete', 1),
     'file' => 'includes/bean.pages.inc',
-    'load arguments' => array(1, 3),
+    'load arguments' => array(3),
     'weight' => 1,
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_NONE,
@@ -260,6 +262,13 @@ function bean_menu() {
   }
 
   return $items;
+}
+
+/**
+ * Title callback
+ */
+function bean_revision_title($bean) {
+  return $bean->label();
 }
 
 /**

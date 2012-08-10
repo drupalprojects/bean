@@ -422,7 +422,7 @@ class Bean extends Entity {
    * Load the revisions from the DB
    */
   public function loadRevisions() {
-    $this->revisions = db_select('bean_revisions', 'br')
+    $this->revisions = db_select('bean_revision', 'br')
                         ->condition('delta', $this->identifier())
                         ->fields('br')
                         ->execute();
