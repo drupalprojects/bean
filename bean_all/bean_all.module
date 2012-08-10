@@ -21,12 +21,18 @@ function bean_all_menu() {
  * Implements hook_bean_types().
  */
 function bean_all_bean_types() {
+  $running = &drupal_static(__FUNCTION__ . "_running", FALSE);
+
   $plugins = array();
 
-  foreach (module_implements('block_info') as $module) {
-    if ($module !== 'bean') {
-      _bean_all_bean_types($plugins, $module);
+  if (!$running) {
+    $running = TRUE;
+    foreach (module_implements('block_info') as $module) {
+      if ($module !== 'bean') {
+        _bean_all_bean_types($plugins, $module);
+      }
     }
+    $running = FALSE;
   }
 
   return $plugins;
@@ -34,8 +40,8 @@ function bean_all_bean_types() {
 
 function _bean_all_bean_types(&$plugins, $module) {
   $default = array(
-    'file' => 'all.inc',
-    'path' => drupal_get_path('module', 'bean_all') . '/plugins',
+    //'file' => 'all.inc',
+    //'path' => drupal_get_path('module', 'bean_all') . '/plugins',
     'handler' => array(
       'class' => 'BeanAll',
       'parent' => 'bean',
@@ -77,7 +83,7 @@ function bean_all_bean_types_api_info() {
  *  The module to pull the blacklist of
  *
  * @return array
- *  if the array is empty then all blocks are allowed
+ *  if the array is empty then no blocks are allowed
  */
 function bean_all_get_blacklist($module) {
   $variable_name = bean_all_build_variable_name($module);
@@ -98,6 +104,8 @@ function bean_all_build_variable_name($module) {
 
 /**
  * Implements hook_block_info_alter().
+ *
+ * Remove the ability to place the blocks in admin/structure/blocks
  */
 function bean_all_block_info_alter(&$blocks, $theme, $code_blocks) {
   foreach ($blocks as $module => $module_blocks) {
@@ -116,12 +124,21 @@ function bean_all_block_info_alter(&$blocks, $theme, $code_blocks) {
  */
 function bean_all_filter_blocks(&$blocks, $module) {
   $black_list = bean_all_get_blacklist($module);
-  $blocks = array_diff_key($blocks, $black_list);
+
+  if ($black_list === TRUE) {
+    $blocks = array();
+  }
+  elseif (is_array($black_list)) {
+    $black_list = array_combine($black_list, $black_list);
+    $blocks = array_diff_key($blocks, $black_list);
+  }
 }
 
 function bean_all_settings_form($form, &$form_state) {
   $form = array();
   $module_info = system_rebuild_module_data();
+
+  drupal_set_title(t('Select Blocks to not appear as Block Types'));
 
   foreach (module_implements('block_info') as $module) {
     if ($module !== 'bean') {
@@ -133,6 +150,7 @@ function bean_all_settings_form($form, &$form_state) {
       );
       $form[$variable_name][$variable_name] = array(
         '#type' => 'checkboxes',
+        '#default_value' => variable_get($variable_name, array()),
       );
 
       $options = array();
