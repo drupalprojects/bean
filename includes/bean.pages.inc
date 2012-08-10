@@ -509,3 +509,75 @@ function bean_get_filter() {
 function bean_reset_filter() {
   unset($_SESSION['bean-filter']);
 }
+
+/**
+ * Revisions page callback
+ *
+ * @param $bean Bean
+ */
+function bean_revisions_page(Bean $bean) {
+  $bean->loadRevisions();
+
+  // Build the sortable table header.
+  $header = array(
+    'vid' => array('data' => t('Revision ID')),
+    'title' => array('data' => t('Title')),
+    'author' => array('data' => t('Author')),
+    'changed' => array('data' => t('Date Changed')),
+    'operations' => array('data' => t('Operations')),
+  );
+
+  $rows = array();
+
+  $can_delete = bean_access('delete', $bean);
+  $can_edit = bean_access('edit', $bean);
+
+  foreach ($bean->revisions as $rev) {
+    $current = $rev->vid == $bean->identifier() ? TRUE : FALSE;
+    $user = user_load($rev->uid);
+    $row[$rev->vid]  = array(
+      'vid' => $rev->vid,
+      'title' => $current ? t('@label (Current Revision)', array('@label' => $rev->label)) : $rev->label,
+      'author' => format_username($user),
+      'changed' => format_date($rev->chagned),
+    );
+
+    $operations = array();
+    $col_count = 0;
+
+    if ($can_edit) {
+      $operations['edit'] = array(
+        'title' => t('edit'),
+        'href' => "block/{$bean->delta}/revisions/{$rev->vid}/edit",
+        'query' => drupal_get_destination(),
+      );
+      $col_count++;
+    }
+
+    if ($can_delete) {
+      $operations['delete'] = array(
+        'title' => t('delete'),
+        'href' => "block/{$bean->delta}/revisions/{$rev->vid}/delete",
+        'query' => drupal_get_destination(),
+      );
+      $col_count++;
+    }
+
+    $rows[$rev->vid]['operations'] = array(
+      'data' => array(
+        '#theme' => 'links__bean_operations',
+        '#links' => $operations,
+        '#attributes' => array('class' => array('links', 'inline')),
+      ),
+    );
+  }
+
+  $header['operations']['colspan'] = $col_count;
+
+  return array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => t('There are no revisions'),
+  );
+}

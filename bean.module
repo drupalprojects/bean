@@ -543,6 +543,13 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
 }
 
 /**
+ * Delete a bean revision
+ */
+function bean_delete_revision($revision) {
+  return entity_get_controller('bean')->revisionDelete($revision);
+}
+
+/**
  * Implements hook_permissions().
  */
 function bean_permission() {

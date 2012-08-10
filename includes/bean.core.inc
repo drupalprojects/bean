@@ -151,6 +151,7 @@ class Bean extends Entity {
   public $log;
   public $uid;
   public $currentRevision;
+  public $revisions = array();
   protected $plugin;
 
   /**
@@ -187,6 +188,7 @@ class Bean extends Entity {
       $plugin = bean_load_plugin_class($this->type);
       $this->loadUp($plugin);
     }
+    return $this;
   }
 
   /**
@@ -201,9 +203,9 @@ class Bean extends Entity {
         $plugin = bean_load_plugin_class('bean_default');
       }
 
-      $this->setPlugin($plugin);
-      $this->setFields();
+      $this->setPlugin($plugin)->setFields();
     }
+    return $this;
   }
 
   /**
@@ -212,6 +214,8 @@ class Bean extends Entity {
    */
   protected  function setPlugin($plugin) {
     $this->plugin = $plugin;
+
+    return $this;
   }
 
   /**
@@ -226,6 +230,7 @@ class Bean extends Entity {
         $this->$field = isset($values[$field]) ? $values[$field] : $default;
       }
     }
+    return $this;
   }
 
   /**
@@ -302,6 +307,8 @@ class Bean extends Entity {
     foreach ($this->plugin->values() as $field => $value) {
       $this->data[$field] = $values[$field];
     }
+
+    return $this;
   }
 
   /**
@@ -321,11 +328,7 @@ class Bean extends Entity {
    * Override the save to add clearing of caches
    */
   public function save() {
-    if (empty($this->delta)) {
-      $this->checkDelta();
-    }
-
-    $this->setUid();
+    $this->setUid()->checkDelta();
 
     if (empty($this->created)) {
       $this->created = REQUEST_TIME;
@@ -349,34 +352,40 @@ class Bean extends Entity {
     global $user;
 
     $this->uid = empty($this->uid) ? $user->uid : $this->uid;
+
+    return $this;
   }
 
   /**
    * Set the delta function
    */
   protected  function checkDelta() {
-    $max_length = 32;
+    if (empty($this->delta)) {
+      $max_length = 32;
 
-    // Base it on the label and make sure it isn't too long for the database.
-    if (module_exists('transliteration')) {
-      $delta = drupal_clean_css_identifier(transliteration_get($this->label));
-    }
-    else {
-      $delta = drupal_clean_css_identifier(strtolower($this->label));;
+      // Base it on the label and make sure it isn't too long for the database.
+      if (module_exists('transliteration')) {
+        $delta = drupal_clean_css_identifier(transliteration_get($this->label));
+      }
+      else {
+        $delta = drupal_clean_css_identifier(strtolower($this->label));;
+      }
+
+      $this->delta = substr($delta, 0, $max_length);
+
+      // Check if delta is unique.
+      if (bean_load_delta($this->delta)) {
+        $i = 0;
+        $separator = '-';
+        $original_delta = $this->delta;
+        do {
+          $unique_suffix = $separator . $i++;
+          $this->delta = substr($original_delta, 0, $max_length - drupal_strlen($unique_suffix)) . $unique_suffix;
+        } while (bean_load_delta($this->delta));
+      }
     }
 
-    $this->delta = substr($delta, 0, $max_length);
-
-    // Check if delta is unique.
-    if (bean_load_delta($this->delta)) {
-      $i = 0;
-      $separator = '-';
-      $original_delta = $this->delta;
-      do {
-        $unique_suffix = $separator . $i++;
-        $this->delta = substr($original_delta, 0, $max_length - drupal_strlen($unique_suffix)) . $unique_suffix;
-      } while (bean_load_delta($this->delta));
-    }
+    return $this;
   }
 
   /**
@@ -405,6 +414,20 @@ class Bean extends Entity {
         ->execute();
       entity_get_controller($this->entityType)->delete(array($this->internalIdentifier()));
     }
+
+    return $this;
+  }
+
+  /**
+   * Load the revisions from the DB
+   */
+  public function loadRevisions() {
+    $this->revisions = db_select('bean_revisions', 'br')
+                        ->condition('delta', $this->identifier())
+                        ->fields('br')
+                        ->execute();
+
+    return $this;
   }
 }
 
