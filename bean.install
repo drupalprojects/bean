@@ -332,6 +332,6 @@ function bean_update_7007(&$return) {
 
   }
 
-  return t('Bean Revision table has been added');
+  return t('Bean Revision table has been added.');
 }
 
