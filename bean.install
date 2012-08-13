@@ -66,18 +66,6 @@ function bean_schema() {
         'serialize' => TRUE,
         'description' => 'A serialized array of additional data related to this bean.',
       ),
-      'created' => array(
-        'description' => 'The Unix timestamp when the entity was created.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'changed' => array(
-        'description' => 'The Unix timestamp when the entity was most recently saved.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
     ),
     'foreign keys' => array(
       'type' => array(
@@ -304,6 +292,7 @@ function bean_update_7006() {
  * Add a Bean Revision Table
  */
 function bean_update_7007(&$return) {
+  drupal_load('module', 'bean');
   $schema = bean_schema();
   $bean = $schema['bean'];
   $bean_revision = $schema['bean_revision'];
@@ -315,5 +304,34 @@ function bean_update_7007(&$return) {
 
   db_create_table('bean_revision', $bean_revision);
 
+  $results = db_select('bean');
+  foreach ($results as $row) {
+    $bean_revision = array(
+         'bid' => $row->bid,
+         'uid' => variable_get('bean_uid', 1),
+         'delta' => $row->delta,
+         'label' => $row->label,
+         'title' => $row->title,
+         'type' => $row->type,
+         'view_mode' => $row->view_mode,
+         'data' => 'data',
+         'log' => 'Added via update script',
+         'created' => REQUEST_TIME,
+         'changed' => REQUEST_TIME,
+    );
+
+    $options = array('return' => Database::RETURN_INSERT_ID);
+    $vid = db_insert('bean_revision', $options)
+      ->fields($bean_revision)
+      ->execute();
+
+    db_update('bean')
+      ->fields(array('vid' => $vid))
+      ->condition('bid', $row->bid)
+      ->execute();
+
+  }
+
   return t('Bean Revision table has been added');
 }
+
