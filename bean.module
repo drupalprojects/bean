@@ -182,7 +182,6 @@ function bean_menu() {
     'access callback' => 'bean_access',
     'access arguments' => array('view', 1),
     'file' => 'includes/bean.pages.inc',
-    'type' => MENU_LOCAL_TASK,
     'load arguments' => array(3),
   );
 
