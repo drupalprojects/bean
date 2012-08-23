@@ -389,36 +389,6 @@ class Bean extends Entity {
   }
 
   /**
-   * Override the delete to remove the fields and blocks
-   */
-  public function delete() {
-    if ($this->internalIdentifier()) {
-      // Delete the field values
-      field_attach_delete('bean', $this);
-
-      // Delete any blocks
-      // @see block_custom_block_delete_submit()
-      db_delete('block')
-        ->condition('module', 'bean')
-        ->condition('delta', $this->identifier())
-        ->execute();
-      db_delete('block_role')
-        ->condition('module', 'bean')
-        ->condition('delta', $this->identifier())
-        ->execute();
-
-      // @see node_form_block_custom_block_delete_submit()
-      db_delete('block_node_type')
-        ->condition('module', 'bean')
-        ->condition('delta', $this->identifier())
-        ->execute();
-      entity_get_controller($this->entityType)->delete(array($this->internalIdentifier()));
-    }
-
-    return $this;
-  }
-
-  /**
    * Load the revisions from the DB
    */
   public function loadRevisions() {
@@ -447,6 +417,41 @@ class BeanEntityAPIController extends EntityAPIController {
     }
     parent::attachLoad($queried_entities, $revision_id);
   }
+
+  public function delete($ids, DatabaseTransaction $transaction = NULL) {
+    parent::delete($ids, $transaction);
+
+    $beans = $ids ? $this->load($ids) : array();
+
+    $deltas = array();
+    foreach ($beans as $bean) {
+      if ($bean->internalIdentifier()) {
+        field_attach_delete('bean', $bean);
+
+        $deltas[] = $bean->identifier();
+      }
+    }
+
+      // Delete any blocks
+      // @see block_custom_block_delete_submit()
+      db_delete('block')
+        ->condition('module', 'bean')
+        ->condition('delta', $deltas)
+        ->execute();
+      db_delete('block_role')
+        ->condition('module', 'bean')
+        ->condition('delta', $deltas)
+        ->execute();
+
+      // @see node_form_block_custom_block_delete_submit()
+      db_delete('block_node_type')
+        ->condition('module', 'bean')
+        ->condition('delta', $deltas)
+        ->execute();
+    }
+  }
+
+
 }
 
 class BeanException extends Exception {};
