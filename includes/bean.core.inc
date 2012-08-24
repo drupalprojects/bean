@@ -150,7 +150,7 @@ class Bean extends Entity {
   public $changed;
   public $log;
   public $uid;
-  public $currentRevision;
+  public $active_revision;
   public $revisions = array();
   protected $plugin;
 
@@ -397,11 +397,6 @@ class Bean extends Entity {
                         ->fields('br')
                         ->execute();
 
-    return $this;
-  }
-
-  public function setCurrent() {
-    $this->currentRevision = TRUE;
     return $this;
   }
 }

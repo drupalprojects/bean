@@ -218,11 +218,19 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#id' => 'edit-revision',
   );
 
-  $form['revision']['current_revision'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Set Revision as current'),
-    '#default_value' => $bean->currentRevision,
-  );
+  if (empty($bean->bid)) {
+    $form['revision']['active_revision'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Set Revision as active'),
+      '#default_value' => $bean->isActiveRevision(),
+    );
+  }
+  else {
+    $form['active_revision'] = array(
+      '#type' => 'value',
+      '#value' => TRUE,
+    );
+  }
 
   $form['revision']['log'] = array(
     '#type' => 'textarea',
@@ -299,7 +307,7 @@ function bean_form_validate($form, &$form_state) {
   $bean->title = $form_state['values']['title'];
   $bean->view_mode = $form_state['values']['view_mode'];
   $bean->is_new_revision = $form_state['values']['is_new_revision'];
-  $bean->currentRevision = $form_state['values']['current_revision'];
+  $bean->activeRevision = $form_state['values']['active_revision'];
 
   if ($bean->is_new_revision) {
     $bean->log = $form_state['values']['log'];
@@ -469,7 +477,7 @@ function bean_set_active_confirm($form, &$form_state, $bean) {
 function bean_set_active_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
     $bean = $form['#bean'];
-    $bean->setCurrent()->save();
+    $bean->setActive()->save();
     watchdog('bean', '@type: %title revision %vid was set active.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label()));
     drupal_set_message(t('@type %title revision %vid has been set active.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label())));
   }
@@ -593,10 +601,10 @@ function bean_revisions_page(Bean $bean) {
   $can_edit = bean_access('edit', $bean);
 
   foreach ($bean->revisions as $rev) {
-    $current = $rev->vid == $bean->vid ? TRUE : FALSE;
+    $active = $rev->vid == $bean->vid ? TRUE : FALSE;
     $user = user_load($rev->uid);
     $rows[$rev->vid]  = array(
-      'vid' => $current ? t('@label (Current Revision)', array('@label' => $rev->vid)) : $rev->vid,
+      'vid' => $active ? t('@label (Current Revision)', array('@label' => $rev->vid)) : $rev->vid,
       'title' => array(
         'data' => array(
           '#type' => 'link',
@@ -626,7 +634,7 @@ function bean_revisions_page(Bean $bean) {
       );
     }
 
-    if ($can_edit && !$current) {
+    if ($can_edit && !$active) {
       $operations['set-active'] = array(
         'title' => t('set active'),
         'href' => "block/{$bean->delta}/revisions/{$rev->vid}/set-active",

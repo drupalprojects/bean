@@ -23,7 +23,7 @@ function bean_entity_info() {
         'label' => 'title',
         'name' => 'delta',
         'revision' => 'vid',
-        'set active revision' => 'currentRevision',
+        'active revision' => 'active_revision',
       ),
       'bundles' => array(),
       'bundle keys' => array(
