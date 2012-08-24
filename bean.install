@@ -313,6 +313,7 @@ function bean_update_7006() {
  * Add a Bean Revision Table
  */
 function bean_update_7007(&$return) {
+  $t = get_t();
   drupal_load('module', 'bean');
   $schema = bean_schema();
   $bean = $schema['bean'];
@@ -336,7 +337,7 @@ function bean_update_7007(&$return) {
          'type' => $row->type,
          'view_mode' => $row->view_mode,
          'data' => 'data',
-         'log' => 'Added via update script',
+         'log' => $t('Added via update script'),
          'created' => REQUEST_TIME,
          'changed' => REQUEST_TIME,
     );
