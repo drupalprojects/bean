@@ -6,6 +6,127 @@
  */
 
 /**
+ * Implements hook_services_resources().
+ */
+function bean_services_resources() {
+  return array(
+    '#api_version' => 3002,
+    'bean' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'help' => t('This method returns a bean.'),
+          'callback' => 'bean_services_retrieve',
+          'access arguments' => array('view bean page'),
+          'args' => array(
+            array(
+              'name' => 'bid',
+              'type' => 'int',
+              'description' => t('The id of the bean to get.'),
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+        'create' => array(
+          'help' => t('This method creates a bean.'),
+          'callback' => 'bean_services_create',
+          'access callback' => 'bean_services_access',
+          'access arguments' => array('add'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'data',
+              'type' => 'struct',
+              'description' => t('An object representing the bean.'),
+              'source' => 'data',
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+        'update' => array(
+          'help' => t('This method updates a bean.'),
+          'callback' => 'bean_services_update',
+          'access callback' => 'bean_services_access',
+          'access arguments' => array('edit'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'bid',
+              'type' => 'int',
+              'description' => t('The id of the bean to update.'),
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+            ),
+            array(
+              'name' => 'data',
+              'type' => 'struct',
+              'description' => t('An object representing the bean.'),
+              'source' => 'data',
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+        'delete' => array(
+          'help' => t('This method deletes a bean.'),
+          'callback' => 'bean_services_delete',
+          'access callback' => 'bean_services_access',
+          'access arguments' => array('delete'),
+          'access arguments append' => TRUE,
+          'args' => array(
+            array(
+              'name' => 'bid',
+              'type' => 'int',
+              'description' => t('The id of the bean to delete.'),
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+        'index' => array(
+          'help' => t('This method returns a listing of beans.'),
+          'callback' => 'bean_services_index',
+          'access arguments' => array('administer beans'),
+          'args' => array(
+            array(
+              'name' => 'page',
+              'optional' => TRUE,
+              'type' => 'int',
+              'description' => t('The zero-based index of the page to get, defaults to 0.'),
+              'default value' => 0,
+              'source' => array('param' => 'page'),
+            ),
+            array(
+              'name' => 'fields',
+              'optional' => TRUE,
+              'type' => 'string',
+              'description' => t('The fields to return.'),
+              'default value' => '*',
+              'source' => array('param' => 'fields'),
+            ),
+            array(
+              'name' => 'parameters',
+              'optional' => TRUE,
+              'type' => 'array',
+              'description' => t('Fields an values to filter the list by.'),
+              'default value' => array(),
+              'source' => array('param' => 'parameters'),
+            ),
+            array(
+              'name' => 'pagesize',
+              'optional' => TRUE,
+              'type' => 'int',
+              'description' => t('Number of records to get per page.'),
+              'default value' => 20,
+              'source' => array('param' => 'pagesize'),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
  * Adds a new bean to a node and returns the bid.
  *
  * @param $bean Bean
@@ -163,8 +284,8 @@ function bean_services_access($op, $args) {
     if (is_numeric($args[0])) {
       $bean = bean_load($args[0]);
     }
-    else if (is_array($args[0])) {
-      $bean = (object) $args[0];
+    else if (is_array($args[1])) {
+      $bean = (object) $args[1];
     }
   }
 
