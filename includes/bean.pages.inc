@@ -211,11 +211,17 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
   ctools_include('dependent');
   ctools_add_js('dependent');
 
-  $form['revision']['revision'] = array(
+  $form['revision']['is_new_revision'] = array(
     '#type' => 'checkbox',
     '#title' => t('Create new revision'),
     '#default_value' => 1,
     '#id' => 'edit-revision',
+  );
+
+  $form['revision']['current_revision'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Set Revision as current'),
+    '#default_value' => $bean->currentRevision,
   );
 
   $form['revision']['log'] = array(
@@ -292,7 +298,8 @@ function bean_form_validate($form, &$form_state) {
   $bean->label = $form_state['values']['label'];
   $bean->title = $form_state['values']['title'];
   $bean->view_mode = $form_state['values']['view_mode'];
-  $bean->is_new_revision = $form_state['values']['revision'];
+  $bean->is_new_revision = $form_state['values']['is_new_revision'];
+  $bean->currentRevision = $form_state['values']['current_revision'];
 
   if ($bean->is_new_revision) {
     $bean->log = $form_state['values']['log'];
@@ -438,6 +445,33 @@ function bean_delete_revision_confirm_submit($form, &$form_state) {
     bean_delete_revision($form_state['vid']);
     watchdog('bean', '@type: deleted %title revision %vid.', array('%vid' => $form_state['vid'], '@type' => $bean->typeName(), '%title' => $bean->label()));
     drupal_set_message(t('@type %title revision %vid has been deleted.', array('%vid' => $form_state['vid'], '@type' => $bean->typeName(), '%title' => $bean->label())));
+  }
+}
+
+/**
+ * Form for setting a revision active
+ */
+function bean_set_active_confirm($form, &$form_state, $bean) {
+  $form['#bean'] = $bean;
+
+  return confirm_form($form,
+    t('Are you sure you want to set revision %vid of %title active?', array('%vid' => $bean->vid, '%title' => $bean->label())),
+    $bean->viewUrl(),
+    t('This action cannot be undone.'),
+    t('Set Active'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Submit function
+ */
+function bean_set_active_confirm_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    $bean = $form['#bean'];
+    $bean->setCurrent()->save();
+    watchdog('bean', '@type: %title revision %vid was set active.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label()));
+    drupal_set_message(t('@type %title revision %vid has been set active.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label())));
   }
 }
 
@@ -588,6 +622,14 @@ function bean_revisions_page(Bean $bean) {
       $operations['delete'] = array(
         'title' => t('delete'),
         'href' => "block/{$bean->delta}/revisions/{$rev->vid}/delete",
+        'query' => drupal_get_destination(),
+      );
+    }
+
+    if ($can_edit && !$current) {
+      $operations['set-active'] = array(
+        'title' => t('set active'),
+        'href' => "block/{$bean->delta}/revisions/{$rev->vid}/set-active",
         'query' => drupal_get_destination(),
       );
     }

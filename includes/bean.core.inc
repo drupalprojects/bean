@@ -399,9 +399,14 @@ class Bean extends Entity {
 
     return $this;
   }
+
+  public function setCurrent() {
+    $this->currentRevision = TRUE;
+    return $this;
+  }
 }
 
-class BeanEntityAPIController extends EntityAPIController {
+class BeanEntityAPIController extends EntityAPIControllerExportable {
   protected function setPlugin(Bean $bean) {
     static $plugins = array();
 
@@ -419,8 +424,6 @@ class BeanEntityAPIController extends EntityAPIController {
   }
 
   public function delete($ids, DatabaseTransaction $transaction = NULL) {
-    parent::delete($ids, $transaction);
-
     $beans = $ids ? $this->load($ids) : array();
 
     $deltas = array();
@@ -432,26 +435,34 @@ class BeanEntityAPIController extends EntityAPIController {
       }
     }
 
-      // Delete any blocks
-      // @see block_custom_block_delete_submit()
-      db_delete('block')
-        ->condition('module', 'bean')
-        ->condition('delta', $deltas)
-        ->execute();
-      db_delete('block_role')
-        ->condition('module', 'bean')
-        ->condition('delta', $deltas)
-        ->execute();
+    if (!empty($deltas)) {
+      try {
+        // @see block_custom_block_delete_submit()
+        db_delete('block')
+          ->condition('module', 'bean')
+          ->condition('delta', $deltas)
+          ->execute();
+        db_delete('block_role')
+          ->condition('module', 'bean')
+          ->condition('delta', $deltas)
+          ->execute();
 
-      // @see node_form_block_custom_block_delete_submit()
-      db_delete('block_node_type')
-        ->condition('module', 'bean')
-        ->condition('delta', $deltas)
-        ->execute();
+        // @see node_form_block_custom_block_delete_submit()
+        db_delete('block_node_type')
+          ->condition('module', 'bean')
+          ->condition('delta', $deltas)
+          ->execute();
+      }
+      catch (Exception $e) {
+        if (isset($transaction)) {
+          $transaction->rollback();
+        }
+        watchdog_exception('bean', $e);
+        throw $e;
+      }
     }
+    parent::delete($ids, $transaction);
   }
-
-
 }
 
 class BeanException extends Exception {};
