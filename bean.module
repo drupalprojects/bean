@@ -500,7 +500,7 @@ function bean_permission() {
     $bean_type_name = check_plain($bean_type->type);
     $perms += array(
       "create any $bean_type_name bean" => array(
-        'title' => t('%type_name: add Bean', array('%type_name' => $bean_type->getLabel())),
+        'title' => t('%type_name: Add Bean', array('%type_name' => $bean_type->getLabel())),
       ),
       "edit any $bean_type_name bean" => array(
         'title' => t('%type_name: Edit Bean', array('%type_name' => $bean_type->getLabel())),
@@ -509,7 +509,7 @@ function bean_permission() {
         'title' => t('%type_name: View Bean', array('%type_name' => $bean_type->getLabel())),
       ),
       "delete any $bean_type_name bean" => array(
-        'title' => t('%type_name: delete Bean', array('%type_name' => $bean_type->getLabel())),
+        'title' => t('%type_name: Delete Bean', array('%type_name' => $bean_type->getLabel())),
       ),
     );
   }
