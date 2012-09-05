@@ -479,7 +479,7 @@ function bean_permission() {
     ),
     'view bean page' => array(
       'title' => t('View Bean page'),
-      'description' => t('Visit !url', array('!url' => "block/<delta>")),
+      'description' => t('Visit !url', array('!url' => 'block/< delta >')),
     ),
   );
 
