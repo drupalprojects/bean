@@ -10,6 +10,9 @@ Issue #1684250 by rimen|indytechcook: Transliteration module integration.
 Issue #1663264 by brantwynn: Fixed Status Message Text is wrong during Bean Create and Update.
 Issue #1717540 by jonhattan: Fixed [bean_all()] Fatal error when creating a block instance.
 Issue #1751268 by skwashd: Added Support Services API v3002.
+Issue #1770190 by bforchhammer: Fixed entity translation integration.
+Issue #1535444 by indytechcook: Fixed display of permission description.
+
 
 bean 7.x-1.0-rc5
 ================
