@@ -57,6 +57,13 @@ function bean_entity_info() {
           ),
         ),
       ),
+      'translation' => array(
+        'entity_translation' => array(
+          'class' => 'EntityTranslationBeanHandler',
+          'base path' => 'block/%bean_delta',
+          'path wildcard' => '%bean_delta',
+        ),
+      ),
     ),
   );
 
@@ -76,25 +83,6 @@ function bean_entity_info() {
   }
 
   return $return;
-}
-
-/**
- * Implements hook_translation_info().
- */
-function bean_translation_info($types = NULL) {
-  $info = array(
-    'bean' => array(
-      'translation' => array(
-        'entity_translation' => array(
-          'class' => 'EntityTranslationBeanHandler',
-          'base path' => 'block/%bean_delta',
-          'path wildcard' => '%bean_delta',
-        ),
-      ),
-    ),
-  );
-
-  return isset($types) ? array_intersect_key($info, $types) : $info;
 }
 
 /**
