@@ -40,8 +40,8 @@ function bean_all_bean_types() {
 
 function _bean_all_bean_types(&$plugins, $module) {
   $default = array(
-    //'file' => 'all.inc',
-    //'path' => drupal_get_path('module', 'bean_all') . '/plugins',
+    'file' => 'all.inc',
+    'path' => drupal_get_path('module', 'bean_all') . '/plugins',
     'handler' => array(
       'class' => 'BeanAll',
       'parent' => 'bean',
@@ -111,10 +111,8 @@ function bean_all_block_info_alter(&$blocks, $theme, $code_blocks) {
   foreach ($blocks as $module => $module_blocks) {
     bean_all_filter_blocks($module_blocks, $module);
     foreach ($module_blocks as $delta => $block) {
-      if (!isset($blocks_to_ignore[$module][$delta])) {
-        $blocks[$module][$delta]['status'] = FALSE;
-        $blocks[$module][$delta]['disabled'] = FALSE;
-      }
+      $blocks[$module][$delta]['status'] = FALSE;
+      $blocks[$module][$delta]['disabled'] = FALSE;
     }
   }
 }
