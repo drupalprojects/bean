@@ -2,6 +2,11 @@ Current API VERSION: 5.
 
 bean 7.x-1.x-dev
 ================
+Issue #1601960 by indytechcook Fixed [bean_all()] Endless recursion in combination with views.
+Issue #1611676 by barraponto | hazah: Added Views filter by bean type.
+
+bean 7.x-1.0-rc6
+================
 Issue #1649312: Bean Usage sub-module
 Issue #1691458 by mrfelton: Fixed Unable to access bean overview page unless administer bean permissions is granted.
 Issue #1698548 by rsaddington: Fixed Block types tables has too many td's.
@@ -10,6 +15,9 @@ Issue #1684250 by rimen|indytechcook: Transliteration module integration.
 Issue #1663264 by brantwynn: Fixed Status Message Text is wrong during Bean Create and Update.
 Issue #1717540 by jonhattan: Fixed [bean_all()] Fatal error when creating a block instance.
 Issue #1751268 by skwashd: Added Support Services API v3002.
+Issue #1770190 by bforchhammer: Fixed entity translation integration.
+Issue #1535444 by indytechcook: Fixed display of permission description.
+
 
 bean 7.x-1.0-rc5
 ================

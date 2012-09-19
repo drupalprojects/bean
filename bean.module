@@ -60,6 +60,13 @@ function bean_entity_info() {
           ),
         ),
       ),
+      'translation' => array(
+        'entity_translation' => array(
+          'class' => 'EntityTranslationBeanHandler',
+          'base path' => 'block/%bean_delta',
+          'path wildcard' => '%bean_delta',
+        ),
+      ),
     ),
   );
 
@@ -79,25 +86,6 @@ function bean_entity_info() {
   }
 
   return $return;
-}
-
-/**
- * Implements hook_translation_info().
- */
-function bean_translation_info($types = NULL) {
-  $info = array(
-    'bean' => array(
-      'translation' => array(
-        'entity_translation' => array(
-          'class' => 'EntityTranslationBeanHandler',
-          'base path' => 'block/%bean_delta',
-          'path wildcard' => '%bean_delta',
-        ),
-      ),
-    ),
-  );
-
-  return isset($types) ? array_intersect_key($info, $types) : $info;
 }
 
 /**
@@ -593,7 +581,10 @@ function bean_permission() {
     ),
     'view bean page' => array(
       'title' => t('View Bean page'),
-      'description' => t('Visit !url', array('!url' => "block/<delta>")),
+      'description' => t('Visit !url', array('!url' => 'block/< delta >')),
+    ),
+    'administer bean settings' => array(
+      'title' => t('Administer Bean Settings'),
     ),
     'administer bean settings' => array(
       'title' => t('Administer Bean Settings'),
@@ -608,7 +599,7 @@ function bean_permission() {
     $bean_type_name = check_plain($bean_type->type);
     $perms += array(
       "create any $bean_type_name bean" => array(
-        'title' => t('%type_name: add Bean', array('%type_name' => $bean_type->getLabel())),
+        'title' => t('%type_name: Add Bean', array('%type_name' => $bean_type->getLabel())),
       ),
       "edit any $bean_type_name bean" => array(
         'title' => t('%type_name: Edit Bean', array('%type_name' => $bean_type->getLabel())),
@@ -617,7 +608,7 @@ function bean_permission() {
         'title' => t('%type_name: View Bean', array('%type_name' => $bean_type->getLabel())),
       ),
       "delete any $bean_type_name bean" => array(
-        'title' => t('%type_name: delete Bean', array('%type_name' => $bean_type->getLabel())),
+        'title' => t('%type_name: Delete Bean', array('%type_name' => $bean_type->getLabel())),
       ),
     );
   }
@@ -986,4 +977,14 @@ function bean_field_extra_fields() {
   }
 
   return $extra;
+}
+
+/**
+ * Implements hook_views_api()
+ */
+function bean_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'bean') . '/views',
+  );
 }
