@@ -204,7 +204,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#weight' => 10,
   );
 
-  if (empty($bean->bid)) {
+  if (isset($bean->is_new)) {
     $form['revision']['#access'] = FALSE;
   }
 
@@ -218,17 +218,17 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#id' => 'edit-revision',
   );
 
-  if (empty($bean->bid)) {
-    $form['revision']['active_revision'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Set Revision as active'),
-      '#default_value' => $bean->isActiveRevision(),
+  if (isset($bean->is_new)) {
+    $form['default_revision'] = array(
+      '#type' => 'value',
+      '#value' => TRUE,
     );
   }
   else {
-    $form['active_revision'] = array(
-      '#type' => 'value',
-      '#value' => TRUE,
+    $form['revision']['default_revision'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Set Revision as default'),
+      '#default_value' => $bean->isDefaultRevision(),
     );
   }
 
@@ -307,7 +307,7 @@ function bean_form_validate($form, &$form_state) {
   $bean->title = $form_state['values']['title'];
   $bean->view_mode = $form_state['values']['view_mode'];
   $bean->is_new_revision = $form_state['values']['is_new_revision'];
-  $bean->activeRevision = $form_state['values']['active_revision'];
+  $bean->default_revision = $form_state['values']['default_revision'];
 
   if ($bean->is_new_revision) {
     $bean->log = $form_state['values']['log'];
@@ -360,6 +360,8 @@ function bean_form_submit($form, &$form_state) {
  * save or preview. This function can also be called by a "Next" button of a
  * wizard to update the form state's entity with the current step's values
  * before proceeding to the next step.
+ *
+ * @return Bean
  *
  * @see bean_form()
  * @see node_form_submit_build_node()
@@ -459,14 +461,14 @@ function bean_delete_revision_confirm_submit($form, &$form_state) {
 /**
  * Form for setting a revision active
  */
-function bean_set_active_confirm($form, &$form_state, $bean) {
+function bean_set_default_confirm($form, &$form_state, $bean) {
   $form['#bean'] = $bean;
 
   return confirm_form($form,
     t('Are you sure you want to set revision %vid of %title active?', array('%vid' => $bean->vid, '%title' => $bean->label())),
     $bean->viewUrl(),
     t('This action cannot be undone.'),
-    t('Set Active'),
+    t('Set Default'),
     t('Cancel')
   );
 }
@@ -474,10 +476,10 @@ function bean_set_active_confirm($form, &$form_state, $bean) {
 /**
  * Submit function
  */
-function bean_set_active_confirm_submit($form, &$form_state) {
+function bean_set_default_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
     $bean = $form['#bean'];
-    $bean->setActive()->save();
+    $bean->setDefault()->save();
     watchdog('bean', '@type: %title revision %vid was set active.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label()));
     drupal_set_message(t('@type %title revision %vid has been set active.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label())));
   }

@@ -150,7 +150,7 @@ class Bean extends Entity {
   public $changed;
   public $log;
   public $uid;
-  public $active_revision;
+  public $default_revision;
   public $revisions = array();
   protected $plugin;
 
@@ -399,6 +399,17 @@ class Bean extends Entity {
 
     return $this;
   }
+
+  /**
+   * Set the revision as default
+   *
+   * @return Bean
+   */
+  public function setDefault() {
+    $this->default_revision = TRUE;
+    return $this;
+  }
+
 }
 
 class BeanEntityAPIController extends EntityAPIControllerExportable {

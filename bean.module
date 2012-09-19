@@ -23,7 +23,7 @@ function bean_entity_info() {
         'label' => 'title',
         'name' => 'delta',
         'revision' => 'vid',
-        'active revision' => 'active_revision',
+        'default revision' => 'default_revision',
       ),
       'bundles' => array(),
       'bundle keys' => array(
@@ -199,10 +199,10 @@ function bean_menu() {
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
 
-  $items['block/%bean_delta/revisions/%/set-active'] = array(
-    'title' => 'Set Active',
+  $items['block/%bean_delta/revisions/%/set-default'] = array(
+    'title' => 'Set Default',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('bean_set_active_confirm', 1),
+    'page arguments' => array('bean_set_default_confirm', 1),
     'access callback' => 'bean_access',
     'access arguments' => array('edit', 1),
     'file' => 'includes/bean.pages.inc',
