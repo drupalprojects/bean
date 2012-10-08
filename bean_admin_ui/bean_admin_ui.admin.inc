@@ -139,15 +139,28 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
   );
 
   // This is a new bean type.
-  if (isset($plugin_info)) {
+  if (!empty($bean_type->type)) {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete Block type'),
       '#weight' => 45,
       '#limit_validation_errors' => array(),
-      '#submit' => array('bean_type_form_submit'),
+      '#submit' => array('bean_admin_ui_type_form_submit_delete'),
       '#disabled' => $disabled,
     );
+
+    if (method_exists($bean_type, 'getExportStatus')) {
+      $export_status = $bean_type->getExportStatus();
+
+      if ($bean_type->getExportStatus() != 'Default') {
+        $form['actions']['delete']['value'] = ($export_status == 'Overridden')
+          ? t('Revert to defaults') : t('Delete Block type');
+      }
+      else {
+        unset($form['actions']['delete']);
+      }
+
+    }
   }
   return $form;
 }
