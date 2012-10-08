@@ -31,7 +31,7 @@ function bean_admin_ui_admin_page() {
           $row[] = array('data' => l(t('Delete'), 'admin/structure/block-types/manage/' . $bean_type->buildURL() . '/delete'));
           break;
         case 'Overridden':
-          $row[] = array('data' => l(t('Revert'), 'admin/structure/block-types/manage/' . $bean_type->buildURL() . '/delete'));
+          $row[] = array('data' => l(t('Revert'), 'admin/structure/block-types/manage/' . $bean_type->buildURL() . '/revert'));
           break;
         case 'Default':
           $row[] = array();
@@ -142,19 +142,17 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
   if (!empty($bean_type->type)) {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
+      '#name' => 'delete',
       '#value' => t('Delete Block type'),
       '#weight' => 45,
       '#limit_validation_errors' => array(),
-      '#submit' => array('bean_admin_ui_type_form_submit_delete'),
       '#disabled' => $disabled,
     );
 
     if (method_exists($bean_type, 'getExportStatus')) {
-      $export_status = $bean_type->getExportStatus();
-
-      if ($bean_type->getExportStatus() != 'Default') {
-        $form['actions']['delete']['value'] = ($export_status == 'Overridden')
-          ? t('Revert to defaults') : t('Delete Block type');
+      if ($bean_type->getExportStatus() == 'Overridden') {
+        $form['actions']['delete']['name'] = 'revert';
+        $form['actions']['delete']['value'] = t('Revert to defaults');
       }
       else {
         unset($form['actions']['delete']);
@@ -169,6 +167,10 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
  * Form API submit callback for the type form.
  */
 function bean_admin_ui_type_form_submit(&$form, &$form_state) {
+  $op = $form_state['clicked_button']['#name'];
+  if (in_array($op, array('revert', 'delete'))) {
+    $form_state['redirect'] = 'admin/structure/block-types/manage/' . $form['bean_type']['#value']->type . '/' . $op;
+  }
   $bean_type = $form_state['values']['bean_type'];
   $bean_type->type = $form_state['values']['name'];
   $bean_type->setLabel($form_state['values']['label']);
@@ -179,24 +181,18 @@ function bean_admin_ui_type_form_submit(&$form, &$form_state) {
 }
 
 /**
- * Form API submit callback for the delete button.
+ * Menu callback; Form builder to confirm delete/revert of a bean type.
  */
-function bean_admin_ui_type_form_submit_delete(&$form, &$form_state) {
-  $form_state['redirect'] = 'admin/structure/block-types/manage/' . $form_state['bean_type']->type . '/delete';
-}
-
-/**
- * Menu callback; delete a single content type.
- */
-function bean_admin_ui_type_delete_confirm($form, &$form_state, $type) {
+function bean_admin_ui_type_op_confirm($form, &$form_state, $op, $type) {
+  $form['op'] = array('#type' => 'value', '#value' => $op);
   $form['type'] = array('#type' => 'value', '#value' => $type);
   $form['name'] = array('#type' => 'value', '#value' => $type->getLabel());
   $caption = '';
-  if (!method_exists($type, 'getExportStatus') || $type->getExportStatus() == 'Normal') {
+  if ($op == 'delete') {
     $message = t('Are you sure you want to delete the block type %type?', array('%type' => $type->getLabel()));
     $num_beans = db_query("SELECT COUNT(*) FROM {bean} WHERE type = :type", array(':type' => $type->type))->fetchField();
     if ($num_beans) {
-      $caption .= '<p>' . format_plural($num_beans, '%type is used by 1 block on your site. If you remove this block type, you will not be able to edit the %type blocks and it may not display correctly.', '%type is used by @count pieces of content on your site. If you remove %type, you will not be able to edit the %type content and it may not display correctly.', array('%type' => $type->getLabel())) . '</p>';
+      $caption .= '<p>' . format_plural($num_beans, '%type is used by 1 block on your site that is going to be removed along with %type.', '%type is used by @count blocks on your site that are going to be removed along %type.', array('%type' => $type->getLabel())) . '</p>';
     }
     $action = t('Delete');
   }
@@ -209,7 +205,7 @@ function bean_admin_ui_type_delete_confirm($form, &$form_state, $type) {
   return confirm_form($form, $message, 'admin/structure/block-types', $caption, $action);
 }
 
-function bean_admin_ui_type_delete_confirm_submit($form, &$form_state) {
-  $form_state['values']['type']->delete();
+function bean_admin_ui_type_op_confirm_submit($form, &$form_state) {
+  $form_state['values']['type']->{$form['op']['#value']}();
   $form_state['redirect'] = 'admin/structure/block-types';
 }

@@ -13,18 +13,14 @@ class BeanCustom extends BeanPlugin {
    * Delete the record from the database.
    */
   public function delete() {
-    // Delete all beans belonging to this bean type if we are removing
-    // the actual bean.
-    if ($this->getExportStatus() == 'Normal') {
-      db_delete('bean')
-      ->condition('type', $this->type)
-      ->execute();
-    }
-    db_delete('bean_type')
-    ->condition('name', $this->type)
+    db_delete('bean')
+    ->condition('type', $this->type)
     ->execute();
+
+    ctools_export_crud_delete('bean_type', $this->type);
     field_attach_delete_bundle('bean', $this->type);
-    drupal_flush_all_caches();
+
+    bean_reset();
   }
 
   /**
@@ -41,6 +37,14 @@ class BeanCustom extends BeanPlugin {
     drupal_write_record('bean_type', $bean_type, $primary_key);
     drupal_static_reset('bean_admin_ui_get_types');
 
+    bean_reset();
+  }
+
+  /**
+   * Revert the bean type to code defaults.
+   */
+  public function revert() {
+    ctools_export_crud_delete('bean_type', $this->type);
     bean_reset();
   }
 
