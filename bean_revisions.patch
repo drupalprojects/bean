@@ -1,0 +1,980 @@
+diff --git a/bean.install b/bean.install
+index ae629b2..edc0b2d 100644
+--- a/bean.install
++++ b/bean.install
+@@ -16,6 +16,14 @@ function bean_schema() {
+         'type' => 'serial',
+         'not null' => TRUE,
+         'description' => 'Primary Key: Unique bean item ID.',
++        'unsigned' => TRUE,
++      ),
++      'vid' => array(
++        'type' => 'int',
++        'not null' => TRUE,
++        'description' => 'Revision ID',
++        'default' => 0,
++        'unsigned' => TRUE,
+       ),
+       'delta' => array(
+         'description' => "The bean's {block}.delta.",
+@@ -64,13 +72,116 @@ function bean_schema() {
+         'table' => 'bean_type',
+         'columns' => array('type' => 'type'),
+       ),
++      'bean_revision' => array(
++        'table' => 'bean_revision',
++        'columns' => array('vid' => 'vid'),
++      )
+     ),
+     'primary key' => array('bid'),
+     'unique keys' => array(
++      'vid' => array('vid'),
+       'delta' => array('delta'),
+     ),
+   );
+ 
++  $schema['bean_revision'] =  array(
++    'description' => 'Stores bean items.',
++    'fields' => array(
++      'bid' => array(
++        'description' => 'The {bean} this version belongs to.',
++        'type' => 'int',
++        'unsigned' => TRUE,
++        'not null' => TRUE,
++        'default' => 0,
++      ),
++      'vid' => array(
++        'description' => 'The primary identifier for this version.',
++        'type' => 'serial',
++        'unsigned' => TRUE,
++        'not null' => TRUE,
++      ),
++      'uid' => array(
++        'description' => 'The author of the revision.',
++        'type' => 'int',
++        'unsigned' => TRUE,
++        'not null' => TRUE,
++        'default' => 0,
++      ),
++      'delta' => array(
++        'description' => "The bean's {block}.delta.",
++        'type' => 'varchar',
++        'length' => 32,
++        'not null' => TRUE,
++      ),
++      'label' => array(
++        'description' => 'The Displays in the Admin page.',
++        'type' => 'varchar',
++        'length' => 255,
++        'not null' => TRUE,
++        'default' => '',
++      ),
++      'title' => array(
++        'description' => 'The human-readable name of this bean.',
++        'type' => 'varchar',
++        'length' => 255,
++        'not null' => TRUE,
++        'default' => '',
++      ),
++      'type' => array(
++        'description' => 'The {bean_type}.type of this bean.',
++        'type' => 'varchar',
++        'length' => 32,
++        'not null' => TRUE,
++        'default' => '',
++      ),
++      'view_mode' => array(
++        'description' => 'The View mode to use as the bean.',
++        'type' => 'varchar',
++        'length' => 32,
++        'not null' => TRUE,
++        'default' => 'default',
++      ),
++      'data' => array(
++        'type' => 'text',
++        'not null' => FALSE,
++        'size' => 'big',
++        'serialize' => TRUE,
++        'description' => 'A serialized array of additional data related to this bean.',
++      ),
++      'log' => array(
++        'description' => t('A log message associated with the revision.'),
++        'type' => 'text',
++        'size' => 'big',
++      ),
++      'created' => array(
++        'description' => 'The Unix timestamp when the entity was created.',
++        'type' => 'int',
++        'not null' => TRUE,
++        'default' => 0,
++      ),
++      'changed' => array(
++        'description' => 'The Unix timestamp when the entity was most recently saved.',
++        'type' => 'int',
++        'not null' => TRUE,
++        'default' => 0,
++      ),
++    ),
++    'foreign keys' => array(
++      'type' => array(
++        'table' => 'bean_type',
++        'columns' => array('type' => 'type'),
++      ),
++      'version_bean' => array(
++        'table' => 'bean',
++        'columns' => array('bid' => 'bid'),
++      )
++    ),
++    'primary key' => array('vid'),
++    'indexes' => array(
++      'bid' => array('bid', 'vid'),
++    ),
++  );
++
+   return $schema;
+ }
+ 
+@@ -87,6 +198,27 @@ function bean_uninstall() {
+ }
+ 
+ /**
++ * Implements hook_install().
++ */
++function bean_install() {
++  $t = get_t();
++
++  // Load the default shortcut set
++  $shortcut_set = shortcut_default_set();
++  $shortcut_set->links[] = array(
++      'link_path' => 'block/add',
++      'link_title' => $t('Add block'),
++      'weight' => -18,
++  );
++  $shortcut_set->links[] = array(
++    'link_path' => 'admin/content/blocks',
++    'link_title' => $t('Add block'),
++    'weight' => -18,
++  );
++
++  shortcut_set_save($shortcut_set);
++}
++/**
+  * Implements hook_disable().
+  */
+ function bean_disable() {
+@@ -176,3 +308,52 @@ function bean_update_7006() {
+   registry_rebuild();
+   return t('Registry and Menu have been rebuilt');
+ }
++
++/**
++ * Add a Bean Revision Table
++ */
++function bean_update_7007(&$return) {
++  $t = get_t();
++  drupal_load('module', 'bean');
++  $schema = bean_schema();
++  $bean = $schema['bean'];
++  $bean_revision = $schema['bean_revision'];
++
++  db_drop_primary_key('bean');
++  db_change_field('bean', 'bid', 'bean', $bean['bid'], array('primary key' => array('bid')));
++  db_add_field('bean', 'vid', $bean['vid']);
++  db_add_unique_key('bean', 'vid', array('vid'));
++
++  db_create_table('bean_revision', $bean_revision);
++
++  $results = db_select('bean');
++  foreach ($results as $row) {
++    $bean_revision = array(
++         'bid' => $row->bid,
++         'uid' => variable_get('bean_uid', 1),
++         'delta' => $row->delta,
++         'label' => $row->label,
++         'title' => $row->title,
++         'type' => $row->type,
++         'view_mode' => $row->view_mode,
++         'data' => 'data',
++         'log' => $t('Added via update script'),
++         'created' => REQUEST_TIME,
++         'changed' => REQUEST_TIME,
++    );
++
++    $options = array('return' => Database::RETURN_INSERT_ID);
++    $vid = db_insert('bean_revision', $options)
++      ->fields($bean_revision)
++      ->execute();
++
++    db_update('bean')
++      ->fields(array('vid' => $vid))
++      ->condition('bid', $row->bid)
++      ->execute();
++
++  }
++
++  return t('Bean Revision table has been added.');
++}
++
+diff --git a/bean.module b/bean.module
+index 96fa80c..dd2068a 100644
+--- a/bean.module
++++ b/bean.module
+@@ -15,12 +15,15 @@ function bean_entity_info() {
+       'entity class' => 'Bean',
+       'controller class' => 'BeanEntityAPIController',
+       'base table' => 'bean',
++      'revision table' => 'bean_revision',
+       'fieldable' => TRUE,
+       'entity keys' => array(
+         'id' => 'bid',
+         'bundle' => 'type',
+         'label' => 'title',
+         'name' => 'delta',
++        'revision' => 'vid',
++        'default revision' => 'default_revision',
+       ),
+       'bundles' => array(),
+       'bundle keys' => array(
+@@ -151,6 +154,75 @@ function bean_menu() {
+     'file' => 'includes/bean.pages.inc',
+   );
+ 
++  $items['block/%bean_delta/revisions'] = array(
++    'title' => 'Revisions',
++    'page callback' => 'bean_revisions_page',
++    'page arguments' => array(1),
++    'access arguments' => array('view bean revisions'),
++    'file' => 'includes/bean.pages.inc',
++    'type' => MENU_LOCAL_TASK,
++  );
++
++  $items['block/%bean_delta/revisions/%'] = array(
++    'title callback' => 'bean_revision_title',
++    'title arguments' => array(1),
++    'page callback' => 'bean_view',
++    'page arguments' => array(1),
++    'access callback' => 'bean_access',
++    'access arguments' => array('view', 1),
++    'file' => 'includes/bean.pages.inc',
++    'load arguments' => array(3),
++  );
++
++  $items['block/%bean_delta/revisions/%/view'] = array(
++    'title' => 'View',
++    'page callback' => 'bean_view',
++    'page arguments' => array(1),
++    'access callback' => 'bean_access',
++    'access arguments' => array('view', 1),
++    'file' => 'includes/bean.pages.inc',
++    'load arguments' => array(3),
++    'weight' => -10,
++    'type' => MENU_DEFAULT_LOCAL_TASK,
++    'context' => MENU_CONTEXT_NONE,
++  );
++
++  $items['block/%bean_delta/revisions/%/edit'] = array(
++    'title' => 'Edit',
++    'page callback' => 'bean_edit',
++    'page arguments' => array(1),
++    'access callback' => 'bean_access',
++    'access arguments' => array('edit', 1),
++    'file' => 'includes/bean.pages.inc',
++    'load arguments' => array(3),
++    'type' => MENU_LOCAL_TASK,
++    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
++  );
++
++  $items['block/%bean_delta/revisions/%/set-default'] = array(
++    'title' => 'Set Default',
++    'page callback' => 'drupal_get_form',
++    'page arguments' => array('bean_set_default_confirm', 1),
++    'access callback' => 'bean_access',
++    'access arguments' => array('edit', 1),
++    'file' => 'includes/bean.pages.inc',
++    'load arguments' => array(3),
++    'type' => MENU_LOCAL_TASK,
++    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
++  );
++
++  $items['block/%bean_delta/revisions/%/delete'] = array(
++    'title' => 'Delete',
++    'page callback' => 'drupal_get_form',
++    'page arguments' => array('bean_delete_revision_confirm', 1),
++    'access callback' => 'bean_access',
++    'access arguments' => array('delete', 1),
++    'file' => 'includes/bean.pages.inc',
++    'load arguments' => array(3),
++    'weight' => 1,
++    'type' => MENU_LOCAL_TASK,
++    'context' => MENU_CONTEXT_NONE,
++  );
+ 
+   $items['admin/content/blocks'] = array(
+     'title' => 'Blocks',
+@@ -193,6 +265,13 @@ function bean_menu() {
+ }
+ 
+ /**
++ * Title callback
++ */
++function bean_revision_title($bean) {
++  return $bean->label();
++}
++
++/**
+  * Implements hook_admin_paths().
+  */
+ function bean_admin_paths() {
+@@ -200,7 +279,8 @@ function bean_admin_paths() {
+     'block/*/edit' => TRUE,
+     'block/*/delete' => TRUE,
+     'block/*/revisions' => TRUE,
+-    'block/*/revisions/*/revert' => TRUE,
++    'block/*/revisions/*/edit' => TRUE,
++    'block/*/revisions/*/set-active' => TRUE,
+     'block/*/revisions/*/delete' => TRUE,
+     'block/add' => TRUE,
+     'block/add/*' => TRUE,
+@@ -409,23 +489,38 @@ function bean_load($bid, $reset = FALSE) {
+ }
+ 
+ /**
++ * Fetch a bean revision
++ *
++ * A new function to not break the bean_load API
++ */
++function bean_load_revision($bid, $vid, $reset = FALSE) {
++  $conditions = array('vid' => $vid);
++  $beans = bean_load_multiple(array($bid), $conditions, $reset);
++  return reset($beans);
++}
++
++/**
+  * Fetch a bean object by its delta.
+  *
+  * @param $delta
+  *   String specifying the bean delta.
+  * @param $reset
+  *   A boolean indicating that the internal cache should be reset.
+- * @return
++ * @return Bean
+  *   A fully-loaded $bean object or FALSE if it cannot be loaded.
+  */
+-function bean_load_delta($delta, $reset = FALSE) {
++function bean_load_delta($delta, $reset = FALSE, $revision = NULL) {
+   $result = db_select('bean', 'b')
+     ->fields('b', array('bid'))
+     ->condition('delta', $delta)
+     ->execute();
+   if ($bid = $result->fetchField()) {
+-    $beans = bean_load_multiple(array($bid), array(), $reset);
+-    return reset($beans);
++    if ($revision) {
++      return bean_load_revision($bid, $revision, $reset);
++    }
++    else {
++      return bean_load($bid, $reset);
++    }
+   }
+   return FALSE;
+ }
+@@ -433,8 +528,8 @@ function bean_load_delta($delta, $reset = FALSE) {
+ /**
+  * Menu callback to load a bean by the delta
+  */
+-function bean_delta_load($delta) {
+-  return bean_load_delta($delta);
++function bean_delta_load($delta, $revision = NULL) {
++  return bean_load_delta($delta, FALSE, $revision);
+ }
+ 
+ /**
+@@ -457,6 +552,13 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
+ }
+ 
+ /**
++ * Delete a bean revision
++ */
++function bean_delete_revision($vid) {
++  return entity_get_controller('bean')->revisionDelete($vid);
++}
++
++/**
+  * Implements hook_permissions().
+  */
+ function bean_permission() {
+@@ -484,6 +586,12 @@ function bean_permission() {
+     'administer bean settings' => array(
+       'title' => t('Administer Bean Settings'),
+     ),
++    'administer bean settings' => array(
++      'title' => t('Administer Bean Settings'),
++    ),
++    'view bean revisions' => array(
++      'title' => t('Administer Bean Settings'),
++    ),
+   );
+ 
+   // Add a Permission for each entity type.
+diff --git a/includes/bean.core.inc b/includes/bean.core.inc
+index ab072fe..db798f2 100644
+--- a/includes/bean.core.inc
++++ b/includes/bean.core.inc
+@@ -144,6 +144,14 @@ class Bean extends Entity {
+   public $data;
+   public $delta;
+   public $view_mode;
++  public $bid;
++  public $vid;
++  public $created;
++  public $changed;
++  public $log;
++  public $uid;
++  public $default_revision;
++  public $revisions = array();
+   protected $plugin;
+ 
+   /**
+@@ -180,6 +188,7 @@ class Bean extends Entity {
+       $plugin = bean_load_plugin_class($this->type);
+       $this->loadUp($plugin);
+     }
++    return $this;
+   }
+ 
+   /**
+@@ -194,9 +203,9 @@ class Bean extends Entity {
+         $plugin = bean_load_plugin_class('bean_default');
+       }
+ 
+-      $this->setPlugin($plugin);
+-      $this->setFields();
++      $this->setPlugin($plugin)->setFields();
+     }
++    return $this;
+   }
+ 
+   /**
+@@ -205,6 +214,8 @@ class Bean extends Entity {
+    */
+   protected  function setPlugin($plugin) {
+     $this->plugin = $plugin;
++
++    return $this;
+   }
+ 
+   /**
+@@ -219,6 +230,7 @@ class Bean extends Entity {
+         $this->$field = isset($values[$field]) ? $values[$field] : $default;
+       }
+     }
++    return $this;
+   }
+ 
+   /**
+@@ -295,6 +307,8 @@ class Bean extends Entity {
+     foreach ($this->plugin->values() as $field => $value) {
+       $this->data[$field] = $values[$field];
+     }
++
++    return $this;
+   }
+ 
+   /**
+@@ -314,7 +328,38 @@ class Bean extends Entity {
+    * Override the save to add clearing of caches
+    */
+   public function save() {
+-    // Set the delta if it's not set already
++    $this->setUid()->checkDelta();
++
++    if (empty($this->created)) {
++      $this->created = REQUEST_TIME;
++    }
++
++    $this->changed = REQUEST_TIME;
++
++    $this->plugin->submit($this);
++
++    $return = parent::save();
++    block_flush_caches();
++    cache_clear_all('bean:' . $this->delta . ':', 'cache_block', TRUE);
++
++    return $return;
++  }
++
++  /**
++   * Get the user
++   */
++  protected function setUid() {
++    global $user;
++
++    $this->uid = empty($this->uid) ? $user->uid : $this->uid;
++
++    return $this;
++  }
++
++  /**
++   * Set the delta function
++   */
++  protected  function checkDelta() {
+     if (empty($this->delta)) {
+       $max_length = 32;
+ 
+@@ -340,44 +385,34 @@ class Bean extends Entity {
+       }
+     }
+ 
+-    $this->plugin->submit($this);
++    return $this;
++  }
+ 
+-    $return = parent::save();
+-    block_flush_caches();
+-    cache_clear_all('bean:' . $this->delta . ':', 'cache_block', TRUE);
+-    return $return;
++  /**
++   * Load the revisions from the DB
++   */
++  public function loadRevisions() {
++    $this->revisions = db_select('bean_revision', 'br')
++                        ->condition('delta', $this->identifier())
++                        ->fields('br')
++                        ->execute();
++
++    return $this;
+   }
+ 
+   /**
+-   * Override the delete to remove the fields and blocks
+-   */
+-  public function delete() {
+-    if ($this->internalIdentifier()) {
+-      // Delete the field values
+-      field_attach_delete('bean', $this);
+-
+-      // Delete any blocks
+-      // @see block_custom_block_delete_submit()
+-      db_delete('block')
+-        ->condition('module', 'bean')
+-        ->condition('delta', $this->identifier())
+-        ->execute();
+-      db_delete('block_role')
+-        ->condition('module', 'bean')
+-        ->condition('delta', $this->identifier())
+-        ->execute();
+-
+-      // @see node_form_block_custom_block_delete_submit()
+-      db_delete('block_node_type')
+-        ->condition('module', 'bean')
+-        ->condition('delta', $this->identifier())
+-        ->execute();
+-      entity_get_controller($this->entityType)->delete(array($this->internalIdentifier()));
+-    }
++   * Set the revision as default
++   *
++   * @return Bean
++   */
++  public function setDefault() {
++    $this->default_revision = TRUE;
++    return $this;
+   }
++
+ }
+ 
+-class BeanEntityAPIController extends EntityAPIController {
++class BeanEntityAPIController extends EntityAPIControllerExportable {
+   protected function setPlugin(Bean $bean) {
+     static $plugins = array();
+ 
+@@ -387,103 +422,52 @@ class BeanEntityAPIController extends EntityAPIController {
+     }
+   }
+ 
+-  /**
+-   * Overridden.
+-   * @see EntityAPIController#load($ids, $conditions)
+-   *
+-   * We need to load the plugin and set the defaults before
+-   * anything else is down to the record
+-   */
+-  public function load($ids = array(), $conditions = array()) {
+-    $entities = array();
+-
+-    // Revisions are not statically cached, and require a different query to
+-    // other conditions, so separate the revision id into its own variable.
+-    if ($this->revisionKey && isset($conditions[$this->revisionKey])) {
+-      $revision_id = $conditions[$this->revisionKey];
+-      unset($conditions[$this->revisionKey]);
+-    }
+-    else {
+-      $revision_id = FALSE;
+-    }
+-
+-    // Create a new variable which is either a prepared version of the $ids
+-    // array for later comparison with the entity cache, or FALSE if no $ids
+-    // were passed. The $ids array is reduced as items are loaded from cache,
+-    // and we need to know if it's empty for this reason to avoid querying the
+-    // database when all requested entities are loaded from cache.
+-    $passed_ids = !empty($ids) ? array_flip($ids) : FALSE;
+-
+-    // Try to load entities from the static cache.
+-    if ($this->cache && !$revision_id) {
+-      $entities = $this->cacheGet($ids, $conditions);
+-      // If any entities were loaded, remove them from the ids still to load.
+-      if ($passed_ids) {
+-        $ids = array_keys(array_diff_key($passed_ids, $entities));
+-      }
++  protected function attachLoad(&$queried_entities, $revision_id = FALSE) {
++    foreach ($queried_entities as $entity) {
++      $this->setPlugin($entity);
+     }
++    parent::attachLoad($queried_entities, $revision_id);
++  }
+ 
+-    // Load any remaining entities from the database. This is the case if $ids
+-    // is set to FALSE (so we load all entities), if there are any ids left to
+-    // load or if loading a revision.
+-    if (!($this->cacheComplete && $ids === FALSE && !$conditions) && ($ids === FALSE || $ids || $revision_id)) {
+-      $queried_entities = array();
+-      foreach ($this->query($ids, $conditions, $revision_id) as $record) {
+-        // This is what was overridden.
+-        $this->setPlugin($record);
+-        // Skip entities already retrieved from cache.
+-        if (isset($entities[$record->{$this->idKey}])) {
+-          continue;
+-        }
++  public function delete($ids, DatabaseTransaction $transaction = NULL) {
++    $beans = $ids ? $this->load($ids) : array();
+ 
+-        // Take care of serialized columns.
+-        $schema = drupal_get_schema($this->entityInfo['base table']);
+-
+-        foreach ($schema['fields'] as $field => $info) {
+-          if (!empty($info['serialize']) && isset($record->$field)) {
+-            $record->$field = unserialize($record->$field);
+-            // Support automatic merging of 'data' fields into the entity.
+-            if (!empty($info['merge']) && is_array($record->$field)) {
+-              foreach ($record->$field as $key => $value) {
+-                $record->$key = $value;
+-              }
+-              unset($record->$field);
+-            }
+-          }
+-        }
++    $deltas = array();
++    foreach ($beans as $bean) {
++      if ($bean->internalIdentifier()) {
++        field_attach_delete('bean', $bean);
+ 
+-        $queried_entities[$record->{$this->idKey}] = $record;
++        $deltas[] = $bean->identifier();
+       }
+     }
+ 
+-    // Pass all entities loaded from the database through $this->attachLoad(),
+-    // which attaches fields (if supported by the entity type) and calls the
+-    // entity type specific load callback, for example hook_node_load().
+-    if (!empty($queried_entities)) {
+-      $this->attachLoad($queried_entities, $revision_id);
+-      $entities += $queried_entities;
+-    }
+-
+-    if ($this->cache) {
+-      // Add entities to the cache if we are not loading a revision.
+-      if (!empty($queried_entities) && !$revision_id) {
+-        $this->cacheSet($queried_entities);
+-
+-        // Remember if we have cached all entities now.
+-        if (!$conditions && $ids === FALSE) {
+-          $this->cacheComplete = TRUE;
+-        }
++    if (!empty($deltas)) {
++      try {
++        // @see block_custom_block_delete_submit()
++        db_delete('block')
++          ->condition('module', 'bean')
++          ->condition('delta', $deltas)
++          ->execute();
++        db_delete('block_role')
++          ->condition('module', 'bean')
++          ->condition('delta', $deltas)
++          ->execute();
++
++        // @see node_form_block_custom_block_delete_submit()
++        db_delete('block_node_type')
++          ->condition('module', 'bean')
++          ->condition('delta', $deltas)
++          ->execute();
+       }
+-    }
+-    // Ensure that the returned array is ordered the same as the original
+-    // $ids array if this was passed in and remove any invalid ids.
+-    if ($passed_ids && $passed_ids = array_intersect_key($passed_ids, $entities)) {
+-      foreach ($passed_ids as $id => $value) {
+-        $passed_ids[$id] = $entities[$id];
++      catch (Exception $e) {
++        if (isset($transaction)) {
++          $transaction->rollback();
++        }
++        watchdog_exception('bean', $e);
++        throw $e;
+       }
+-      $entities = $passed_ids;
+     }
+-    return $entities;
++    parent::delete($ids, $transaction);
+   }
+ }
+ 
+diff --git a/includes/bean.info.inc b/includes/bean.info.inc
+index 3aec965..25abb22 100644
+--- a/includes/bean.info.inc
++++ b/includes/bean.info.inc
+@@ -42,7 +42,6 @@ class BeanMetadataController extends EntityDefaultMetadataController {
+       'label' => t('Block Delta'),
+       'required' => TRUE,
+       'schema field' => 'delta',
+-      'description' => t('The bean delta.'),
+     );
+ 
+     $properties['type'] = array(
+@@ -56,4 +55,4 @@ class BeanMetadataController extends EntityDefaultMetadataController {
+ 
+     return $info;
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/includes/bean.pages.inc b/includes/bean.pages.inc
+index 1d10ff5..9e8eccf 100644
+--- a/includes/bean.pages.inc
++++ b/includes/bean.pages.inc
+@@ -200,6 +200,46 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
+     '#weight' => -9,
+   );
+ 
++  $form['revision'] = array(
++    '#weight' => 10,
++  );
++
++  if (isset($bean->is_new)) {
++    $form['revision']['#access'] = FALSE;
++  }
++
++  ctools_include('dependent');
++  ctools_add_js('dependent');
++
++  $form['revision']['is_new_revision'] = array(
++    '#type' => 'checkbox',
++    '#title' => t('Create new revision'),
++    '#default_value' => 1,
++    '#id' => 'edit-revision',
++  );
++
++  if (isset($bean->is_new)) {
++    $form['default_revision'] = array(
++      '#type' => 'value',
++      '#value' => TRUE,
++    );
++  }
++  else {
++    $form['revision']['default_revision'] = array(
++      '#type' => 'checkbox',
++      '#title' => t('Set Revision as default'),
++      '#default_value' => $bean->isDefaultRevision(),
++    );
++  }
++
++  $form['revision']['log'] = array(
++    '#type' => 'textarea',
++    '#title' => t('Log message'),
++    '#description' => t('Provide an explanation of the changes you are making. This will help other authors understand your motivations.'),
++    '#dependency' => array('edit-revision' => array(1)),
++    '#default_value' => '',
++  );
++
+   // The view mode.
+   if (user_access('edit bean view mode')) {
+     $bean_info = $bean->entityInfo();
+@@ -239,7 +279,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
+     '#weight' => 200,
+     '#submit' => array('bean_form_submit'),
+   );
+-  if (!empty($bean->bid) && user_access('delete any ' . $bean->type . ' bean')) {
++  if (!empty($bean->bid) && bean_access('delete', $bean)) {
+     $form['actions']['delete'] = array(
+       '#type' => 'submit',
+       '#value' => t('Delete'),
+@@ -266,6 +306,12 @@ function bean_form_validate($form, &$form_state) {
+   $bean->label = $form_state['values']['label'];
+   $bean->title = $form_state['values']['title'];
+   $bean->view_mode = $form_state['values']['view_mode'];
++  $bean->is_new_revision = $form_state['values']['is_new_revision'];
++  $bean->default_revision = $form_state['values']['default_revision'];
++
++  if ($bean->is_new_revision) {
++    $bean->log = $form_state['values']['log'];
++  }
+ 
+   field_attach_form_validate('bean', $bean, $form, $form_state);
+   $form_state['values']['bean'] = $bean;
+@@ -315,6 +361,8 @@ function bean_form_submit($form, &$form_state) {
+  * wizard to update the form state's entity with the current step's values
+  * before proceeding to the next step.
+  *
++ * @return Bean
++ *
+  * @see bean_form()
+  * @see node_form_submit_build_node()
+  */
+@@ -382,6 +430,61 @@ function bean_delete_confirm_submit($form, &$form_state) {
+   $form_state['redirect'] = '<front>';
+ }
+ 
++/**
++ * Menu callback -- ask for confirmation of bean deletion
++ */
++function bean_delete_revision_confirm($form, &$form_state, $bean, $vid) {
++  $form['#bean'] = $bean;
++  $form['#vid'] = $vid;
++
++  return confirm_form($form,
++    t('Are you sure you want to revision %vid of %title?', array('%vid' => $vid, '%title' => $bean->label())),
++    $bean->viewUrl(),
++    t('This action cannot be undone.'),
++    t('Delete'),
++    t('Cancel')
++  );
++}
++
++/**
++ * Delete a bean revisiosn
++ */
++function bean_delete_revision_confirm_submit($form, &$form_state) {
++  if ($form_state['values']['confirm']) {
++    $bean = $form['#bean'];
++    bean_delete_revision($form_state['vid']);
++    watchdog('bean', '@type: deleted %title revision %vid.', array('%vid' => $form_state['vid'], '@type' => $bean->typeName(), '%title' => $bean->label()));
++    drupal_set_message(t('@type %title revision %vid has been deleted.', array('%vid' => $form_state['vid'], '@type' => $bean->typeName(), '%title' => $bean->label())));
++  }
++}
++
++/**
++ * Form for setting a revision active
++ */
++function bean_set_default_confirm($form, &$form_state, $bean) {
++  $form['#bean'] = $bean;
++
++  return confirm_form($form,
++    t('Are you sure you want to set revision %vid of %title active?', array('%vid' => $bean->vid, '%title' => $bean->label())),
++    $bean->viewUrl(),
++    t('This action cannot be undone.'),
++    t('Set Default'),
++    t('Cancel')
++  );
++}
++
++/**
++ * Submit function
++ */
++function bean_set_default_confirm_submit($form, &$form_state) {
++  if ($form_state['values']['confirm']) {
++    $bean = $form['#bean'];
++    $bean->setDefault()->save();
++    watchdog('bean', '@type: %title revision %vid was set active.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label()));
++    drupal_set_message(t('@type %title revision %vid has been set active.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label())));
++  }
++}
++
+ function bean_filter_form($form, &$form_state) {
+   $filters = bean_get_filter();
+ 
+@@ -473,3 +576,87 @@ function bean_get_filter() {
+ function bean_reset_filter() {
+   unset($_SESSION['bean-filter']);
+ }
++
++/**
++ * Revisions page callback
++ *
++ * @param $bean Bean
++ */
++function bean_revisions_page(Bean $bean) {
++  $bean->loadRevisions();
++
++  // Build the sortable table header.
++  $header = array(
++    'vid' => array('data' => t('Revision ID')),
++    'title' => array('data' => t('Title')),
++    'author' => array('data' => t('Author')),
++    'changed' => array('data' => t('Date Changed')),
++    'operations' => array(
++      'data' => t('Operations'),
++      'colspan' => 2,
++    ),
++  );
++
++  $rows = array();
++
++  $can_delete = bean_access('delete', $bean);
++  $can_edit = bean_access('edit', $bean);
++
++  foreach ($bean->revisions as $rev) {
++    $active = $rev->vid == $bean->vid ? TRUE : FALSE;
++    $user = user_load($rev->uid);
++    $rows[$rev->vid]  = array(
++      'vid' => $active ? t('@label (Current Revision)', array('@label' => $rev->vid)) : $rev->vid,
++      'title' => array(
++        'data' => array(
++          '#type' => 'link',
++          '#title' => $rev->label,
++          '#href' => "block/{$rev->delta}/revisions/{$rev->vid}",
++        ),
++      ),
++      'author' => format_username($user),
++      'changed' => format_date($rev->changed),
++    );
++
++    $operations = array();
++
++    if ($can_edit) {
++      $operations['edit'] = array(
++        'title' => t('edit'),
++        'href' => "block/{$bean->delta}/revisions/{$rev->vid}/edit",
++        'query' => drupal_get_destination(),
++      );
++    }
++
++    if ($can_delete) {
++      $operations['delete'] = array(
++        'title' => t('delete'),
++        'href' => "block/{$bean->delta}/revisions/{$rev->vid}/delete",
++        'query' => drupal_get_destination(),
++      );
++    }
++
++    if ($can_edit && !$active) {
++      $operations['set-active'] = array(
++        'title' => t('set active'),
++        'href' => "block/{$bean->delta}/revisions/{$rev->vid}/set-active",
++        'query' => drupal_get_destination(),
++      );
++    }
++
++    $rows[$rev->vid]['operations'] = array(
++      'data' => array(
++        '#theme' => 'links__bean_operations',
++        '#links' => $operations,
++        '#attributes' => array('class' => array('links', 'inline')),
++      ),
++    );
++  }
++
++  return array(
++    '#theme' => 'table',
++    '#header' => $header,
++    '#rows' => $rows,
++    '#empty' => t('There are no revisions'),
++  );
++}

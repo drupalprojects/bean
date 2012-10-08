@@ -35,7 +35,6 @@ class BeanCustom extends BeanPlugin {
 
     $primary_key = $new == FALSE ? 'name' : array();
     drupal_write_record('bean_type', $bean_type, $primary_key);
-    drupal_static_reset('bean_admin_ui_get_types');
 
     bean_reset();
   }
