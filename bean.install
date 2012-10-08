@@ -16,6 +16,14 @@ function bean_schema() {
         'type' => 'serial',
         'not null' => TRUE,
         'description' => 'Primary Key: Unique bean item ID.',
+        'unsigned' => TRUE,
+      ),
+      'vid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'Revision ID',
+        'default' => 0,
+        'unsigned' => TRUE,
       ),
       'delta' => array(
         'description' => "The bean's {block}.delta.",
@@ -64,10 +72,113 @@ function bean_schema() {
         'table' => 'bean_type',
         'columns' => array('type' => 'type'),
       ),
+      'bean_revision' => array(
+        'table' => 'bean_revision',
+        'columns' => array('vid' => 'vid'),
+      )
     ),
     'primary key' => array('bid'),
     'unique keys' => array(
+      'vid' => array('vid'),
       'delta' => array('delta'),
+    ),
+  );
+
+  $schema['bean_revision'] =  array(
+    'description' => 'Stores bean items.',
+    'fields' => array(
+      'bid' => array(
+        'description' => 'The {bean} this version belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'vid' => array(
+        'description' => 'The primary identifier for this version.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'The author of the revision.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'delta' => array(
+        'description' => "The bean's {block}.delta.",
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'label' => array(
+        'description' => 'The Displays in the Admin page.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'title' => array(
+        'description' => 'The human-readable name of this bean.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'type' => array(
+        'description' => 'The {bean_type}.type of this bean.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'view_mode' => array(
+        'description' => 'The View mode to use as the bean.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => 'default',
+      ),
+      'data' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data related to this bean.',
+      ),
+      'log' => array(
+        'description' => t('A log message associated with the revision.'),
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the entity was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the entity was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'foreign keys' => array(
+      'type' => array(
+        'table' => 'bean_type',
+        'columns' => array('type' => 'type'),
+      ),
+      'version_bean' => array(
+        'table' => 'bean',
+        'columns' => array('bid' => 'bid'),
+      )
+    ),
+    'primary key' => array('vid'),
+    'indexes' => array(
+      'bid' => array('bid', 'vid'),
     ),
   );
 
@@ -86,6 +197,27 @@ function bean_uninstall() {
   }
 }
 
+/**
+ * Implements hook_install().
+ */
+function bean_install() {
+  $t = get_t();
+
+  // Load the default shortcut set
+  $shortcut_set = shortcut_default_set();
+  $shortcut_set->links[] = array(
+      'link_path' => 'block/add',
+      'link_title' => $t('Add block'),
+      'weight' => -18,
+  );
+  $shortcut_set->links[] = array(
+    'link_path' => 'admin/content/blocks',
+    'link_title' => $t('Add block'),
+    'weight' => -18,
+  );
+
+  shortcut_set_save($shortcut_set);
+}
 /**
  * Implements hook_disable().
  */
@@ -176,3 +308,52 @@ function bean_update_7006() {
   registry_rebuild();
   return t('Registry and Menu have been rebuilt');
 }
+
+/**
+ * Add a Bean Revision Table
+ */
+function bean_update_7007(&$return) {
+  $t = get_t();
+  drupal_load('module', 'bean');
+  $schema = bean_schema();
+  $bean = $schema['bean'];
+  $bean_revision = $schema['bean_revision'];
+
+  db_drop_primary_key('bean');
+  db_change_field('bean', 'bid', 'bean', $bean['bid'], array('primary key' => array('bid')));
+  db_add_field('bean', 'vid', $bean['vid']);
+  db_add_unique_key('bean', 'vid', array('vid'));
+
+  db_create_table('bean_revision', $bean_revision);
+
+  $results = db_select('bean');
+  foreach ($results as $row) {
+    $bean_revision = array(
+         'bid' => $row->bid,
+         'uid' => variable_get('bean_uid', 1),
+         'delta' => $row->delta,
+         'label' => $row->label,
+         'title' => $row->title,
+         'type' => $row->type,
+         'view_mode' => $row->view_mode,
+         'data' => 'data',
+         'log' => $t('Added via update script'),
+         'created' => REQUEST_TIME,
+         'changed' => REQUEST_TIME,
+    );
+
+    $options = array('return' => Database::RETURN_INSERT_ID);
+    $vid = db_insert('bean_revision', $options)
+      ->fields($bean_revision)
+      ->execute();
+
+    db_update('bean')
+      ->fields(array('vid' => $vid))
+      ->condition('bid', $row->bid)
+      ->execute();
+
+  }
+
+  return t('Bean Revision table has been added.');
+}
+

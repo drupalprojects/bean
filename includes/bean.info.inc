@@ -42,7 +42,6 @@ class BeanMetadataController extends EntityDefaultMetadataController {
       'label' => t('Block Delta'),
       'required' => TRUE,
       'schema field' => 'delta',
-      'description' => t('The bean delta.'),
     );
 
     $properties['type'] = array(

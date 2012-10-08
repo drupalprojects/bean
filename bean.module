@@ -15,12 +15,15 @@ function bean_entity_info() {
       'entity class' => 'Bean',
       'controller class' => 'BeanEntityAPIController',
       'base table' => 'bean',
+      'revision table' => 'bean_revision',
       'fieldable' => TRUE,
       'entity keys' => array(
         'id' => 'bid',
         'bundle' => 'type',
         'label' => 'title',
         'name' => 'delta',
+        'revision' => 'vid',
+        'default revision' => 'default_revision',
       ),
       'bundles' => array(),
       'bundle keys' => array(
@@ -151,6 +154,75 @@ function bean_menu() {
     'file' => 'includes/bean.pages.inc',
   );
 
+  $items['block/%bean_delta/revisions'] = array(
+    'title' => 'Revisions',
+    'page callback' => 'bean_revisions_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view bean revisions'),
+    'file' => 'includes/bean.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['block/%bean_delta/revisions/%'] = array(
+    'title callback' => 'bean_revision_title',
+    'title arguments' => array(1),
+    'page callback' => 'bean_view',
+    'page arguments' => array(1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('view', 1),
+    'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(3),
+  );
+
+  $items['block/%bean_delta/revisions/%/view'] = array(
+    'title' => 'View',
+    'page callback' => 'bean_view',
+    'page arguments' => array(1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('view', 1),
+    'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(3),
+    'weight' => -10,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_NONE,
+  );
+
+  $items['block/%bean_delta/revisions/%/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'bean_edit',
+    'page arguments' => array(1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('edit', 1),
+    'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  $items['block/%bean_delta/revisions/%/set-default'] = array(
+    'title' => 'Set Default',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bean_set_default_confirm', 1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('edit', 1),
+    'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  $items['block/%bean_delta/revisions/%/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bean_delete_revision_confirm', 1),
+    'access callback' => 'bean_access',
+    'access arguments' => array('delete', 1),
+    'file' => 'includes/bean.pages.inc',
+    'load arguments' => array(3),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_NONE,
+  );
 
   $items['admin/content/blocks'] = array(
     'title' => 'Blocks',
@@ -193,6 +265,13 @@ function bean_menu() {
 }
 
 /**
+ * Title callback
+ */
+function bean_revision_title($bean) {
+  return $bean->label();
+}
+
+/**
  * Implements hook_admin_paths().
  */
 function bean_admin_paths() {
@@ -200,7 +279,8 @@ function bean_admin_paths() {
     'block/*/edit' => TRUE,
     'block/*/delete' => TRUE,
     'block/*/revisions' => TRUE,
-    'block/*/revisions/*/revert' => TRUE,
+    'block/*/revisions/*/edit' => TRUE,
+    'block/*/revisions/*/set-active' => TRUE,
     'block/*/revisions/*/delete' => TRUE,
     'block/add' => TRUE,
     'block/add/*' => TRUE,
@@ -418,23 +498,38 @@ function bean_load($bid, $reset = FALSE) {
 }
 
 /**
+ * Fetch a bean revision
+ *
+ * A new function to not break the bean_load API
+ */
+function bean_load_revision($bid, $vid, $reset = FALSE) {
+  $conditions = array('vid' => $vid);
+  $beans = bean_load_multiple(array($bid), $conditions, $reset);
+  return reset($beans);
+}
+
+/**
  * Fetch a bean object by its delta.
  *
  * @param $delta
  *   String specifying the bean delta.
  * @param $reset
  *   A boolean indicating that the internal cache should be reset.
- * @return
+ * @return Bean
  *   A fully-loaded $bean object or FALSE if it cannot be loaded.
  */
-function bean_load_delta($delta, $reset = FALSE) {
+function bean_load_delta($delta, $reset = FALSE, $revision = NULL) {
   $result = db_select('bean', 'b')
     ->fields('b', array('bid'))
     ->condition('delta', $delta)
     ->execute();
   if ($bid = $result->fetchField()) {
-    $beans = bean_load_multiple(array($bid), array(), $reset);
-    return reset($beans);
+    if ($revision) {
+      return bean_load_revision($bid, $revision, $reset);
+    }
+    else {
+      return bean_load($bid, $reset);
+    }
   }
   return FALSE;
 }
@@ -442,8 +537,8 @@ function bean_load_delta($delta, $reset = FALSE) {
 /**
  * Menu callback to load a bean by the delta
  */
-function bean_delta_load($delta) {
-  return bean_load_delta($delta);
+function bean_delta_load($delta, $revision = NULL) {
+  return bean_load_delta($delta, FALSE, $revision);
 }
 
 /**
@@ -463,6 +558,13 @@ function bean_delta_load($delta) {
  */
 function bean_load_multiple($bids = array(), $conditions = array(), $reset = FALSE) {
   return entity_load('bean', $bids, $conditions, $reset);
+}
+
+/**
+ * Delete a bean revision
+ */
+function bean_delete_revision($vid) {
+  return entity_get_controller('bean')->revisionDelete($vid);
 }
 
 /**
@@ -491,6 +593,12 @@ function bean_permission() {
       'description' => t('Visit !url', array('!url' => 'block/< delta >')),
     ),
     'administer bean settings' => array(
+      'title' => t('Administer Bean Settings'),
+    ),
+    'administer bean settings' => array(
+      'title' => t('Administer Bean Settings'),
+    ),
+    'view bean revisions' => array(
       'title' => t('Administer Bean Settings'),
     ),
   );
