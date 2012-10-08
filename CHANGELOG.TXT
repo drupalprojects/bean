@@ -8,7 +8,7 @@ Issue #1799776 by bforchhammer: Fixed entity translation regressions.
 Issue #1710256 by jonhattan, indytechcook: Fixed «Delete block type» button misplaced.
 Issue #1785950 by jonhattan | indytechcook: Fixed Revert and delete should be separate operations.
 Issue #1786036 by jonhattan | indytechcook: Fixed Caches not completely cleared.
-
+Integrate Bean Revisions
 
 bean 7.x-1.0-rc6
 ================
