@@ -806,13 +806,22 @@ function bean_block_view($delta = '') {
       'content' => $bean->view($bean->view_mode),
       'subject' => $bean->title,
     );
-
-    if (!empty($return['content']) && module_exists('contextual')) {
-      $return['content']['#contextual_links']['bean'] = array('block', array($bean->Identifier()));
-    }
   }
 
   return $return;
+}
+
+/**
+ * Implements hook_contextual_links_view_alter().
+ */
+function bean_contextual_links_view_alter(&$element, $items) {
+  if (isset($element['#element']['#block']->module) && $element['#element']['#block']->module == 'bean') {
+    $element['#links']['bean-configure'] = array(
+      'title' => t('Edit block'),
+      'href' => 'block/' . $element['#element']['#block']->delta . '/edit',
+    );
+    unset($element['#links']['block-configure']);
+  }
 }
 
 /**
