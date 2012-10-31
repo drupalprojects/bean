@@ -320,7 +320,7 @@ function bean_update_7007(&$return) {
   $bean_revision = $schema['bean_revision'];
 
   db_drop_primary_key('bean');
-  db_change_field('bean', 'bid', 'bean', $bean['bid'], array('primary key' => array('bid')));
+  db_change_field('bean', 'bid', 'bid', $bean['bid'], array('primary key' => array('bid')));
   db_add_field('bean', 'vid', $bean['vid']);
   db_add_unique_key('bean', 'vid', array('vid'));
 
