@@ -10,6 +10,7 @@ Issue #1710256 by jonhattan, indytechcook: Fixed «Delete block type» button mi
 Issue #1785950 by jonhattan | indytechcook: Fixed Revert and delete should be separate operations.
 Issue #1786036 by jonhattan | indytechcook: Fixed Caches not completely cleared.
 Integrate Bean Revisions
+Issue #1814068 by jonhattan: Remove leftover patch files in repo.
 
 bean 7.x-1.0-rc6
 ================
