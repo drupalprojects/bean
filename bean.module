@@ -771,7 +771,8 @@ function bean_view(Bean $bean, $view_mode = 'default', $langcode = NULL) {
     $langcode = $GLOBALS['language_content']->language;
   }
 
-  drupal_set_title($bean->label());
+  $title = $bean->label() ? $bean->label() : $bean->label;
+  drupal_set_title($title);
   return $bean->view($view_mode, $langcode);
 }
 
@@ -783,7 +784,7 @@ function bean_block_info() {
   $beans = bean_get_all_beans();
   foreach ($beans as $bean) {
     $blocks[$bean->delta] = array(
-      'info' => $bean->label,
+      'info' => $bean->label(),
       'cache' => $bean->getInfo('cache_level'),
     );
   }
@@ -801,7 +802,7 @@ function bean_block_view($delta = '') {
   if (bean_access('view', $bean) && $bean) {
     $return = array(
       'content' => $bean->view($bean->view_mode),
-      'subject' => $bean->title,
+      'subject' => $bean->label(),
     );
   }
 

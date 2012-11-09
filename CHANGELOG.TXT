@@ -13,6 +13,7 @@ Issue #1786036 by jonhattan | indytechcook: Fixed Caches not completely cleared.
 Integrate Bean Revisions
 Issue #1814068 by jonhattan: Remove leftover patch files in repo.
 Issue #1833176 by darrenmothersele: Fixed List Shortcut module as a dependency or remove from bean_install().
+Issue #1836798 by bhauff: Block Label used rather than Title on block/delta and block/delta/view.
 
 bean 7.x-1.0-rc6
 ================

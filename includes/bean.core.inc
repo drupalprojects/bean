@@ -168,10 +168,6 @@ class Bean extends Entity {
     return NULL;
   }
 
-  public function defaultLabel() {
-    return $this->label;
-  }
-
   public function __construct(array $values = array()) {
     // If this is new then set the type first.
     if (isset($values['is_new'])) {
