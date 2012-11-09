@@ -201,22 +201,25 @@ function bean_uninstall() {
  * Implements hook_install().
  */
 function bean_install() {
-  $t = get_t();
 
-  // Load the default shortcut set
-  $shortcut_set = shortcut_default_set();
-  $shortcut_set->links[] = array(
-      'link_path' => 'block/add',
+  if (module_exists('shortcut')) {
+    $t = get_t();
+
+    // Load the default shortcut set
+    $shortcut_set = shortcut_default_set();
+    $shortcut_set->links[] = array(
+        'link_path' => 'block/add',
+        'link_title' => $t('Add block'),
+        'weight' => -18,
+    );
+    $shortcut_set->links[] = array(
+      'link_path' => 'admin/content/blocks',
       'link_title' => $t('Add block'),
       'weight' => -18,
-  );
-  $shortcut_set->links[] = array(
-    'link_path' => 'admin/content/blocks',
-    'link_title' => $t('Add block'),
-    'weight' => -18,
-  );
+    );
 
-  shortcut_set_save($shortcut_set);
+    shortcut_set_save($shortcut_set);
+  }
 }
 /**
  * Implements hook_disable().
