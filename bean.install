@@ -112,6 +112,7 @@ function bean_schema() {
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
+        'default' => 0,
       ),
       'label' => array(
         'description' => 'The Displays in the Admin page.',
@@ -318,31 +319,46 @@ function bean_update_7006() {
 function bean_update_7007(&$return) {
   $t = get_t();
   drupal_load('module', 'bean');
+  cache_clear_all('schema', 'cache'); // So we actually load the current schema.
   $schema = bean_schema();
   $bean = $schema['bean'];
   $bean_revision = $schema['bean_revision'];
 
-  db_drop_primary_key('bean');
-  db_change_field('bean', 'bid', 'bid', $bean['bid'], array('primary key' => array('bid')));
-  db_add_field('bean', 'vid', $bean['vid']);
-  db_add_unique_key('bean', 'vid', array('vid'));
+  /**
+   * Adding an unsigned attribute to our primary key. Because our primary key is an auto_increment, 
+   * we can't drop it without a MySQL error. Instead, we're doing a MySQL-specific call to perform
+   * our alter, and leaving the Drupal-recommended way of doing things as default.
+   *
+   * Reference (error): http://stackoverflow.com/questions/2111291/remove-primary-key-in-mysql
+   * Reference: http://api.drupal.org/api/drupal/includes%21database%21database.inc/function/db_change_field/7
+   */
+  switch(db_driver('mysql')) {
+    case 'mysql':
+      db_query('ALTER TABLE {bean} MODIFY bid INT UNSIGNED NOT NULL AUTO_INCREMENT');
+      break;
+    default:
+      db_drop_primary_key('bean');
+      db_change_field('bean', 'bid', 'bid', $bean['fields']['bid'], array('primary key' => array('bid')));
+  }
+
+  db_add_field('bean', 'vid', $bean['fields']['vid']);
 
   db_create_table('bean_revision', $bean_revision);
 
-  $results = db_select('bean');
+  $results = db_query('SELECT * FROM {bean}');
   foreach ($results as $row) {
     $bean_revision = array(
-         'bid' => $row->bid,
-         'uid' => variable_get('bean_uid', 1),
-         'delta' => $row->delta,
-         'label' => $row->label,
-         'title' => $row->title,
-         'type' => $row->type,
-         'view_mode' => $row->view_mode,
-         'data' => 'data',
-         'log' => $t('Added via update script'),
-         'created' => REQUEST_TIME,
-         'changed' => REQUEST_TIME,
+      'bid' => $row->bid,
+      'uid' => variable_get('bean_uid', 1),
+      'delta' => $row->delta,
+      'label' => $row->label,
+      'title' => $row->title,
+      'type' => $row->type,
+      'view_mode' => $row->view_mode,
+      'data' => $row->data,
+      'log' => $t('Added via update script'),
+      'created' => REQUEST_TIME,
+      'changed' => REQUEST_TIME,
     );
 
     $options = array('return' => Database::RETURN_INSERT_ID);
@@ -354,9 +370,9 @@ function bean_update_7007(&$return) {
       ->fields(array('vid' => $vid))
       ->condition('bid', $row->bid)
       ->execute();
-
   }
+  // Add unique key back after populating our table.
+  db_add_unique_key('bean', 'vid', array('vid'));
 
   return t('Bean Revision table has been added.');
 }
-
