@@ -31,13 +31,24 @@ function bean_add($type) {
 function bean_add_page() {
   $bean_types = bean_get_types();
 
+  foreach ($bean_types as $key => $bean_type) {
+    if (bean_access('create', $bean_type->type)) {
+      $types[$key] = $bean_type;
+    }
+  }
+
+  // If there are block types, but the user doesn't have access, return 403.
+  if (count($types) == 0 && count($bean_types) > 0) {
+    return drupal_access_denied();
+  }
+
   // Bypass the block/add listing if only one block type is available.
-  if (count($bean_types) == 1) {
-    $bean_type = array_shift($bean_types);
+  if (count($types) == 1) {
+    $bean_type = array_shift($types);
     drupal_goto('block/add/' . $bean_type->buildURL());
   }
 
-  return theme('bean_add_list', array('content' => $bean_types));
+  return theme('bean_add_list', array('content' => $types));
 }
 
 function bean_list() {
