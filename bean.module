@@ -67,6 +67,10 @@ function bean_entity_info() {
           'path wildcard' => '%bean_delta',
         ),
       ),
+      'inline entity form' => array(
+        'controller' => 'BeanInlineEntityFormController',
+      ),
+      'form callback' => 'bean_get_form',
     ),
   );
 
@@ -1003,4 +1007,17 @@ function bean_views_api() {
     'api' => 3,
     'path' => drupal_get_path('module', 'bean') . '/views',
   );
+}
+
+/**
+ * Get the bean form
+ *
+ * This is the callback for the entity['form callback']
+ *
+ * @see entity_form()
+ */
+function bean_get_form($bean, $entity_type) {
+  module_load_include('inc', 'bean', 'includes/bean.pages.inc');
+
+  return drupal_get_form('bean_form', $bean);
 }

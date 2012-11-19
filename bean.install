@@ -325,7 +325,7 @@ function bean_update_7007(&$return) {
   $bean_revision = $schema['bean_revision'];
 
   /**
-   * Adding an unsigned attribute to our primary key. Because our primary key is an auto_increment, 
+   * Adding an unsigned attribute to our primary key. Because our primary key is an auto_increment,
    * we can't drop it without a MySQL error. Instead, we're doing a MySQL-specific call to perform
    * our alter, and leaving the Drupal-recommended way of doing things as default.
    *
@@ -375,4 +375,11 @@ function bean_update_7007(&$return) {
   db_add_unique_key('bean', 'vid', array('vid'));
 
   return t('Bean Revision table has been added.');
+}
+
+/**
+ * Update Registry for Inline Entity Form
+ */
+function bean_update_7008(&$return) {
+  registry_rebuild();
 }
