@@ -1004,3 +1004,12 @@ function bean_views_api() {
     'path' => drupal_get_path('module', 'bean') . '/views',
   );
 }
+
+/**
+ * Implements hook_flush_caches().
+ */
+function bean_flush_caches() {
+  bean_reset();
+  return array();
+}
+

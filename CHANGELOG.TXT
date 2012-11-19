@@ -16,6 +16,7 @@ Issue #1833176 by darrenmothersele: Fixed List Shortcut module as a dependency o
 Issue #1836798 by bhauff: Block Label used rather than Title on block/delta and block/delta/view.
 Issue #1844538 by mrfelton: Fixed Field data missing when editing language neutral beans.
 Issue #1839966 by ultimateboy: Fixed block/add doesn't check for access before generating list.
+Issue #1838088 by jamesharv: Fixed Adding bean type and permissions to existing features module can cause drush cache clear to fail.
 
 bean 7.x-1.0-rc6
 ================
