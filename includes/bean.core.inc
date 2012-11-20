@@ -177,6 +177,10 @@ class Bean extends Entity {
     parent::__construct($values, 'bean');
   }
 
+  public function adminTitle() {
+    return $this->label;
+  }
+
   protected function setUp() {
     parent::setUp();
 

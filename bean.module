@@ -784,7 +784,7 @@ function bean_block_info() {
   $beans = bean_get_all_beans();
   foreach ($beans as $bean) {
     $blocks[$bean->delta] = array(
-      'info' => $bean->label(),
+      'info' => $bean->adminTitle(),
       'cache' => $bean->getInfo('cache_level'),
     );
   }
