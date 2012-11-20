@@ -771,7 +771,7 @@ function bean_view(Bean $bean, $view_mode = 'default', $langcode = NULL) {
     $langcode = $GLOBALS['language_content']->language;
   }
 
-  $title = $bean->label() ? $bean->label() : $bean->label;
+  $title = $bean->label() ? $bean->label() : $bean->adminTitle();
   drupal_set_title($title);
   return $bean->view($view_mode, $langcode);
 }
