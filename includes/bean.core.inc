@@ -339,8 +339,7 @@ class Bean extends Entity {
     $this->plugin->submit($this);
 
     $return = parent::save();
-    block_flush_caches();
-    cache_clear_all('bean:' . $this->delta . ':', 'cache_block', TRUE);
+    cache_clear_all();
 
     return $return;
   }
