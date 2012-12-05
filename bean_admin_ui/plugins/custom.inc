@@ -17,6 +17,7 @@ class BeanCustom extends BeanPlugin {
     ->condition('type', $this->type)
     ->execute();
 
+    ctools_include('export');
     ctools_export_crud_delete('bean_type', $this->type);
     field_attach_delete_bundle('bean', $this->type);
 
@@ -43,6 +44,7 @@ class BeanCustom extends BeanPlugin {
    * Revert the bean type to code defaults.
    */
   public function revert() {
+    ctools_include('export');
     ctools_export_crud_delete('bean_type', $this->type);
     bean_reset();
   }
