@@ -7,7 +7,6 @@ files[] = plugins/base.inc
 files[] = includes/translation.handler.bean.inc
 files[] = views/views_handler_filter_bean_type.inc
 files[] = bean.test
-dependencies[] = block
 dependencies[] = entity
 dependencies[] = ctools
 package = Bean

@@ -20,6 +20,7 @@ Issue #1838088 by jamesharv: Fixed Adding bean type and permissions to existing 
 Issue #1845974 by indytechcook: Fixed Block Admin label is correct.
 Issue #1793586 by Mixologic | indytechcook: Fixed Editing Bean Content Does not Trigger Page Cache Clear.
 Issue #1870730 by jm.federico: Fixed bean_view() changes the current page title.
+Issue #1859450 by jonhattan: Drop dependency on block.module.
 
 bean 7.x-1.0-rc6
 ================
