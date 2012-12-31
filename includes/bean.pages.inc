@@ -6,6 +6,15 @@
  */
 
 /**
+ * Bean view page
+ */
+function bean_view_page(Bean $bean) {
+  $title = $bean->label() ? $bean->label() : $bean->adminTitle();
+  drupal_set_title($title);
+  return bean_view($bean);
+}
+
+/**
  * Edit bean page callback
  */
 function bean_edit(Bean $bean) {

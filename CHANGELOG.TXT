@@ -19,6 +19,7 @@ Issue #1839966 by ultimateboy: Fixed block/add doesn't check for access before g
 Issue #1838088 by jamesharv: Fixed Adding bean type and permissions to existing features module can cause drush cache clear to fail.
 Issue #1845974 by indytechcook: Fixed Block Admin label is correct.
 Issue #1793586 by Mixologic | indytechcook: Fixed Editing Bean Content Does not Trigger Page Cache Clear.
+Issue #1870730 by jm.federico: Fixed bean_view() changes the current page title.
 
 bean 7.x-1.0-rc6
 ================

@@ -117,7 +117,7 @@ function bean_menu() {
 
   $items['block/%bean_delta'] = array(
     'title' => 'Block',
-    'page callback' => 'bean_view',
+    'page callback' => 'bean_view_page',
     'page arguments' => array(1),
     'access arguments' => array('view bean page'),
     'file' => 'includes/bean.pages.inc',
@@ -771,8 +771,6 @@ function bean_view(Bean $bean, $view_mode = 'default', $langcode = NULL) {
     $langcode = $GLOBALS['language_content']->language;
   }
 
-  $title = $bean->label() ? $bean->label() : $bean->adminTitle();
-  drupal_set_title($title);
   return $bean->view($view_mode, $langcode);
 }
 
