@@ -1,6 +1,6 @@
 Current API VERSION: 5.
 
-bean 7.x-1.x-rc7
+bean 7.x-1.0-rc7
 ================
 Issue #1828096 by Brandonian: Fixed bean_update_7007 does not work with real-world data.
 Issue #1691482 by Brandonian | mrfelton: Fixed contextual links not working.
