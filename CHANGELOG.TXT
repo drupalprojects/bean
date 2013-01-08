@@ -1,5 +1,10 @@
 Current API VERSION: 5.
 
+bean 7.x-1.x
+=============
+Remove batches and use correct cache clear function.
+Issue #1883232 by Steven Jones: Fixed Bean EntityMetadataWrapper integration broken.
+
 bean 7.x-1.0-rc7
 ================
 Issue #1828096 by Brandonian: Fixed bean_update_7007 does not work with real-world data.
