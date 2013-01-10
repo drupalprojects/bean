@@ -29,9 +29,9 @@ class BeanCustom extends BeanPlugin {
    */
   public function save($new = FALSE) {
     $bean_type = array(
-      'name' => $this->type,
-      'label' => $this->getLabel(),
-      'description' => $this->getDescription(),
+      'name' => check_plain($this->type),
+      'label' => check_plain($this->getLabel()),
+      'description' => check_plain($this->getDescription()),
     );
 
     $primary_key = $new == FALSE ? 'name' : array();

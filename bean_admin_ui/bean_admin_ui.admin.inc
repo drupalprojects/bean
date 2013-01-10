@@ -15,7 +15,7 @@ function bean_admin_ui_admin_page() {
 
   foreach (bean_get_types() as $bean_type) {
     $row = array();
-    $row[] = array('data' => $bean_type->getLabel());
+    $row[] = array('data' => check_plain($bean_type->getLabel()));
     if (method_exists($bean_type, 'getExportStatus')) {
       $export_status = $bean_type->getExportStatus();
     }

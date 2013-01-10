@@ -4,6 +4,8 @@ bean 7.x-1.x
 =============
 Remove batches and use correct cache clear function.
 Issue #1883232 by Steven Jones: Fixed Bean EntityMetadataWrapper integration broken.
+Fix bean unit test.
+Issue #1885238 by indytechcook: Fixed xss bean type label not escaped sufficiently.
 
 bean 7.x-1.0-rc7
 ================

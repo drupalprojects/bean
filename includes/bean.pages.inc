@@ -40,6 +40,7 @@ function bean_add($type) {
 function bean_add_page() {
   $bean_types = bean_get_types();
 
+  $types = array();
   foreach ($bean_types as $key => $bean_type) {
     if (bean_access('create', $bean_type->type)) {
       $types[$key] = $bean_type;
