@@ -596,7 +596,7 @@ function bean_permission() {
       'title' => t('Administer Bean Settings'),
     ),
     'view bean revisions' => array(
-      'title' => t('Administer Bean Settings'),
+      'title' => t('View Bean revisions'),
     ),
   );
 
