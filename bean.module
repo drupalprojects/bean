@@ -373,7 +373,7 @@ function bean_fetch_plugin_info($plugin = NULL) {
 /**
  * Reset the static variables and caches.
  */
-function bean_reset() {
+function bean_reset($skip_menu_rebuild = FALSE) {
   // Clear ctools cache.
   ctools_include('plugins');
   ctools_get_plugins_reset();
@@ -387,7 +387,9 @@ function bean_reset() {
 
   // Rebuild ctools plugin types and the menu.
   ctools_plugin_get_plugin_type_info(TRUE);
-  menu_rebuild();
+  if ($skip_menu_rebuild) {
+    menu_rebuild();
+  }
 }
 
 /**
@@ -972,7 +974,7 @@ function bean_workbench_create_alter(&$output) {
  * Implements hook_modules_enabled()
  */
 function bean_modules_enabled($modules) {
-  bean_reset();
+  bean_reset(TRUE);
 }
 
 /**
@@ -1007,7 +1009,7 @@ function bean_views_api() {
  * Implements hook_flush_caches().
  */
 function bean_flush_caches() {
-  bean_reset();
+  bean_reset(TRUE);
   return array();
 }
 
