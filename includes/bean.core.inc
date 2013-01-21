@@ -178,7 +178,7 @@ class Bean extends Entity {
   }
 
   public function adminTitle() {
-    return $this->label;
+    return check_plain($this->label);
   }
 
   protected function setUp() {
@@ -400,13 +400,15 @@ class Bean extends Entity {
   }
 
   /**
-   * Set the revision as default
+   * Returns the label of the entity.
    *
-   * @return Bean
+   * Modules may alter the label by specifying another 'label callback' using
+   * hook_entity_info_alter().
+   *
+   * @see entity_label()
    */
-  public function setDefault() {
-    $this->default_revision = TRUE;
-    return $this;
+  public function label() {
+    return check_plain($this->defaultLabel());
   }
 
 }

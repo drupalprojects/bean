@@ -782,7 +782,7 @@ function bean_block_info() {
   $beans = bean_get_all_beans();
   foreach ($beans as $bean) {
     $blocks[$bean->delta] = array(
-      'info' => check_plain($bean->adminTitle()),
+      'info' => $bean->adminTitle(),
       'cache' => $bean->getInfo('cache_level'),
     );
   }
@@ -800,7 +800,7 @@ function bean_block_view($delta = '') {
   if (bean_access('view', $bean) && $bean) {
     $return = array(
       'content' => $bean->view($bean->view_mode),
-      'subject' => check_plain($bean->label()),
+      'subject' => $bean->label(),
     );
   }
 

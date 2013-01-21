@@ -4,6 +4,7 @@ bean 7.x-1.x-dev
 ================
 Issue #1885958 by Steven Jones: Added EntityMetadataWrapper sets not working.
 Issue #1893950: Fixed Ctools warnings in log.
+Move check_plain into the entity class.
 
 bean 7.x-1.0-rc8
 ================
