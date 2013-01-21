@@ -56,7 +56,7 @@ function bean_admin_ui_admin_page() {
   }
   ksort($rows);
 
-  $header = array(t('Name'), t('Status'), array('data' => t('Operations'), 'colspan' => $field_ui ? '6' : '4'));
+  $header = array(t('Name'), t('Status'), array('data' => t('Operations'), 'colspan' => $field_ui ? '4' : '2'));
 
   $build['bean_table'] = array(
     '#theme' => 'table',
