@@ -250,6 +250,12 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
       '#type' => 'checkbox',
       '#title' => t('Set Revision as default'),
       '#default_value' => $bean->isDefaultRevision(),
+      '#states' => array(
+        // Hide if the option above is disabled, to avoid potential dataloss.
+        'invisible' => array(
+          ':input[name="is_new_revision"]' => array('checked' => FALSE),
+        ),
+      ),
     );
   }
 
@@ -330,7 +336,13 @@ function bean_form_validate($form, &$form_state) {
   $bean->title = $form_state['values']['title'];
   $bean->view_mode = $form_state['values']['view_mode'];
   $bean->is_new_revision = $form_state['values']['is_new_revision'];
-  $bean->default_revision = $form_state['values']['default_revision'];
+  // Avoid dataloss.
+  if (empty($form_state['values']['is_new_revision'])) {
+    $bean->default_revision = TRUE;
+  }
+  else {
+    $bean->default_revision = $form_state['values']['default_revision'];
+  }
 
   if ($bean->is_new_revision) {
     $bean->log = $form_state['values']['log'];
@@ -350,6 +362,12 @@ function bean_form_validate($form, &$form_state) {
 function bean_form_submit($form, &$form_state) {
   $bean = bean_form_submit_build_bean($form, $form_state);
   $bean->setValues($form_state['values']);
+
+  // Avoid dataloss.
+  if (empty($form_state['values']['is_new_revision'])) {
+    $bean->default_revision = TRUE;
+  }
+
   $insert = $bean->internalIdentifier();
   field_attach_submit('bean', $bean, $form, $form_state);
   $bean->save();
