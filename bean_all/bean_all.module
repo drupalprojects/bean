@@ -45,6 +45,8 @@ function _bean_all_bean_types(&$plugins, $module) {
     'handler' => array(
       'class' => 'BeanAll',
       'parent' => 'bean',
+      'file' => 'all.inc',
+      'path' => drupal_get_path('module', 'bean_all') . '/plugins',
     ),
   );
 
