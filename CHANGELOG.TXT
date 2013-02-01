@@ -9,6 +9,7 @@ Issue #1887778 by Deciphered: Fixed Incorrect operations colspan.
 Issue #1891358 by DamienMcKenna: Fixed Data loss if both 'Create new revision" and "Set Revision as default" options unchecked.
 Issue #1886002 by DamienMcKenna | paulhhowells: Fixed Administer Bean Settings x2.
 Issue #1889892 Fixed bean_reset() calls menu_rebuild(), which already happens during drupal_flush_all_caches().
+Make sure bean_reset rebuilds the menu correctly.
 
 bean 7.x-1.0-rc8
 ================

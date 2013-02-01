@@ -387,7 +387,7 @@ function bean_reset($skip_menu_rebuild = FALSE) {
 
   // Rebuild ctools plugin types and the menu.
   ctools_plugin_get_plugin_type_info(TRUE);
-  if ($skip_menu_rebuild) {
+  if (!$skip_menu_rebuild) {
     menu_rebuild();
   }
 }
