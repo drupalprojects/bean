@@ -230,17 +230,19 @@ function bean_disable() {
 
   // Delete any blocks
   // @see block_custom_block_delete_submit()
-  db_delete('block')
-    ->condition('module', 'bean')
-    ->execute();
-  db_delete('block_role')
-    ->condition('module', 'bean')
-    ->execute();
+  if (module_exists('block')) {
+    db_delete('block')
+      ->condition('module', 'bean')
+      ->execute();
+    db_delete('block_role')
+      ->condition('module', 'bean')
+      ->execute();
 
-  // @see node_form_block_custom_block_delete_submit()
-  db_delete('block_node_type')
-    ->condition('module', 'bean')
-    ->execute();
+    // @see node_form_block_custom_block_delete_submit()
+    db_delete('block_node_type')
+      ->condition('module', 'bean')
+      ->execute();
+  }
 }
 
 

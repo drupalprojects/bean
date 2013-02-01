@@ -439,20 +439,22 @@ class BeanEntityAPIController extends EntityAPIControllerExportable {
     if (!empty($deltas)) {
       try {
         // @see block_custom_block_delete_submit()
-        db_delete('block')
-          ->condition('module', 'bean')
-          ->condition('delta', $deltas)
-          ->execute();
-        db_delete('block_role')
-          ->condition('module', 'bean')
-          ->condition('delta', $deltas)
-          ->execute();
+        if (module_exists('block')) {
+          db_delete('block')
+            ->condition('module', 'bean')
+            ->condition('delta', $deltas)
+            ->execute();
+          db_delete('block_role')
+            ->condition('module', 'bean')
+            ->condition('delta', $deltas)
+            ->execute();
 
-        // @see node_form_block_custom_block_delete_submit()
-        db_delete('block_node_type')
-          ->condition('module', 'bean')
-          ->condition('delta', $deltas)
-          ->execute();
+          // @see node_form_block_custom_block_delete_submit()
+          db_delete('block_node_type')
+            ->condition('module', 'bean')
+            ->condition('delta', $deltas)
+            ->execute();
+        }
       }
       catch (Exception $e) {
         if (isset($transaction)) {
