@@ -57,7 +57,8 @@ interface BeanTypePluginInterface {
    *
    * @abstract
    *
-   * @return description of the type
+   * @return
+   *  description of the type
    */
   public function getDescription();
 
@@ -92,7 +93,8 @@ interface BeanTypePluginInterface {
    * @param $bean
    * @param $form
    * @param $form_state
-   * @return form array
+   * @return array
+   *  form array
    */
   public function form($bean, $form, &$form_state);
 
@@ -120,13 +122,16 @@ interface BeanTypePluginInterface {
    *
    * @abstract
    *
-   * @param $bean
+   * @param        $bean
    *   The bean object being viewed.
-   * @param $content
+   * @param        $content
    *   The default content array created by Entity API.  This will include any
    *   fields attached to the entity.
-   * @param $view_mode
+   * @param string $view_mode
    *   The view mode passed into $entity->view().
+   *
+   * @param null   $langcode
+   *
    * @return
    *   Return a renderable content array.
    */
@@ -159,6 +164,8 @@ class Bean extends Entity {
    *
    * @param $key
    *  The plugin key to get the info for.
+   *
+   * @return array|null
    */
   public function getInfo($key = NULL) {
     if ($this->plugin instanceof BeanTypePluginInterface) {
@@ -398,19 +405,6 @@ class Bean extends Entity {
 
     return $this;
   }
-
-  /**
-   * Returns the label of the entity.
-   *
-   * Modules may alter the label by specifying another 'label callback' using
-   * hook_entity_info_alter().
-   *
-   * @see entity_label()
-   */
-  public function label() {
-    return check_plain($this->defaultLabel());
-  }
-
 }
 
 class BeanEntityAPIController extends EntityAPIControllerExportable {
