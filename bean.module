@@ -132,7 +132,7 @@ function bean_menu() {
 
 
   $items['block/%bean_delta/edit'] = array(
-    'title' => 'Edit',
+    'title' => 'Edit Block',
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'page callback' => 'bean_edit',
@@ -143,7 +143,7 @@ function bean_menu() {
   );
 
   $items['block/%bean_delta/delete'] = array(
-    'title' => 'Delete',
+    'title' => 'Delete Block',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bean_delete_confirm', 1),
     'access callback' => 'bean_access',
@@ -305,8 +305,6 @@ function bean_type_load($type) {
 /**
  * Gets an array of all bean types, keyed by the type name.
  *
- * @param $type_name
- *   If set, the type with the given name is returned.
  * @return BeanType
  *   Depending whether $type isset, an array of bean types or a single one.
  */
@@ -800,26 +798,26 @@ function bean_block_view($delta = '') {
   $bean = bean_load_delta($delta);
 
   if (bean_access('view', $bean) && $bean) {
+    $content = $bean->view($bean->view_mode);
+    if (!is_array($content)) {
+      $content = array(
+        '#markup' => $content,
+      );
+    }
+
     $return = array(
-      'content' => $bean->view($bean->view_mode),
+      'content' => $content,
       'subject' => $bean->label(),
     );
   }
 
-  return $return;
-}
-
-/**
- * Implements hook_contextual_links_view_alter().
- */
-function bean_contextual_links_view_alter(&$element, $items) {
-  if (isset($element['#element']['#block']->module) && $element['#element']['#block']->module == 'bean') {
-    $element['#links']['bean-configure'] = array(
-      'title' => t('Edit block'),
-      'href' => 'block/' . $element['#element']['#block']->delta . '/edit',
+  if (!empty($return['content']) && module_exists('contextual')) {
+    $return['content']['#contextual_links']['bean'] = array(
+      'block', array($bean->Identifier())
     );
-    unset($element['#links']['block-configure']);
   }
+
+  return $return;
 }
 
 /**
