@@ -1,6 +1,6 @@
 Current API VERSION: 5.
 
-bean 7.x-1.x-dev
+bean 7.x-1.0
 ================
 Issue #1850948 by indytechcook: Fixed Bean revision fields are not acceibel in EntityFieldQuery.
 
