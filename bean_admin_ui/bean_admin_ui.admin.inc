@@ -151,8 +151,8 @@ function bean_admin_ui_type_form($form, &$form_state, $bean_type = NULL) {
 
     if (method_exists($bean_type, 'getExportStatus')) {
       if ($bean_type->getExportStatus() == 'Overridden') {
-        $form['actions']['delete']['name'] = 'revert';
-        $form['actions']['delete']['value'] = t('Revert to defaults');
+        $form['actions']['delete']['#name'] = 'revert';
+        $form['actions']['delete']['#value'] = t('Revert to defaults');
       }
       else {
         unset($form['actions']['delete']);
