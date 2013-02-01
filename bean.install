@@ -66,6 +66,25 @@ function bean_schema() {
         'serialize' => TRUE,
         'description' => 'A serialized array of additional data related to this bean.',
       ),
+      'uid' => array(
+        'description' => 'The author of the revision.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the entity was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the entity was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'foreign keys' => array(
       'type' => array(
@@ -376,5 +395,31 @@ function bean_update_7007(&$return) {
   // Add unique key back after populating our table.
   db_add_unique_key('bean', 'vid', array('vid'));
 
-  return t('Bean Revision table has been added.');
+  return $t('Bean Revision table has been added.');
+}
+
+/**
+ * Add uid, changed and created to bean table
+ */
+function bean_update_7010(&$sand) {
+  $t = get_t();
+  $schema = bean_schema();
+
+  db_add_field('bean', 'uid', $schema['bean_revision']['fields']['uid']);
+  db_add_field('bean', 'created', $schema['bean_revision']['fields']['created']);
+  db_add_field('bean', 'changed', $schema['bean_revision']['fields']['changed']);
+
+  $results = db_query("SELECT bid, uid, created, changed from {bean_revision} GROUP BY bid ORDER BY changed");
+  foreach($results as $row) {
+    db_update('bean')
+      ->fields(array(
+          'uid' => $row->uid,
+          'created' => $row->created,
+          'changed' => $row->changed,
+        ))
+      ->condition('bid', $row->bid)
+      ->execute();
+  }
+
+  return $t('Bean Table updated and data upgraded');
 }
