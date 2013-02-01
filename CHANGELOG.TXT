@@ -1,6 +1,16 @@
 Current API VERSION: 5.
 
-bean 7.x-1.x-dev
+bean 7.x-1.0-rc9
+================
+Make sure bean_reset rebuilds the menu correctly.
+Fix issue in install of shortcuts.
+#1691482: Moved contextual links back to bean_view and check that return of plugin is a render array
+#1891532: Remove check_plain from bean entity class
+Issue #1897834 Fixed Bean, Features and permissions.
+Issue #1900104: Fixed Error when disabling bean.
+Issue #1892272 by stijndm: Fixed Unable to edit exported bean types due to form API syntax error.
+
+bean 7.x-1.0-rc9
 ================
 Issue #1885958 by Steven Jones: Added EntityMetadataWrapper sets not working.
 Issue #1893950: Fixed Ctools warnings in log.
@@ -9,9 +19,6 @@ Issue #1887778 by Deciphered: Fixed Incorrect operations colspan.
 Issue #1891358 by DamienMcKenna: Fixed Data loss if both 'Create new revision" and "Set Revision as default" options unchecked.
 Issue #1886002 by DamienMcKenna | paulhhowells: Fixed Administer Bean Settings x2.
 Issue #1889892 Fixed bean_reset() calls menu_rebuild(), which already happens during drupal_flush_all_caches().
-Make sure bean_reset rebuilds the menu correctly.
-Fix issue in install of shortcuts.
-#1691482: Moved contextual links back to bean_view and check that return of plugin is a render array
 
 bean 7.x-1.0-rc8
 ================
