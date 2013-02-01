@@ -601,6 +601,7 @@ function bean_permission() {
   );
 
   // Add a Permission for each entity type.
+  bean_reset(TRUE);
   foreach (bean_get_types() as $bean_type) {
     $bean_type_name = check_plain($bean_type->type);
     $perms += array(
