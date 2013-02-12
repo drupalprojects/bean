@@ -1012,3 +1012,16 @@ function bean_flush_caches() {
   return array();
 }
 
+/**
+ * Implements hook_references_dialog_entity_admin_paths().
+ *
+ * Enables integration for the References Dialog module.
+ */
+function bean_references_dialog_entity_admin_paths() {
+  return array(
+    'bean' => array(
+      'add' => 'block/add/[bundle-sanitized]',
+      'edit' => 'block/[entity_id]/edit',
+    ),
+  );
+}
