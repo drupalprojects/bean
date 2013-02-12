@@ -270,8 +270,9 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
   // The view mode.
   if (user_access('edit bean view mode')) {
     $bean_info = $bean->entityInfo();
-    $view_modes = array_keys($bean_info['view modes']);
-    $view_modes = array_combine($view_modes, $view_modes);
+    foreach ($bean_info['view modes'] as $view_mode_name => $data) {
+      $view_modes[$view_mode_name] = $data['label'];
+    }
 
     $form['view_mode'] = array(
       '#title' => t('View Mode'),
