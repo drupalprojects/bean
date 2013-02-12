@@ -322,7 +322,12 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
   }
   $form += array('#submit' => array());
 
-  $langcode = entity_language('bean', $bean);
+  if(function_exists('entity_language')){
+    $langcode = entity_language('bean', $bean);
+  }
+  else {
+    $langcode = NULL;
+  }
 
   field_attach_form('bean', $bean, $form, $form_state, $langcode);
   return $form;
@@ -349,7 +354,12 @@ function bean_form_validate($form, &$form_state) {
     $bean->log = $form_state['values']['log'];
   }
 
-  $langcode = entity_language('bean', $bean);
+  if(function_exists('entity_language')){
+    $langcode = entity_language('bean', $bean);
+  }
+  else {
+    $langcode = NULL;
+  }
 
   field_attach_form_validate('bean', $bean, $form, $form_state, $langcode);
   $form_state['values']['bean'] = $bean;
