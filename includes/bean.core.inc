@@ -245,7 +245,7 @@ class Bean extends Entity {
    * 'entity_class_uri' as 'uri callback' hook_entity_info().
    */
   protected function defaultUri() {
-    return array('path' => 'block/' . $this->identifier());
+    return array('path' => 'block/' . strtolower($this->identifier()));
   }
 
   /**

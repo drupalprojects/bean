@@ -8,6 +8,7 @@ Issue #1912444 by John Bickar: Fixed Fatal Error: Call to undefined function ent
 Issue #1354824 by DamienMcKenna, willvincent | mrfelton: Fixed Unable to add fields to newly created bean type.
 Issue #1918188 by eugene.ilyin: Added Few useful views handlers for work with bean blocks.
 Issue #1916938: Fixed Empty block name in entity reference field.
+Issue #1924006 by DamienMcKenna: Added Convert bean URL to lowercase.
 
 bean 7.x-1.0
 ================

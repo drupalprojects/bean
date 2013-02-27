@@ -231,10 +231,13 @@ class BeanTests extends BeanSetup {
     $bean = bean_create($values);
     bean_save($bean);
 
-    $this->drupalGet("block/{$bean->identifier()}");
+    $this->drupalGet($bean->url());
     $this->assertResponse(200, t('Bean Page is viewable'));
     $this->assertText($bean->label(), t('Bean Page is viewable'));
 
+    $this->drupalGet("block/{$bean->identifier()}");
+    $this->assertResponse(200, t('Legacy Bean Page is viewable'));
+    $this->assertText($bean->label(), t('Legacy Bean Page is viewable'));
   }
 }
 
