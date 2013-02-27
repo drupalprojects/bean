@@ -7,6 +7,7 @@ Issue #1910566 by Bès: Added Use label of view mode in bean add and edit form.
 Issue #1912444 by John Bickar: Fixed Fatal Error: Call to undefined function entity_language().
 Issue #1354824 by DamienMcKenna, willvincent | mrfelton: Fixed Unable to add fields to newly created bean type.
 Issue #1918188 by eugene.ilyin: Added Few useful views handlers for work with bean blocks.
+Issue #1916938: Fixed Empty block name in entity reference field.
 
 bean 7.x-1.0
 ================

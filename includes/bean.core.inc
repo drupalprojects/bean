@@ -249,6 +249,19 @@ class Bean extends Entity {
   }
 
   /**
+  +   * Get the default label
+  +   *
+  +   * @return string
+  +   */
+  protected function defaultLabel() {
+    if (empty($this->label)) {
+      return $this->getTranslation('title');
+    }
+
+    return $this->getTranslation('label');
+  }
+
+  /**
    * Get the plugin form
    */
   public function getForm($form, &$form_state) {
