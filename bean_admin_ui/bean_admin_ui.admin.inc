@@ -178,6 +178,10 @@ function bean_admin_ui_type_form_submit(&$form, &$form_state) {
   $bean_type->save($form_state['values']['new']);
   $form_state['redirect'] = 'admin/structure/block-types';
   ctools_include('export');
+
+  // Clear the site caches so that the new "manage fields" and "display fields"
+  // pages for the new bean type work.
+  drupal_flush_all_caches();
 }
 
 /**

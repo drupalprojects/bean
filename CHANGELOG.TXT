@@ -5,6 +5,7 @@ bean 7.x-1.x-dev
 Issue #1911224 by DamienMcKenna: Added Support for references_dialog().
 Issue #1910566 by Bès: Added Use label of view mode in bean add and edit form.
 Issue #1912444 by John Bickar: Fixed Fatal Error: Call to undefined function entity_language().
+Issue #1354824 by DamienMcKenna, willvincent | mrfelton: Fixed Unable to add fields to newly created bean type.
 
 bean 7.x-1.0
 ================
