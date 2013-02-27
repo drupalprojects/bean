@@ -487,12 +487,11 @@ function bean_delete_confirm_submit($form, &$form_state) {
 /**
  * Menu callback -- ask for confirmation of bean deletion
  */
-function bean_delete_revision_confirm($form, &$form_state, $bean, $vid) {
+function bean_delete_revision_confirm($form, &$form_state, $bean) {
   $form['#bean'] = $bean;
-  $form['#vid'] = $vid;
 
   return confirm_form($form,
-    t('Are you sure you want to revision %vid of %title?', array('%vid' => $vid, '%title' => $bean->label())),
+    t('Are you sure you want to delete revision %vid of %title?', array('%vid' => $bean->vid, '%title' => $bean->label())),
     $bean->viewUrl(),
     t('This action cannot be undone.'),
     t('Delete'),
@@ -506,9 +505,9 @@ function bean_delete_revision_confirm($form, &$form_state, $bean, $vid) {
 function bean_delete_revision_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
     $bean = $form['#bean'];
-    bean_delete_revision($form_state['vid']);
-    watchdog('bean', '@type: deleted %title revision %vid.', array('%vid' => $form_state['vid'], '@type' => $bean->typeName(), '%title' => $bean->label()));
-    drupal_set_message(t('@type %title revision %vid has been deleted.', array('%vid' => $form_state['vid'], '@type' => $bean->typeName(), '%title' => $bean->label())));
+    bean_delete_revision($bean->vid);
+    watchdog('bean', '@type: deleted %title revision %vid.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label()));
+    drupal_set_message(t('@type %title revision %vid has been deleted.', array('%vid' => $bean->vid, '@type' => $bean->typeName(), '%title' => $bean->label())));
   }
 }
 
@@ -653,6 +652,7 @@ function bean_revisions_page(Bean $bean) {
 
   $rows = array();
 
+  // Dont' show link for default revision
   $can_delete = bean_access('delete', $bean);
   $can_edit = bean_access('edit', $bean);
 
@@ -682,7 +682,7 @@ function bean_revisions_page(Bean $bean) {
       );
     }
 
-    if ($can_delete) {
+    if ($can_delete && !$active) {
       $operations['delete'] = array(
         'title' => t('delete'),
         'href' => "block/{$bean->delta}/revisions/{$rev->vid}/delete",

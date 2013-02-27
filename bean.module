@@ -564,7 +564,7 @@ function bean_load_multiple($bids = array(), $conditions = array(), $reset = FAL
  * Delete a bean revision
  */
 function bean_delete_revision($vid) {
-  return entity_get_controller('bean')->revisionDelete($vid);
+  return entity_get_controller('bean')->deleteRevision($vid);
 }
 
 /**
