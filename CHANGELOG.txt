@@ -1,5 +1,9 @@
 Current API VERSION: 5.
 
+Bean 7.x-1.x-dev, xxxx-xx-xx
+----------------------------
+
+
 Bean 7.x-1.1, 2013-02-27
 ------------------------
 Issue #1911224 by DamienMcKenna: Added Support for references_dialog().
