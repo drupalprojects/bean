@@ -2,6 +2,7 @@ Current API VERSION: 5.
 
 Bean 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------
+#1941168 by DamienMcKenna: Fixed the 'set active' URL.
 
 
 Bean 7.x-1.1, 2013-02-27

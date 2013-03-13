@@ -199,8 +199,8 @@ function bean_menu() {
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
 
-  $items['block/%bean_delta/revisions/%/set-default'] = array(
-    'title' => 'Set Default',
+  $items['block/%bean_delta/revisions/%/set-active'] = array(
+    'title' => 'Set active',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bean_set_default_confirm', 1),
     'access callback' => 'bean_access',
