@@ -874,7 +874,7 @@ function bean_ctools_plugin_type() {
         'handler' => array(
           'class' => 'BeanDefault',
           'parent' => 'bean',
-          'file' => 'base.inc',
+          'file' => 'BeanDefault.class.php',
           'path' => drupal_get_path('module', 'bean') . '/plugins',
         ),
       ),
@@ -891,7 +891,7 @@ function bean_bean_types() {
   $plugins['bean'] = array(
     'handler' => array(
       'class' => 'BeanPlugin',
-      'file' => 'base.inc',
+      'file' => 'BeanPlugin.class.php',
       'path' => drupal_get_path('module', 'bean') . '/plugins',
     ),
   );
@@ -901,7 +901,7 @@ function bean_bean_types() {
     'handler' => array(
       'class' => 'BeanDefault',
       'parent' => 'bean',
-      'file' => 'base.inc',
+      'file' => 'BeanDefault.class.php',
       'path' => drupal_get_path('module', 'bean') . '/plugins',
     ),
   );
