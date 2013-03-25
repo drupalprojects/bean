@@ -10,6 +10,7 @@ files[] = views/views_handler_filter_bean_type.inc
 files[] = views/views_handler_field_bean_type.inc
 files[] = views/views_handler_field_bean_edit_link.inc
 files[] = views/views_handler_field_bean_delete_link.inc
+files[] = views/views_handler_field_bean_operations.inc
 files[] = bean.test
 dependencies[] = entity
 dependencies[] = ctools
