@@ -2,7 +2,7 @@ Current API VERSION: 5.
 
 Bean 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------
-#1906958 by miro_dietiker: Switch admin bean/block list to views (optionally)
+#1906958 by ytsurk, Albert Volkman | miro_dietiker: Added Switch admin bean/block list to views.
 #1941168 by DamienMcKenna, Albert Volkman: Fixed the 'set active' URL.
 #1911224 by DamienMcKenna: Reverted support for references_dialog, that module
   already added support for Bean.

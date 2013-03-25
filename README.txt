@@ -16,8 +16,11 @@ admin/structure/block-types
 
 Beans
 -----
+An overview of all beans created is at: admin/content/blocks
 
-Beans can be added at block/add
+If views is installed and enabled, a default called 'Bean Block List' is available to replace the default block list at: admin/content/blocks
+
+Beans can be added at: block/add
 
 Example Bean Type Plugins
 -------------------------
