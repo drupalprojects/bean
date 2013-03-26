@@ -36,9 +36,8 @@ function hook_bean_types() {
     'path' => drupal_get_path('module', 'example_bean') . '/plugins';
     // Class files should be named accordingly in order to support ctools
     // autoloading procedures.
-    'file' => 'TaxListingBean.class.php'
+    'file' => 'ClassName.class.php'
   );
-
   return $plugins;
 }
 
@@ -76,4 +75,3 @@ function hook_bean_form_submit($form, $form_state) {
 function hook_bean_cache_clear() {
 
 }
-
