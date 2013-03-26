@@ -2,6 +2,7 @@ Current API VERSION: 5.
 
 Bean 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------
+Issue #1934294 by darthsteven: Entity Cache Support
 Issue #1906958 by ytsurk, Albert Volkman | miro_dietiker: Added Switch admin bean/block list to views.
 Issue #1935770 by rooby: fixed erronous block titles showing up as labels
 Issue #1179420 by mrfelton: Unable to install Bean plugins from an installation profile.
