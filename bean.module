@@ -1011,3 +1011,43 @@ function bean_flush_caches() {
   bean_reset(TRUE);
   return array();
 }
+
+/**
+ * Implements hook_admin_menu_output_build().
+ *
+ * Places the "Add block" tree into the toolbar from Admin Menu module
+ *
+ * @see admin_menu_admin_menu_output_build()
+ */
+function bean_admin_menu_output_build(&$content) {
+  if (!isset($content['menu'])) {
+    return;
+  }
+
+  // Retrieve the "Add block" link tree.
+  $link = db_query("SELECT * FROM {menu_links} WHERE router_path = 'block/add' AND module = 'system'")->fetchAssoc();
+  $conditions = array();
+  for ($i = 1; $i < MENU_MAX_DEPTH; $i++) {
+    if (!empty($link["p$i"])) {
+      $conditions["p$i"] = $link["p$i"];
+    }
+  }
+  $tree = menu_build_tree($link['menu_name'], array(
+    'conditions' => $conditions,
+    'min_depth' => $link['depth'],
+  ));
+  $links = admin_menu_links_menu($tree);
+  if (!empty($links)) {
+    // If the user has access to the top-level "Content" category, insert the
+    // "Add content" link tree there.
+    if (isset($content['menu']['admin/content'])) {
+      $content['menu']['admin/content'] += $links;
+    }
+    // Otherwise insert "Add blocks" as top-level category.
+    else {
+      $key = key($links);
+      $links[$key]['#weight'] = -100;
+      $content['menu'] += $links;
+    }
+  }
+}
