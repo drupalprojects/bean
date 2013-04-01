@@ -33,10 +33,10 @@ function hook_bean_types() {
       'parent' => 'bean',
     ),
     // This should be pointing to the path of your custom bean plugin module.
-    'path' => drupal_get_path('module', 'example_bean') . '/plugins';
+    'path' => drupal_get_path('module', 'example_bean') . '/plugins',
     // Class files should be named accordingly in order to support ctools
     // autoloading procedures.
-    'file' => 'ClassName.class.php'
+    'file' => 'ClassName.class.php',
   );
   return $plugins;
 }
