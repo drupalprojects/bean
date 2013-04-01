@@ -361,7 +361,7 @@ function bean_form_validate($form, &$form_state) {
     $langcode = NULL;
   }
 
-  field_attach_form_validate('bean', $bean, $form, $form_state, $langcode);
+  field_attach_form_validate('bean', $bean, $form, $form_state);
   $form_state['values']['bean'] = $bean;
 
   $bean->validate($form_state['values'], $form_state);

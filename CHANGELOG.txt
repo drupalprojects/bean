@@ -2,6 +2,8 @@ Current API VERSION: 5.
 
 Bean 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------
+#1957260 by DamienMcKenna: There is no $langcode argument for
+  field_attach_form_validate().
 #1935466 by jeffam, DamienMcKenna: Improve integration with Admin Menu module.
 #1934294 by darthsteven: Entity Cache Support.
 #1906958 by ytsurk, Albert Volkman, miro_dietiker: Added Switch admin
