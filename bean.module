@@ -808,7 +808,7 @@ function bean_block_view($delta = '') {
 
     $return = array(
       'content' => $content,
-      'subject' => $bean->label(),
+      'subject' => isset($bean->title) ? $bean->title : '',
     );
   }
 
