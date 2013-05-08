@@ -982,15 +982,32 @@ function bean_modules_enabled($modules) {
 function bean_field_extra_fields() {
   $extra = array();
   foreach (bean_get_types() as $type) {
-    $field = array(
-      'label' => t('Bean field: !title', array('!title' => 'Title')),
-      'weight' => -5,
+    $extra['bean'][$type->type]['display']['title'] = array(
+      'label' => t('Title'),
+      'description' => t('Bean module element'),
+      'weight' => -9,
     );
-
-    $extra['bean'][$type->type]['form']['title'] = $field;
-    $extra['bean'][$type->type]['display']['title'] = $field;
+    $extra['bean'][$type->type]['form']['label'] = array(
+      'label' => t('Label'),
+      'description' => t('Bean module element'),
+      'weight' => -10,
+    );
+    $extra['bean'][$type->type]['form']['title'] = array(
+      'label' => t('Title'),
+      'description' => t('Bean module element'),
+      'weight' => -9,
+    );
+    $extra['bean'][$type->type]['form']['revision'] = array(
+      'label' => t('Revision settings'),
+      'description' => t('Bean module element'),
+      'weight' => 10,
+    );
+    $extra['bean'][$type->type]['form']['view_mode'] = array(
+      'label' => t('View mode'),
+      'description' => t('Bean module element'),
+      'weight' => 10,
+     );
   }
-
   return $extra;
 }
 
