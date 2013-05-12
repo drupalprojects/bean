@@ -382,6 +382,7 @@ function bean_form_submit($form, &$form_state) {
   $insert = $bean->internalIdentifier();
   field_attach_submit('bean', $bean, $form, $form_state);
   $bean->save();
+  $form_state['values']['bean'] = $bean;
 
   $watchdog_args = array('@type' => $bean->typeName(), '%title' => $bean->label());
   $t_args = array('@type' => $bean->typeName(), '%title' => $bean->label());
