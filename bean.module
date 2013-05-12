@@ -1068,3 +1068,35 @@ function bean_admin_menu_output_build(&$content) {
     }
   }
 }
+
+/**
+ * CTools callback for Bean blocks.
+ *
+ * @see _ctools_block_content_type_content_type() in block.inc.
+ */
+function bean_ctools_block_info($module, $delta, &$info) {
+  // Use the core block icon.
+  $info['icon'] = 'icon_contrib_block.png';
+
+  // Load the full bean.
+  $bean = bean_load_delta($delta);
+
+  // Identify the bean type.
+  $bean_types = bean_get_types();
+
+  // By default store all beans in the Blocks category.
+  $info['category'] = t('Blocks');
+
+  // If the bean type loaded correctly (should always happen),
+  if (isset($bean_types[$bean->type])) {
+    // Optionally group the blocks by their bean type..
+    if (variable_get('bean_ctools_separate', TRUE)) {
+      $info['category'] = t('Blocks') . ': ' . $bean_types[$bean->type]->getLabel();
+    }
+    // Optionally prefix the block with the bean type's label.
+    if (variable_get('bean_ctools_prefix', FALSE)) {
+      $info['title'] = $bean_types[$bean->type]->getLabel() . ': ' . $info['title'];
+    }
+  }
+}
+
