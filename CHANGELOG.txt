@@ -1,7 +1,16 @@
 Current API VERSION: 5.
 
-Bean 7.x-1.x-dev, xxxx-xx-xx
+Bean 7.x-1.2, 2013-05-12
 ----------------------------
+#1924126 by DamienMcKenna: Group beans by block type in the CTools/Panels content
+type (sic) plugin
+#1978808 by k.minkov: Assign bean object to form on insert
+#1990112 by rodrigo panchiniak fernandes: Minor Typo at README.txt
+#1961464 by jamsilver: Extra fields needed for label, revision and view_mode
+form elements.
+#1973696 by pcambra: Fix bean.api.php to set path and file in the class level.
+#1935770 by rooby: Beans without a title should not fallback to showing the
+admin label but instead show no title at all
 #1957260 by DamienMcKenna: There is no $langcode argument for
   field_attach_form_validate().
 #1935466 by jeffam, DamienMcKenna: Improve integration with Admin Menu module.
