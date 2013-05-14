@@ -215,6 +215,15 @@ function bean_uninstall() {
   foreach (bean_get_types() as $bean_type) {
     field_attach_delete_bundle('bean', $bean_type->type);
   }
+  //Remove shortcut links
+  $shortcut_set = shortcut_default_set();
+  foreach ($shortcut_set->links as $shortcut_key => $shortcut) {
+    if ($shortcut['link_path'] == 'block/add' || $shortcut['link_path'] == 'admin/content/blocks') {
+      unset($shortcut_set->link[$shortcut_key]);
+      shortcut_set_save($shortcut_set);
+      menu_link_delete(NULL, $shortcut['link_path']);
+    }
+  }
 }
 
 /**
