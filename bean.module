@@ -436,7 +436,7 @@ function bean_load_plugin_class($plugin_key = NULL) {
  */
 function bean_check_plugin_class($class) {
   $ref_class = new ReflectionClass($class);
-  if (in_array('BeanTypePluginInterface', $ref_class->getInterfaceNames())) {
+  if ($ref_class->isInstantiable() && in_array('BeanTypePluginInterface', $ref_class->getInterfaceNames())) {
     return TRUE;
   }
 
