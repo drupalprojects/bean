@@ -392,11 +392,10 @@ class Bean extends Entity {
 
       // Add 'bean-' prefix when it's need to avoid a purely numeric delta.
       if (is_numeric($delta)) {
-        $max_length = 27;
-        $delta = 'bean-' . substr($delta, 0, $max_length);
+        $delta = 'bean-' . $delta;
       }
 
-      $this->delta = $delta;
+      $this->delta = substr($delta, 0, $max_length);
 
       // Check if delta is unique.
       if (bean_load_delta($this->delta)) {
