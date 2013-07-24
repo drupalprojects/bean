@@ -1,5 +1,12 @@
 Current API VERSION: 5.
 
+Bean 7.x-1.3, 2013-07-24
+----------------------------
+#2036137 by eugene.ilyin: Fixed Numeric delta of the bean block.
+ Followup by brantwynn Fix block delta truncation error.
+#1728632 by donutdan4114 | indytechcook: Fixed Can't name a bean type 'bean'.
+#1982468 by 30equals: Cleanup menulink/shortcut after uninstall
+
 Bean 7.x-1.2, 2013-05-12
 ----------------------------
 #1924126 by DamienMcKenna: Group beans by block type in the CTools/Panels content
