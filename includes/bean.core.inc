@@ -390,7 +390,13 @@ class Bean extends Entity {
         $delta = drupal_clean_css_identifier(strtolower($this->label));;
       }
 
-      $this->delta = substr($delta, 0, $max_length);
+      // Add 'bean-' prefix when it's need to avoid a purely numeric delta.
+      if (is_numeric($delta)) {
+        $max_length = 27;
+        $delta = 'bean-' . substr($delta, 0, $max_length);
+      }
+
+      $this->delta = $delta;
 
       // Check if delta is unique.
       if (bean_load_delta($this->delta)) {
