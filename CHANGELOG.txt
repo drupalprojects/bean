@@ -8,6 +8,7 @@ Bean 7.x-1.3, 2013-07-24
 #1982468 by 30equals: Cleanup menulink/shortcut after uninstall
 #2080239 by ro0NL: Bean export type is internally translated
 #2061725 by timaholt: support UUID for revisions
+#2076133 by Sylvain Lecoy: Align admin/structure text with drupal standards
 
 Bean 7.x-1.2, 2013-05-12
 ----------------------------
