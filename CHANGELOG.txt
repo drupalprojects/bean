@@ -10,6 +10,8 @@ Bean 7.x-1.3, 2013-07-24
 #2061725 by timaholt: support UUID for revisions
 #2076133 by Sylvain Lecoy: Align admin/structure text with drupal standards
 #1359472 by arithmetric: Fix uninstall of bean module plugins
+#2053911 by franz: When no Bean type is created, views_handler_filter_bean_type 
+  return many errors.
 
 Bean 7.x-1.2, 2013-05-12
 ----------------------------
