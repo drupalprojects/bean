@@ -7,6 +7,7 @@ Bean 7.x-1.3, 2013-07-24
 #1728632 by donutdan4114 | indytechcook: Fixed Can't name a bean type 'bean'.
 #1982468 by 30equals: Cleanup menulink/shortcut after uninstall
 #2080239 by ro0NL: Bean export type is internally translated
+#2061725 by timaholt: support UUID for revisions
 
 Bean 7.x-1.2, 2013-05-12
 ----------------------------
