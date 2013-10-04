@@ -359,7 +359,7 @@ class Bean extends Entity {
     $this->plugin->submit($this);
 
     $return = parent::save();
-    bean_reset(TRUE);
+    bean_reset(TRUE, TRUE);
 
     return $return;
   }
