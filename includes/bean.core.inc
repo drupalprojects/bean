@@ -484,6 +484,17 @@ class BeanEntityAPIController extends EntityAPIControllerExportable {
     }
     parent::delete($ids, $transaction);
   }
+
+  protected function saveRevision($entity) {
+    global $user;
+
+    $org_uid = $entity->uid;
+    $entity->uid = $user->uid;
+    $return = parent::saveRevision($entity);
+    $entity->uid = $org_uid;
+
+    return $return;
+  }
 }
 
 class BeanException extends Exception {};
