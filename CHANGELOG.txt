@@ -1,6 +1,6 @@
 Current API VERSION: 5.
 
-Bean 7.x-1.4, 2013-10-4
+Bean 7.x-1.4, 2013-10-13
 ---------------------------
 #2080239 by ro0NL: Bean export type is internally translated
 #2061725 by timaholt: support UUID for revisions
