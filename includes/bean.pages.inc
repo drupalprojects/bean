@@ -116,16 +116,20 @@ function bean_list() {
 
     // Build a list of all the accessible operations for the current bean.
     $operations = array();
-    $operations['edit'] = array(
-      'title' => t('edit'),
-      'href' => 'block/' . $bean->delta . '/edit',
-      'query' => $destination,
-    );
-    $operations['delete'] = array(
-      'title' => t('delete'),
-      'href' => 'block/' . $bean->delta . '/delete',
-      'query' => $destination,
-    );
+    if (bean_access('edit', $bean)) {
+      $operations['edit'] = array(
+        'title' => t('edit'),
+        'href' => 'block/' . $bean->delta . '/edit',
+        'query' => $destination,
+      );
+    }
+    if (bean_access('delete', $bean)) {
+      $operations['delete'] = array(
+        'title' => t('delete'),
+        'href' => 'block/' . $bean->delta . '/delete',
+        'query' => $destination,
+      );
+    }
     // Render an unordered list of operations links.
     $rows[$bean->bid]['operations'] = array(
       'data' => array(
