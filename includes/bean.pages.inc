@@ -220,7 +220,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
   $form['title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
-    '#description' => t('The Title of the block.'),
+    '#description' => t('The Title of the block. The &lt;em&gt;, &lt;strong&gt;, &lt;i&gt; and &lt;b&gt; HTML tags are allowed, all others will be filtered out.'),
     '#default_value' => $bean->title,
     '#weight' => -9,
   );

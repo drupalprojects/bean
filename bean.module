@@ -827,7 +827,7 @@ function bean_block_view($delta = '') {
 
     $return = array(
       'content' => $content,
-      'subject' => isset($bean->title) ? $bean->title : '',
+      'subject' => isset($bean->title) ? filter_xss($bean->title, $allowed_tags = array('em', 'strong', 'i', 'b')) : '',
     );
   }
 
