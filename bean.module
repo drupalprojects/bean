@@ -798,6 +798,12 @@ function bean_view_callback($entities, $view_mode, $langcode, $entity_type) {
  * Implements hook_block_info().
  */
 function bean_block_info() {
+  static $blocks = array();
+
+  if (!empty($blocks)) {
+    return $blocks;
+  }
+
   $blocks = array();
   $beans = bean_get_all_beans();
   foreach ($beans as $bean) {
