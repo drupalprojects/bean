@@ -392,7 +392,7 @@ function bean_reset($skip_menu_rebuild = FALSE, $rehash_blocks= FALSE) {
 
   // Rehashes blocks for active themes. This will populate the blocks table and allow
   // modules like blockreference to work properly.
-  if ($rehash_blocks) {
+  if ($rehash_blocks && module_exists('block')) {
     block_flush_caches();
   }
 }
