@@ -138,8 +138,8 @@ function bean_menu() {
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'page callback' => 'bean_edit',
     'page arguments' => array(1),
-    'access arguments' => array('edit', 1),
-    'access callback' => 'bean_access',
+    'access arguments' => array('update', 'bean', 1),
+    'access callback' => 'entity_access',
     'file' => 'includes/bean.pages.inc',
   );
 
@@ -147,8 +147,8 @@ function bean_menu() {
     'title' => 'Delete Block',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bean_delete_confirm', 1),
-    'access callback' => 'bean_access',
-    'access arguments' => array('delete', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('delete', 'bean', 1),
     'weight' => 1,
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_NONE,
@@ -169,8 +169,8 @@ function bean_menu() {
     'title arguments' => array(1),
     'page callback' => 'bean_view',
     'page arguments' => array(1),
-    'access callback' => 'bean_access',
-    'access arguments' => array('view', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('view', 'bean', 1),
     'file' => 'includes/bean.pages.inc',
     'load arguments' => array(3),
   );
@@ -179,8 +179,8 @@ function bean_menu() {
     'title' => 'View',
     'page callback' => 'bean_view',
     'page arguments' => array(1),
-    'access callback' => 'bean_access',
-    'access arguments' => array('view', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('view', 'bean', 1),
     'file' => 'includes/bean.pages.inc',
     'load arguments' => array(3),
     'weight' => -10,
@@ -192,8 +192,8 @@ function bean_menu() {
     'title' => 'Edit',
     'page callback' => 'bean_edit',
     'page arguments' => array(1),
-    'access callback' => 'bean_access',
-    'access arguments' => array('edit', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('update', 'bean', 1),
     'file' => 'includes/bean.pages.inc',
     'load arguments' => array(3),
     'type' => MENU_LOCAL_TASK,
@@ -204,8 +204,8 @@ function bean_menu() {
     'title' => 'Set active',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bean_set_default_confirm', 1),
-    'access callback' => 'bean_access',
-    'access arguments' => array('edit', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('update', 'bean', 1),
     'file' => 'includes/bean.pages.inc',
     'load arguments' => array(3),
     'type' => MENU_LOCAL_TASK,
@@ -216,8 +216,8 @@ function bean_menu() {
     'title' => 'Delete',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bean_delete_revision_confirm', 1),
-    'access callback' => 'bean_access',
-    'access arguments' => array('delete', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('delete', 'bean', 1),
     'file' => 'includes/bean.pages.inc',
     'load arguments' => array(3),
     'weight' => 1,
@@ -726,7 +726,7 @@ function bean_add_page_access() {
     return TRUE;
   }
   foreach (bean_get_types() as $bean_type) {
-    if (bean_access('create', $bean_type->type)) {
+    if (entity_access('create', 'bean', $bean_type->type)) {
       return TRUE;
     }
   }
@@ -823,7 +823,7 @@ function bean_block_view($delta = '') {
   $return = array();
   $bean = bean_load_delta($delta);
 
-  if (bean_access('view', $bean) && $bean) {
+  if (entity_access('view', 'bean', $bean) && $bean) {
     $content = $bean->view($bean->view_mode);
     if (!is_array($content)) {
       $content = array(
@@ -972,7 +972,7 @@ function bean_workbench_create_alter(&$output) {
   $items = array();
   $i = 0;
   foreach (bean_get_types() as $bean_type) {
-    if (bean_access('create', $bean_type->type)) {
+    if (entity_access('create', 'bean', $bean_type->type)) {
       $items[str_replace(' ', '', $bean_type->getLabel()) . '_' . $i] = array(
         'title' => $bean_type->getLabel(),
         'href' => 'block/add/' . $bean_type->buildURL(),

@@ -1,0 +1,221 @@
+diff --git a/bean.module b/bean.module
+index d4f8f23..d459adb 100644
+--- a/bean.module
++++ b/bean.module
+@@ -138,8 +138,8 @@ function bean_menu() {
+     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+     'page callback' => 'bean_edit',
+     'page arguments' => array(1),
+-    'access arguments' => array('edit', 1),
+-    'access callback' => 'bean_access',
++    'access arguments' => array('update', 'bean', 1),
++    'access callback' => 'entity_access',
+     'file' => 'includes/bean.pages.inc',
+   );
+ 
+@@ -147,8 +147,8 @@ function bean_menu() {
+     'title' => 'Delete Block',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('bean_delete_confirm', 1),
+-    'access callback' => 'bean_access',
+-    'access arguments' => array('delete', 1),
++    'access callback' => 'entity_access',
++    'access arguments' => array('delete', 'bean', 1),
+     'weight' => 1,
+     'type' => MENU_LOCAL_TASK,
+     'context' => MENU_CONTEXT_NONE,
+@@ -169,8 +169,8 @@ function bean_menu() {
+     'title arguments' => array(1),
+     'page callback' => 'bean_view',
+     'page arguments' => array(1),
+-    'access callback' => 'bean_access',
+-    'access arguments' => array('view', 1),
++    'access callback' => 'entity_access',
++    'access arguments' => array('view', 'bean', 1),
+     'file' => 'includes/bean.pages.inc',
+     'load arguments' => array(3),
+   );
+@@ -179,8 +179,8 @@ function bean_menu() {
+     'title' => 'View',
+     'page callback' => 'bean_view',
+     'page arguments' => array(1),
+-    'access callback' => 'bean_access',
+-    'access arguments' => array('view', 1),
++    'access callback' => 'entity_access',
++    'access arguments' => array('view', 'bean', 1),
+     'file' => 'includes/bean.pages.inc',
+     'load arguments' => array(3),
+     'weight' => -10,
+@@ -192,8 +192,8 @@ function bean_menu() {
+     'title' => 'Edit',
+     'page callback' => 'bean_edit',
+     'page arguments' => array(1),
+-    'access callback' => 'bean_access',
+-    'access arguments' => array('edit', 1),
++    'access callback' => 'entity_access',
++    'access arguments' => array('update', 'bean', 1),
+     'file' => 'includes/bean.pages.inc',
+     'load arguments' => array(3),
+     'type' => MENU_LOCAL_TASK,
+@@ -204,8 +204,8 @@ function bean_menu() {
+     'title' => 'Set active',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('bean_set_default_confirm', 1),
+-    'access callback' => 'bean_access',
+-    'access arguments' => array('edit', 1),
++    'access callback' => 'entity_access',
++    'access arguments' => array('update', 'bean', 1),
+     'file' => 'includes/bean.pages.inc',
+     'load arguments' => array(3),
+     'type' => MENU_LOCAL_TASK,
+@@ -216,8 +216,8 @@ function bean_menu() {
+     'title' => 'Delete',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('bean_delete_revision_confirm', 1),
+-    'access callback' => 'bean_access',
+-    'access arguments' => array('delete', 1),
++    'access callback' => 'entity_access',
++    'access arguments' => array('delete', 'bean', 1),
+     'file' => 'includes/bean.pages.inc',
+     'load arguments' => array(3),
+     'weight' => 1,
+@@ -726,7 +726,7 @@ function bean_add_page_access() {
+     return TRUE;
+   }
+   foreach (bean_get_types() as $bean_type) {
+-    if (bean_access('create', $bean_type->type)) {
++    if (entity_access('create', 'bean', $bean_type->type)) {
+       return TRUE;
+     }
+   }
+@@ -817,7 +817,7 @@ function bean_block_view($delta = '') {
+   $return = array();
+   $bean = bean_load_delta($delta);
+ 
+-  if (bean_access('view', $bean) && $bean) {
++  if (entity_access('view', 'bean', $bean) && $bean) {
+     $content = $bean->view($bean->view_mode);
+     if (!is_array($content)) {
+       $content = array(
+@@ -966,7 +966,7 @@ function bean_workbench_create_alter(&$output) {
+   $items = array();
+   $i = 0;
+   foreach (bean_get_types() as $bean_type) {
+-    if (bean_access('create', $bean_type->type)) {
++    if (entity_access('create', 'bean', $bean_type->type)) {
+       $items[str_replace(' ', '', $bean_type->getLabel()) . '_' . $i] = array(
+         'title' => $bean_type->getLabel(),
+         'href' => 'block/add/' . $bean_type->buildURL(),
+diff --git a/bean.services.inc b/bean.services.inc
+index 1b9b76a..3c8467a 100644
+--- a/bean.services.inc
++++ b/bean.services.inc
+@@ -293,5 +293,5 @@ function bean_services_access($op, $args) {
+     return FALSE;
+   }
+ 
+-  return bean_access($op, $bean);
++  return entity_access($op, 'bean', $bean);
+ }
+diff --git a/includes/bean.pages.inc b/includes/bean.pages.inc
+index bfa88c0..f1097b8 100644
+--- a/includes/bean.pages.inc
++++ b/includes/bean.pages.inc
+@@ -42,7 +42,7 @@ function bean_add_page() {
+ 
+   $types = array();
+   foreach ($bean_types as $key => $bean_type) {
+-    if (bean_access('create', $bean_type->type)) {
++    if (entity_access('create', 'bean', $bean_type->type)) {
+       $types[$key] = $bean_type;
+     }
+   }
+@@ -116,14 +116,14 @@ function bean_list() {
+ 
+     // Build a list of all the accessible operations for the current bean.
+     $operations = array();
+-    if (bean_access('edit', $bean)) {
++    if (entity_access('update', 'bean', $bean)) {
+       $operations['edit'] = array(
+         'title' => t('edit'),
+         'href' => 'block/' . $bean->delta . '/edit',
+         'query' => $destination,
+       );
+     }
+-    if (bean_access('delete', $bean)) {
++    if (entity_access('delete', 'bean', $bean)) {
+       $operations['delete'] = array(
+         'title' => t('delete'),
+         'href' => 'block/' . $bean->delta . '/delete',
+@@ -311,7 +311,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
+     '#weight' => 200,
+     '#submit' => array('bean_form_submit'),
+   );
+-  if (!empty($bean->bid) && bean_access('delete', $bean)) {
++  if (!empty($bean->bid) && enitty_access('delete', 'bean', $bean)) {
+     $form['actions']['delete'] = array(
+       '#type' => 'submit',
+       '#value' => t('Delete'),
+@@ -658,8 +658,8 @@ function bean_revisions_page(Bean $bean) {
+   $rows = array();
+ 
+   // Dont' show link for default revision
+-  $can_delete = bean_access('delete', $bean);
+-  $can_edit = bean_access('edit', $bean);
++  $can_delete = entity_access('delete', 'bean', $bean);
++  $can_edit = entity_access('update', 'bean', $bean);
+ 
+   foreach ($bean->revisions as $rev) {
+     $active = $rev->vid == $bean->vid ? TRUE : FALSE;
+diff --git a/includes/translation.handler.bean.inc b/includes/translation.handler.bean.inc
+index 98a2b27..19b6c0f 100644
+--- a/includes/translation.handler.bean.inc
++++ b/includes/translation.handler.bean.inc
+@@ -18,7 +18,7 @@ class EntityTranslationBeanHandler extends EntityTranslationDefaultHandler {
+   }
+ 
+   public function getAccess($op) {
+-    return bean_access($op, $this->entity);
++    return entity_access($op, 'bean', $this->entity);
+   }
+ 
+   protected function getEntityId() {
+diff --git a/views/views_handler_field_bean_delete_link.inc b/views/views_handler_field_bean_delete_link.inc
+index 4f334c7..56c5ac2 100644
+--- a/views/views_handler_field_bean_delete_link.inc
++++ b/views/views_handler_field_bean_delete_link.inc
+@@ -38,7 +38,7 @@ class views_handler_field_bean_delete_link extends views_handler_field_entity {
+   }
+ 
+   function render_link($bean) {
+-    if (bean_access('delete', $bean)) {
++    if (entity_access('delete', 'bean', $bean)) {
+       $this->options['alter']['make_link'] = TRUE;
+       $this->options['alter']['path'] = "block/$bean->delta/delete";
+       $this->options['alter']['query'] = drupal_get_destination();
+diff --git a/views/views_handler_field_bean_edit_link.inc b/views/views_handler_field_bean_edit_link.inc
+index 8519650..3153965 100644
+--- a/views/views_handler_field_bean_edit_link.inc
++++ b/views/views_handler_field_bean_edit_link.inc
+@@ -38,7 +38,7 @@ class views_handler_field_bean_edit_link extends views_handler_field_entity {
+   }
+ 
+   function render_link($bean) {
+-    if (bean_access('edit', $bean)) {
++    if (entity_access('update', 'bean', $bean)) {
+       $this->options['alter']['make_link'] = TRUE;
+       $this->options['alter']['path'] = "block/$bean->delta/edit";
+       $this->options['alter']['query'] = drupal_get_destination();
+diff --git a/views/views_handler_field_bean_operations.inc b/views/views_handler_field_bean_operations.inc
+index 7ed0277..f95a3de 100644
+--- a/views/views_handler_field_bean_operations.inc
++++ b/views/views_handler_field_bean_operations.inc
+@@ -35,7 +35,7 @@ class views_handler_field_bean_operations extends views_handler_field_entity {
+   }
+ 
+   function render_link($bean) {
+-    if (bean_access('edit', $bean)) {
++    if (entity_acces('update', 'bean', $bean)) {
+       // Get the operations links.
+       $links = menu_contextual_links('bean', 'block', array($bean->delta));
+ 
