@@ -384,7 +384,7 @@ class Bean extends Entity {
 
       // Base it on the label and make sure it isn't too long for the database.
       if (module_exists('transliteration')) {
-        $delta = drupal_clean_css_identifier(transliteration_get($this->label));
+        $delta = drupal_clean_css_identifier(strtolower(transliteration_get($this->label)));
       }
       else {
         $delta = drupal_clean_css_identifier(strtolower($this->label));;
