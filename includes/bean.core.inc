@@ -262,6 +262,16 @@ class Bean extends Entity {
   }
 
   /**
+   * Set the revision as default
+   *
+   * @return Bean
+   */
+  public function setDefault() {
+    $this->default_revision = TRUE;
+    return $this;
+  }
+
+  /**
    * Get the plugin form
    */
   public function getForm($form, &$form_state) {
