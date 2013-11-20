@@ -1,5 +1,17 @@
 Current API VERSION: 5.
 
+Bean 7.x-1.6, 2013-11-20
+---------------------------
+#2138651 by indytechcook: Add deploy_managed_ui_form_elements() to edit/create form.
+#1941168: Add back in missing setDefault method on bean class.
+#1957986 by sylus: Bean + UUID / Deploy.
+#2112567 by webflo: Make access controller swappable.
+#2115463 by webflo: Page title is escaped twice.
+#1684250 by rimen, foopang: Transliteration module integration fix.
+#2117223 by jrbeeman: Static cache bean_block_info().
+#2123053 by dagmar: Uninstalling Bean when Shortcut module is disabled produces a fatal error.
+#2114279 by kingandy: Block cache flush introduces Block module dependency.
+
 Bean 7.x-1.5, 2013-10-23
 ---------------------------
 by DamienMcKenna: Fixed arbitrary tag in the bean title input.
