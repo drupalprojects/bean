@@ -208,6 +208,10 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     $bean = $form_state['bean'];
   }
 
+  // Add entity api defaults
+  $form['#entity_type'] = 'bean';
+  $form['bean']['#value'] = $bean;
+
   $form['label'] = array(
     '#type' => 'textfield',
     '#title' => t('Label'),
@@ -311,7 +315,7 @@ function bean_form($form, &$form_state, Bean $bean, $type = NULL) {
     '#weight' => 200,
     '#submit' => array('bean_form_submit'),
   );
-  if (!empty($bean->bid) && enitty_access('delete', 'bean', $bean)) {
+  if (!empty($bean->bid) && entity_access('delete', 'bean', $bean)) {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
