@@ -585,7 +585,7 @@ function bean_permission() {
     ),
     'administer beans' => array(
       'title' => t('Administer beans'),
-      'description' => t('Edit and view all beans.'),
+      'description' => t('Delete, add, edit and view all beans.'),
     ),
     'access bean overview' => array(
       'title' => t('Access the Bean overview page'),
