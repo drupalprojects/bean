@@ -4,4 +4,5 @@ core = 7.x
 files[] = plugins/all.inc
 dependencies[] = bean
 dependencies[] = block
+dependencies[] = menu
 package = Bean
