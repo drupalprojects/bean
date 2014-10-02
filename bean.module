@@ -415,6 +415,24 @@ function bean_bean_cache_clear() {
 
   // Flush caches.
   cache_clear_all('bean_plugins', 'cache');
+
+  if (module_exists('block')) {
+    cache_clear_all(NULL, 'cache_block');
+  }
+  cache_clear_all(NULL, 'cache_page');
+}
+
+/**
+ * Clear out cache_block table
+ * @param  object $bean the bean object
+ */
+function bean_cache_clear_block($bean = null) {
+  if (isset($bean->delta)) {
+    cache_clear_all('bean:' . $bean->delta . ':', 'cache_block', TRUE);
+  }
+  else {
+    cache_clear_all('bean:', 'cache_block', TRUE);
+  }
 }
 
 /**
