@@ -66,6 +66,9 @@ function bean_entity_info() {
           'class' => 'EntityTranslationBeanHandler',
           'base path' => 'block/%bean_delta',
           'path wildcard' => '%bean_delta',
+          'path schemes' => array(
+            'default' => array(),
+          ),
         ),
       ),
     ),
