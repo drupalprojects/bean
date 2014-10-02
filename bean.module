@@ -549,6 +549,11 @@ function bean_load_revision($bid, $vid, $reset = FALSE) {
  *   A fully-loaded $bean object or FALSE if it cannot be loaded.
  */
 function bean_load_delta($delta, $reset = FALSE, $revision = NULL) {
+  static $deltas = array();
+  if (!$reset && !$revision && isset($deltas[$delta])) {
+    return $deltas[$delta];
+  }
+
   $result = db_select('bean', 'b')
     ->fields('b', array('bid'))
     ->condition('delta', $delta)
@@ -558,7 +563,8 @@ function bean_load_delta($delta, $reset = FALSE, $revision = NULL) {
       return bean_load_revision($bid, $revision, $reset);
     }
     else {
-      return bean_load($bid, $reset);
+      $deltas[$delta] = bean_load($bid, $reset);
+      return $deltas[$delta];
     }
   }
   return FALSE;
