@@ -1,0 +1,19 @@
+diff --git a/bean_usage/bean_usage.module b/bean_usage/bean_usage.module
+index 932874a..2e5943b 100644
+--- a/bean_usage/bean_usage.module
++++ b/bean_usage/bean_usage.module
+@@ -177,10 +177,10 @@ function bean_usage_output($bean = NULL) {
+             break;
+         }
+ 
+-        $content[$bean_data->label][$bean_data->entity_type][$bean_data->delta]['bean_title'] = $bean_data->title;
+-        $content[$bean_data->label][$bean_data->entity_type][$bean_data->delta]['bean_type'] = $bean_data->type;
+-        $content[$bean_data->label][$bean_data->entity_type][$bean_data->delta]['entity_id'] = $bean_data->entity_id;
+-        $content[$bean_data->label][$bean_data->entity_type][$bean_data->delta]['entity_title'] = $entity_title;
++        $content[$bean_data->label][$bean_data->entity_type][$bean_data->entity_id]['bean_title'] = $bean_data->title;
++        $content[$bean_data->label][$bean_data->entity_type][$bean_data->entity_id]['bean_type'] = $bean_data->type;
++        $content[$bean_data->label][$bean_data->entity_type][$bean_data->entity_id]['entity_id'] = $bean_data->entity_id;
++        $content[$bean_data->label][$bean_data->entity_type][$bean_data->entity_id]['entity_title'] = $entity_title;
+ 
+         if ($delta_specific) {
+           $delta_found = TRUE;
