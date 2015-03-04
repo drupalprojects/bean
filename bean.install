@@ -224,6 +224,22 @@ function bean_uninstall() {
       }
     }
   }
+
+  // Remove all variables used by the module.
+  variable_del('bean_ctools_separate');
+  variable_del('bean_ctools_prefix');
+  variable_del('bean_usage_results_per_page');
+  // Remove all variables for field bundle settings.
+  db_delete('variable')
+    ->condition('name', 'field_bundle_settings_bean%', 'LIKE')
+    ->execute();
+  // Remove all variables for blacklisting modules.
+  // Note: it is not possible to list them here because the variable names are
+  // generated dynamically and are not defined upfront.
+  db_delete('variable')
+    ->condition('name', 'bean_all_blacklist%', 'LIKE')
+    ->execute();
+
 }
 
 /**
