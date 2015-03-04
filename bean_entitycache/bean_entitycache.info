@@ -4,5 +4,7 @@ description = "Integrates the Bean module with the Entitycache module"
 core = 7.x
 package = Performance and scalability
 
+files[] = includes/bean_entitycache.core.inc
+
 dependencies[] = bean
 dependencies[] = entitycache
