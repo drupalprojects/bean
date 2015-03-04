@@ -734,6 +734,12 @@ function bean_access($op, $bean = NULL, $account = NULL) {
       return TRUE;
     }
   }
+  elseif (isset($bean) && is_string($bean)) {
+    if (user_access("$op any {$bean} bean", $account)) {
+      $rights[$account->uid][$cid][$op] = TRUE;
+      return TRUE;
+    }
+  }
   else {
     // Here we are looking for access to any of the types.
     foreach (bean_get_types() as $bean_type) {
