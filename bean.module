@@ -309,6 +309,14 @@ function bean_type_load($type) {
 }
 
 /**
+ * Menu Argument Loader for panelizer tab.
+ */
+function bean_type_panelizer_load($type) {
+  $type = bean_load_plugin_class(strtr($type, array('-' => '_')));
+  return $type->type;
+}
+
+/**
  * Gets an array of all bean types, keyed by the type name.
  *
  * @return BeanType
@@ -1161,3 +1169,13 @@ function bean_ctools_block_info($module, $delta, &$info) {
   }
 }
 
+/**
+ * Implements hook_ctools_plugin_directory().
+ *
+ * Inform ctools about our panelizer plugin.
+ */
+function bean_ctools_plugin_directory($module, $plugin) {
+  if (in_array($module, array('panelizer'))) {
+    return 'plugins/' . $plugin;
+  }
+}
