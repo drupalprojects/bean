@@ -12,6 +12,6 @@ files[] = views/views_handler_field_bean_edit_link.inc
 files[] = views/views_handler_field_bean_delete_link.inc
 files[] = views/views_handler_field_bean_operations.inc
 files[] = bean.test
-dependencies[] = entity (>=7.x-1.0)
+dependencies[] = entity
 dependencies[] = ctools
 package = Bean
