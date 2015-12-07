@@ -5,6 +5,8 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
 #2527008 by axel.rutz: Display cache breaks bean display.
 #2465267 by brantwynn: Bean insists we use a tagged release of Entity API and
   that's simply not happening.
+#2576711 by a.milkovsky: Missing isNewEntity() method caused problems with e.g.
+  entity_extract_ids(), Deploy, etc.
 
 
 Bean 7.x-1.9, 2015-03-03
