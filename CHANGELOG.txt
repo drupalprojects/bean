@@ -7,6 +7,7 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
   that's simply not happening.
 #2576711 by a.milkovsky: Missing isNewEntity() method caused problems with e.g.
   entity_extract_ids(), Deploy, etc.
+#2623448 by helmo: Ensure uuid.install is loaded when overloading its schema.
 
 
 Bean 7.x-1.9, 2015-03-03
