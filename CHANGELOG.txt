@@ -10,7 +10,9 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
 #2623448 by helmo: Ensure uuid.install is loaded when overloading its schema.
 #1995770 by kris84, Albert Volkman: Use the label as the entity label, not the
   title. This should resolve a number of issues with other modules.
-
+#2572517 by JeroenT: Weights of submit buttons on the bean form results in the
+  Entity Translation 'Remove translation' button appearing before the 'save'
+  button.
 
 Bean 7.x-1.9, 2015-03-03
 ------------------------
