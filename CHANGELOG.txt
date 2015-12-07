@@ -8,6 +8,8 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
 #2576711 by a.milkovsky: Missing isNewEntity() method caused problems with e.g.
   entity_extract_ids(), Deploy, etc.
 #2623448 by helmo: Ensure uuid.install is loaded when overloading its schema.
+#1995770 by kris84, Albert Volkman: Use the label as the entity label, not the
+  title. This should resolve a number of issues with other modules.
 
 
 Bean 7.x-1.9, 2015-03-03

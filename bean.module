@@ -24,7 +24,7 @@ function bean_entity_info() {
       'entity keys' => array(
         'id' => 'bid',
         'bundle' => 'type',
-        'label' => 'title',
+        'label' => 'label',
         'name' => 'delta',
         'revision' => 'vid',
         'default revision' => 'default_revision',
