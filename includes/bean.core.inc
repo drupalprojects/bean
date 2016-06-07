@@ -185,7 +185,7 @@ class Bean extends Entity {
   }
 
   public function adminTitle() {
-    return check_plain($this->label);
+    return filter_xss_admin($this->label);
   }
 
   protected function setUp() {
