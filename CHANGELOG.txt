@@ -13,6 +13,12 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
 #2572517 by JeroenT: Weights of submit buttons on the bean form results in the
   Entity Translation 'Remove translation' button appearing before the 'save'
   button.
+#2743457 by dan.munn, max.parker: Bean labels being encoded on admin pages
+#2714693 by fullerja: In watchdog logging, use type rather than typeName()
+#2702495 by plopesc: Get rid of bean_load_delta() in Bean entity class for
+  better compatibility and performance
+#2459041 by jsacksick: Use bean_access as access callback for block/add/(type)
+#2267391 by freality: Bean properties display as improper type in Views
 
 Bean 7.x-1.9, 2015-03-03
 ------------------------
