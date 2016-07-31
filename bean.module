@@ -117,7 +117,8 @@ function bean_menu() {
         'title callback' => 'check_plain',
         'page callback' => 'bean_add',
         'page arguments' => array($type->type),
-        'access arguments' => array('create any ' . $type->type . ' bean'),
+        'access callback' => 'bean_access',
+        'access arguments' => array('create', $type->type),
         'file' => 'includes/bean.pages.inc',
       );
     }
