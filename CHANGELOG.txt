@@ -3,7 +3,7 @@ Current API VERSION: 5.
 Bean 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------
 
-Bean 7.x-1.0-beta10, 2016-08-03
+Bean 7.x-1.10, 2016-08-03
 ----------------------------
 #2527008 by axel.rutz: Display cache breaks bean display.
 #2465267 by brantwynn: Bean insists we use a tagged release of Entity API and
