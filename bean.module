@@ -429,7 +429,6 @@ function bean_bean_cache_clear() {
 
   // Flush caches.
   cache_clear_all('bean_plugins', 'cache');
-  cache_clear_all('bean_block_info', 'cache');
 
   if (module_exists('block')) {
     cache_clear_all(NULL, 'cache_block');
@@ -448,8 +447,6 @@ function bean_cache_clear_block($bean = null) {
   else {
     cache_clear_all('bean:', 'cache_block', TRUE);
   }
-
-  cache_clear_all('bean_block_info', 'cache');
 }
 
 /**
@@ -856,12 +853,6 @@ function bean_block_info() {
     return $blocks;
   }
 
-  $cache = cache_get('bean_block_info', 'cache');
-  if ($cache) {
-    $blocks = $cache->data;
-    return $blocks;
-  }
-
   $blocks = array();
   $beans = bean_get_all_beans();
   foreach ($beans as $bean) {
@@ -870,8 +861,6 @@ function bean_block_info() {
       'cache' => $bean->getInfo('cache_level'),
     );
   }
-
-  cache_set('bean_block_info', $blocks, 'cache');
 
   return $blocks;
 }
