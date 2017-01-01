@@ -1,10 +1,12 @@
 Current API VERSION: 5.
 
-Bean 7.x-1.x-dev, xxxx-xx-xx
-----------------------------
+Bean 7.x-1.11, 2016-08-08
+-------------------------
+Reverted: #2527008 by axel.rutz: Display cache breaks bean display
+
 
 Bean 7.x-1.10, 2016-08-03
-----------------------------
+-------------------------
 #2527008 by axel.rutz: Display cache breaks bean display.
 #2465267 by brantwynn: Bean insists we use a tagged release of Entity API and
   that's simply not happening.
@@ -22,6 +24,7 @@ Bean 7.x-1.10, 2016-08-03
   better compatibility and performance
 #2459041 by jsacksick: Use bean_access as access callback for block/add/(type)
 #2267391 by freality: Bean properties display as improper type in Views
+
 
 Bean 7.x-1.9, 2015-03-03
 ------------------------
