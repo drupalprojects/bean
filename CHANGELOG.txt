@@ -4,6 +4,9 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------
 #2375291 by kyletaylored: Allow the view mode to be controlled in
   bean_view_page().
+#2734693 by joseph.olstad, Fabianx, krlucas, sylus: Add persistent caching to
+  bean_block_info() to avoid loading all beans at run-time when using Panels /
+  CTools content type block plugin.
 
 
 Bean 7.x-1.11, 2016-08-08
