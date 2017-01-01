@@ -10,8 +10,10 @@
  */
 function bean_view_page(Bean $bean) {
   $title = $bean->label() ? $bean->label() : $bean->adminTitle();
+  $view_mode = ($bean->view_mode) ? $bean->view_mode : 'default';
   drupal_set_title($title);
-  return bean_view($bean);
+
+  return bean_view($bean, $view_mode);
 }
 
 /**

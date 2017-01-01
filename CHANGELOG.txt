@@ -2,6 +2,8 @@ Current API VERSION: 5.
 
 Bean 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------
+#2375291 by kyletaylored: Allow the view mode to be controlled in
+  bean_view_page().
 
 
 Bean 7.x-1.11, 2016-08-08
