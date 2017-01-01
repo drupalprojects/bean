@@ -1,5 +1,9 @@
 Current API VERSION: 5.
 
+Bean 7.x-1.x-dev, xxxx-xx-xx
+----------------------------
+
+
 Bean 7.x-1.11, 2016-08-08
 -------------------------
 Reverted: #2527008 by axel.rutz: Display cache breaks bean display
