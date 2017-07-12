@@ -75,6 +75,9 @@ function bean_entity_info() {
           ),
         ),
       ),
+
+      // @see devel_contrib.module
+      'devel contrib generator class' => 'DevelContribGeneratorDefault',
     ),
   );
 

@@ -9,6 +9,7 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
   CTools content type block plugin.
 #2894054 by DamienMcKenna: Undefined index: type in DevelContribGeneratorDefault
   ->createEntity().
+#2894053 by DamienMcKenna: Add support for Devel (Contrib) Generate.
 
 
 Bean 7.x-1.11, 2016-08-08
