@@ -7,6 +7,8 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
 #2734693 by joseph.olstad, Fabianx, krlucas, sylus: Add persistent caching to
   bean_block_info() to avoid loading all beans at run-time when using Panels /
   CTools content type block plugin.
+#2894054 by DamienMcKenna: Undefined index: type in DevelContribGeneratorDefault
+  ->createEntity().
 
 
 Bean 7.x-1.11, 2016-08-08
