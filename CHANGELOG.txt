@@ -10,6 +10,7 @@ Bean 7.x-1.x-dev, xxxx-xx-xx
 #2894054 by DamienMcKenna: Undefined index: type in DevelContribGeneratorDefault
   ->createEntity().
 #2894053 by DamienMcKenna: Add support for Devel (Contrib) Generate.
+#2940081 by DamienMcKenna: Clean up existing tests.
 
 
 Bean 7.x-1.11, 2016-08-08

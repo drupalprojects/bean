@@ -1,6 +1,12 @@
 name = Bean
 description = Create Bean (Block Entities)
 core = 7.x
+package = Bean
+
+; These modules are required.
+dependencies[] = ctools
+dependencies[] = entity
+
 files[] = includes/bean.core.inc
 files[] = includes/bean.info.inc
 files[] = plugins/BeanPlugin.class.php
@@ -12,7 +18,9 @@ files[] = views/views_handler_field_bean_type.inc
 files[] = views/views_handler_field_bean_edit_link.inc
 files[] = views/views_handler_field_bean_delete_link.inc
 files[] = views/views_handler_field_bean_operations.inc
-files[] = bean.test
-dependencies[] = entity
-dependencies[] = ctools
-package = Bean
+
+; Tests.
+files[] = tests/BeanSetup.test
+files[] = tests/BeanTests.test
+files[] = tests/BeanTestPlugins.test
+files[] = tests/BeanUnitTests.test
